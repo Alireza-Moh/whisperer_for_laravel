@@ -1,0 +1,17 @@
+<idea-plugin>
+    <id>at.alirezamoh.idea_whisperer_for_laravel</id>
+
+    <name>Idea Whisperer For Laravel</name>
+
+    <vendor email="" url="https://github.com/Alireza-Moh/idea-whisperer-for-laravel">Idea Whisperer For Laravel</vendor>
+
+    <description>Idea Whisperer For Laravel enables you to develop faster</description>
+
+    <depends>com.jetbrains.php</depends>
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.jetbrains.php.blade</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+
+    </extensions>
+</idea-plugin>
