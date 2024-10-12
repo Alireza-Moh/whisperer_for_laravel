@@ -25,7 +25,10 @@ abstract public class BaseServiceProviderVisitor extends PsiRecursiveElementWalk
      */
     protected SettingsState projectSettingState;
 
-    protected PsiDirectory rootDir;
+    /**
+     * The module root directory path
+     */
+    protected PsiDirectory moduleRootDirectoryPath;
 
     /**
      * @param project The current project
@@ -34,7 +37,7 @@ abstract public class BaseServiceProviderVisitor extends PsiRecursiveElementWalk
         this.project = project;
         this.projectSettingState = SettingsState.getInstance(project);
 
-        rootDir = DirectoryPsiUtil.getDirectory(
+        moduleRootDirectoryPath = DirectoryPsiUtil.getDirectory(
             project,
             projectSettingState.getModuleRootDirectoryPath()
         );

@@ -1,7 +1,6 @@
 package at.alirezamoh.idea_whisperer_for_laravel.config.visitors;
 
 import at.alirezamoh.idea_whisperer_for_laravel.config.ConfigModule;
-import at.alirezamoh.idea_whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
 import at.alirezamoh.idea_whisperer_for_laravel.support.applicationModules.visitors.BaseServiceProviderVisitor;
 import at.alirezamoh.idea_whisperer_for_laravel.support.strUtil.StrUtil;
 import com.intellij.openapi.project.Project;
@@ -65,8 +64,8 @@ public class ConfigModuleServiceProviderVisitor extends BaseServiceProviderVisit
             return;
         }
 
-        if (rootDir != null) {
-            for (PsiDirectory module : rootDir.getSubdirectories()) {
+        if (moduleRootDirectoryPath != null) {
+            for (PsiDirectory module : moduleRootDirectoryPath.getSubdirectories()) {
                 PsiDirectory configDir = module.findSubdirectory("config");
 
                 if (configDir != null) {

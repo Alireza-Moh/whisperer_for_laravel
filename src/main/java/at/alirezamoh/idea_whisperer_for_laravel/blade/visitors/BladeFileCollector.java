@@ -40,6 +40,9 @@ public class BladeFileCollector {
      */
     private SettingsState projectSettingState;
 
+    /**
+     * Should save the blade file psiFile
+     */
     private boolean withPsiFile;
 
     public BladeFileCollector(Project project) {

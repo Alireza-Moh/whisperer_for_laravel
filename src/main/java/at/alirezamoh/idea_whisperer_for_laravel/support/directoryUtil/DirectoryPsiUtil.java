@@ -9,6 +9,8 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
+import com.intellij.psi.impl.source.PsiFileImpl;
+import com.jetbrains.php.lang.psi.PhpFile;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -54,7 +56,11 @@ public class DirectoryPsiUtil {
      * @param files     The list to store the collected files
      */
     public static void collectFilesRecursively(PsiDirectory directory, List<PsiFile> files) {
-        files.addAll(List.of(directory.getFiles()));
+        for (PsiFile file : directory.getFiles()) {
+            if (file instanceof PhpFile) {
+                files.add(file);
+            }
+        }
 
         for (PsiDirectory subdirectory : directory.getSubdirectories()) {
             collectFilesRecursively(subdirectory, files);

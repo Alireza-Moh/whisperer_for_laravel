@@ -43,7 +43,7 @@ public class BladeModuleServiceProviderVisitor extends BaseServiceProviderVisito
         if (element instanceof MethodReference methodReference) {
             String methodName = methodReference.getName();
             if (methodName != null && methodName.equals(LOAD_VIEWS_METHOD)) {
-                this.iterateOverModules(methodReference);
+                this.initParameters(methodReference);
             }
         }
         super.visitElement(element);
@@ -61,7 +61,7 @@ public class BladeModuleServiceProviderVisitor extends BaseServiceProviderVisito
      * Iterates over the modules in the project and searches for Blade files
      * @param method The method reference being visited
      */
-    private void iterateOverModules(MethodReference method) {
+    private void initParameters(MethodReference method) {
         String viewNamespace = this.getSecondParameterFromMethod(method);
         String viewDirName = getFirstParameterFromMethod(method);
 
@@ -69,9 +69,9 @@ public class BladeModuleServiceProviderVisitor extends BaseServiceProviderVisito
             return;
         }
 
-        if (rootDir != null) {
+        if (moduleRootDirectoryPath != null) {
             viewDirName = StrUtil.getLastWord(viewDirName);
-            for (PsiDirectory module : rootDir.getSubdirectories()) {
+            for (PsiDirectory module : moduleRootDirectoryPath.getSubdirectories()) {
                 PsiDirectory resourcesDir = module.findSubdirectory("resources");
 
                 if (resourcesDir != null) {
