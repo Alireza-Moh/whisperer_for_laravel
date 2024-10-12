@@ -1,8 +1,10 @@
 package at.alirezamoh.idea_whisperer_for_laravel.support.applicationModules.visitors;
 
 import at.alirezamoh.idea_whisperer_for_laravel.settings.SettingsState;
+import at.alirezamoh.idea_whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
 import at.alirezamoh.idea_whisperer_for_laravel.support.strUtil.StrUtil;
 import com.intellij.openapi.project.Project;
+import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
@@ -23,12 +25,19 @@ abstract public class BaseServiceProviderVisitor extends PsiRecursiveElementWalk
      */
     protected SettingsState projectSettingState;
 
+    protected PsiDirectory rootDir;
+
     /**
      * @param project The current project
      */
     public BaseServiceProviderVisitor(Project project) {
         this.project = project;
         this.projectSettingState = SettingsState.getInstance(project);
+
+        rootDir = DirectoryPsiUtil.getDirectory(
+            project,
+            projectSettingState.getModuleRootDirectoryPath()
+        );
     }
 
     /**

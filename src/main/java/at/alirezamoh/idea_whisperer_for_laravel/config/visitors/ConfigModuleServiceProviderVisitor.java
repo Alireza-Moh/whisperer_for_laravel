@@ -24,15 +24,11 @@ public class ConfigModuleServiceProviderVisitor extends BaseServiceProviderVisit
 
     private List<ConfigModule> configFilesInModule = new ArrayList<>();
 
-    private PsiDirectory rootDir;
-
     /**
      * @param project The current project
      */
     public ConfigModuleServiceProviderVisitor(Project project) {
         super(project);
-
-        rootDir = DirectoryPsiUtil.getDirectory(project, projectSettingState.getModuleRootDirectoryPath());
     }
 
     /**
@@ -68,11 +64,6 @@ public class ConfigModuleServiceProviderVisitor extends BaseServiceProviderVisit
         if (configKeyIdentifier == null || configFileName == null) {
             return;
         }
-
-        PsiDirectory rootDir = DirectoryPsiUtil.getDirectory(
-            project,
-            projectSettingState.getModuleRootDirectoryPath()
-        );
 
         if (rootDir != null) {
             for (PsiDirectory module : rootDir.getSubdirectories()) {
