@@ -9,6 +9,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.ParameterList;
 import com.jetbrains.php.lang.psi.elements.PhpExpression;
+import com.jetbrains.php.lang.psi.elements.impl.ArrayHashElementImpl;
 import com.jetbrains.php.lang.psi.elements.impl.FunctionReferenceImpl;
 import com.jetbrains.php.lang.psi.elements.impl.MethodReferenceImpl;
 import org.jetbrains.annotations.Nullable;
@@ -158,6 +159,37 @@ public class PsiUtil {
         }
 
         return key;
+    }
+
+    /**
+     * Checks if the caret is within the value part of an array hash element
+     * @param element The PSI element to check
+     * @param offset  The current caret offset
+     * @return        True if the caret is in the array value, false otherwise
+     */
+    public static boolean isCaretInArrayValue(PsiElement element, int offset) {
+        ArrayHashElementImpl arrayElement = PsiTreeUtil.getParentOfType(element, ArrayHashElementImpl.class);
+
+        if (arrayElement != null) {
+            PsiElement value = arrayElement.getValue();
+            return value != null && isInRange(value, offset);
+        }
+        return false;
+    }
+
+    /**
+     * Checks if the caret is within the second parameter of a method call
+     * @param element The PSI element to check
+     * @return        True if the caret is in the second parameter, false otherwise
+     */
+    public static boolean isCaretInMethodSecParameter(PsiElement element) {
+        MethodReferenceImpl method = PsiTreeUtil.getParentOfType(element, MethodReferenceImpl.class);
+
+        if (method != null) {
+            PsiElement[] parameters = method.getParameters();
+            return parameters.length > 0 && PsiUtil.isInRange(parameters[1], getOffset(element));
+        }
+        return false;
     }
 
     /**

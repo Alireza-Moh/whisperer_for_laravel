@@ -21,5 +21,7 @@
         <psi.referenceContributor  language="PHP" implementation="at.alirezamoh.idea_whisperer_for_laravel.blade.BladeReferenceContributor"/>
         <psi.referenceContributor  language="PHP" implementation="at.alirezamoh.idea_whisperer_for_laravel.routing.RouteReferenceContributor"/>
         <psi.referenceContributor  language="PHP" implementation="at.alirezamoh.idea_whisperer_for_laravel.gate.GateReferenceContributor"/>
+
+        <completion.contributor language="PHP" implementationClass="at.alirezamoh.idea_whisperer_for_laravel.formRequest.RuleValidationCompletionContributor"/>
     </extensions>
 </idea-plugin>
