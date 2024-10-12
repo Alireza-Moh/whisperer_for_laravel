@@ -20,5 +20,6 @@
         <psi.referenceContributor  language="PHP" implementation="at.alirezamoh.idea_whisperer_for_laravel.config.ConfigReferenceContributor"/>
         <psi.referenceContributor  language="PHP" implementation="at.alirezamoh.idea_whisperer_for_laravel.blade.BladeReferenceContributor"/>
         <psi.referenceContributor  language="PHP" implementation="at.alirezamoh.idea_whisperer_for_laravel.routing.RouteReferenceContributor"/>
+        <psi.referenceContributor  language="PHP" implementation="at.alirezamoh.idea_whisperer_for_laravel.gate.GateReferenceContributor"/>
     </extensions>
 </idea-plugin>

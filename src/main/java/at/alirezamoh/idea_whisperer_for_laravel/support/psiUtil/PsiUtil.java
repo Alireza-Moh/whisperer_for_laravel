@@ -1,13 +1,17 @@
 package at.alirezamoh.idea_whisperer_for_laravel.support.psiUtil;
 
+import at.alirezamoh.idea_whisperer_for_laravel.support.strUtil.StrUtil;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.jetbrains.php.lang.psi.elements.MethodReference;
+import com.jetbrains.php.lang.psi.elements.ParameterList;
 import com.jetbrains.php.lang.psi.elements.PhpExpression;
 import com.jetbrains.php.lang.psi.elements.impl.FunctionReferenceImpl;
 import com.jetbrains.php.lang.psi.elements.impl.MethodReferenceImpl;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -116,6 +120,44 @@ public class PsiUtil {
     public static boolean isInRange(PsiElement firstParameter, int offset) {
         TextRange parameterRange = firstParameter.getTextRange();
         return parameterRange.contains(offset);
+    }
+
+    /**
+     * Extracts the first parameter from a method
+     * @param method method reference
+     * @return the first parameter value
+     */
+    public static String getFirstParameterFromMethod(MethodReference method) {
+        String key = "";
+
+        ParameterList parameters = method.getParameterList();
+        if (parameters != null) {
+            PsiElement namespaceParameter = parameters.getParameter(0);
+            if (namespaceParameter != null) {
+                key = StrUtil.removeQuotes(namespaceParameter.getText());
+            }
+        }
+
+        return key;
+    }
+
+    /**
+     * Extracts the second parameter from a method
+     * @param method method reference
+     * @return the second parameter value
+     */
+    public static @Nullable String getSecondParameterFromMethod(MethodReference method) {
+        String key = null;
+
+        ParameterList parameters = method.getParameterList();
+        if (parameters != null) {
+            PsiElement namespaceParameter = parameters.getParameter(1);
+            if (namespaceParameter != null) {
+                key = StrUtil.removeQuotes(namespaceParameter.getText());
+            }
+        }
+
+        return key;
     }
 
     /**

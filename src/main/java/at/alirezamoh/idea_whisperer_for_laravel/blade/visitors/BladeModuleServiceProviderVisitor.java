@@ -2,6 +2,7 @@ package at.alirezamoh.idea_whisperer_for_laravel.blade.visitors;
 
 import at.alirezamoh.idea_whisperer_for_laravel.blade.BladeModule;
 import at.alirezamoh.idea_whisperer_for_laravel.support.applicationModules.visitors.BaseServiceProviderVisitor;
+import at.alirezamoh.idea_whisperer_for_laravel.support.psiUtil.PsiUtil;
 import at.alirezamoh.idea_whisperer_for_laravel.support.strUtil.StrUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
@@ -62,8 +63,8 @@ public class BladeModuleServiceProviderVisitor extends BaseServiceProviderVisito
      * @param method The method reference being visited
      */
     private void initParameters(MethodReference method) {
-        String viewNamespace = this.getSecondParameterFromMethod(method);
-        String viewDirName = getFirstParameterFromMethod(method);
+        String viewNamespace = PsiUtil.getSecondParameterFromMethod(method);
+        String viewDirName = PsiUtil.getFirstParameterFromMethod(method);
 
         if (viewNamespace == null || viewDirName == null) {
             return;

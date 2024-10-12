@@ -2,6 +2,7 @@ package at.alirezamoh.idea_whisperer_for_laravel.config.visitors;
 
 import at.alirezamoh.idea_whisperer_for_laravel.config.ConfigModule;
 import at.alirezamoh.idea_whisperer_for_laravel.support.applicationModules.visitors.BaseServiceProviderVisitor;
+import at.alirezamoh.idea_whisperer_for_laravel.support.psiUtil.PsiUtil;
 import at.alirezamoh.idea_whisperer_for_laravel.support.strUtil.StrUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
@@ -57,8 +58,8 @@ public class ConfigModuleServiceProviderVisitor extends BaseServiceProviderVisit
      * @param method method reference being visited
      */
     private void initParameters(MethodReference method) {
-        String configKeyIdentifier = getSecondParameterFromMethod(method);
-        String configFileName = getFirstParameterFromMethod(method);
+        String configKeyIdentifier = PsiUtil.getSecondParameterFromMethod(method);
+        String configFileName = PsiUtil.getFirstParameterFromMethod(method);
 
         if (configKeyIdentifier == null || configFileName == null) {
             return;
