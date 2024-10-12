@@ -17,5 +17,6 @@
         <projectConfigurable parentId="language" instance="at.alirezamoh.idea_whisperer_for_laravel.settings.SettingConfigurable" id="idea_whisperer_for_laravel_settings" displayName="Idea Whisperer For Laravel" nonDefaultProject="true"/>
         <projectService serviceImplementation="at.alirezamoh.idea_whisperer_for_laravel.settings.SettingsState"/>
 
+        <psi.referenceContributor  language="PHP" implementation="at.alirezamoh.idea_whisperer_for_laravel.config.ConfigReferenceContributor"/>
     </extensions>
 </idea-plugin>

@@ -96,4 +96,12 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
     public void setRootAppPath(String rootAppPath) {
         this.rootAppPath = rootAppPath;
     }
+
+    /**
+     * Checks if the project is a module-based application
+     * @return True if the project is a module-based application, false otherwise
+     */
+    public boolean isModuleApplication() {
+        return "Module based Application".equals(projectType);
+    }
 }
