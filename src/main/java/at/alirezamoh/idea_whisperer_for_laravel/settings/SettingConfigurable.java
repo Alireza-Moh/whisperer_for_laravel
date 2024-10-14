@@ -2,7 +2,6 @@ package at.alirezamoh.idea_whisperer_for_laravel.settings;
 
 
 import com.intellij.openapi.options.Configurable;
-import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.NlsContexts;
 import org.jetbrains.annotations.Nullable;
@@ -15,6 +14,9 @@ public class SettingConfigurable implements Configurable {
      */
     private SettingsState settingsState;
 
+    /**
+     * The UI component
+     */
     private SettingsComponent settingsComponent;
 
     public SettingConfigurable(Project project) {
@@ -41,7 +43,9 @@ public class SettingConfigurable implements Configurable {
 
             || !settingsComponent.getModuleRootDirectoryPath().equals(settingsState.getModuleRootDirectoryPath())
 
-            || !settingsComponent.getRootAppPath().equals(settingsState.getRootAppPath());
+            || !settingsComponent.getRootAppPath().equals(settingsState.getRootAppPath())
+
+            || !settingsComponent.getModuleSrcDirectoryName().equals(settingsState.getModuleSrcDirectoryName());
     }
 
     @Override
@@ -50,6 +54,7 @@ public class SettingConfigurable implements Configurable {
         settingsState.setProjectType(settingsComponent.getProjectType());
         settingsState.setModuleRootDirectoryPath(settingsComponent.getModuleRootDirectoryPath());
         settingsState.setRootAppPath(settingsComponent.getRootAppPath());
+        settingsState.setModuleSrcDirectoryName(settingsComponent.getModuleSrcDirectoryName());
     }
 
     @Override
@@ -58,6 +63,7 @@ public class SettingConfigurable implements Configurable {
         settingsComponent.setProjectTypeComboBox(settingsState.getProjectType());
         settingsComponent.setModuleRootDirectoryPathTextField(settingsState.getModuleRootDirectoryPath());
         settingsComponent.setRootAppPathTextField(settingsState.getRootAppPath());
+        settingsComponent.setModuleSrcDirectoryName(settingsState.getModuleSrcDirectoryName());
     }
 
     @Override

@@ -1,5 +1,6 @@
 package at.alirezamoh.idea_whisperer_for_laravel.settings;
 
+import com.intellij.ide.HelpTooltip;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBTextField;
@@ -29,6 +30,16 @@ public class SettingsComponent {
      * Label for the root directory path field
      */
     private final JBLabel moduleRootDirectoryPathLabel = new JBLabel("Module root directory:");
+
+    /**
+     * Label for the module src directory name
+     */
+    private final JBLabel moduleSrcDirectoryLabel = new JBLabel("Module src directory name:");
+
+    /**
+     * Text field to input module src directory name for module-based projects
+     */
+    private final JBTextField moduleSrcDirectoryTextField = new JBTextField();
 
     /**
      * Label for the root app path field
@@ -105,11 +116,22 @@ public class SettingsComponent {
         this.projectTypeComboBox.setSelectedItem(selectedItem);
     }
 
+    public String getModuleSrcDirectoryName() {
+        return moduleSrcDirectoryTextField.getText();
+    }
+
+    public void setModuleSrcDirectoryName(String srcDirName) {
+        this.moduleSrcDirectoryTextField.setText(srcDirName);
+    }
+
     private void hideModuleTextFields() {
         projectTypeComboBox.setPreferredSize(new java.awt.Dimension(300, projectTypeComboBox.getPreferredSize().height));
 
         moduleRootDirectoryPathLabel.setVisible(false);
         moduleRootDirectoryPathTextField.setVisible(false);
+
+        moduleSrcDirectoryLabel.setVisible(false);
+        moduleSrcDirectoryTextField.setVisible(false);
 
         rootAppPathLabel.setVisible(false);
         rootAppPathTextField.setVisible(false);
@@ -144,11 +166,32 @@ public class SettingsComponent {
             false
         )
         .addLabeledComponent(
+            moduleSrcDirectoryLabel,
+            moduleSrcDirectoryTextField,
+            10,
+            false
+        )
+        .addLabeledComponent(
             rootAppPathLabel,
             rootAppPathTextField,
             10,
             false
         );
+
+        new HelpTooltip()
+            .setLocation(HelpTooltip.Alignment.RIGHT)
+            .setDescription("The main folder where all your project modules are located")
+            .installOn(moduleRootDirectoryPathTextField);
+
+        new HelpTooltip()
+            .setLocation(HelpTooltip.Alignment.RIGHT)
+            .setDescription("The folder name containing the core code for directories like (e.g., Controllers, Commands)")
+            .installOn(moduleSrcDirectoryTextField);
+
+        new HelpTooltip()
+            .setLocation(HelpTooltip.Alignment.RIGHT)
+            .setDescription("The folder path containing the primary code for your application default is app")
+            .installOn(rootAppPathTextField);
     }
 
     private void fillPanel() {
@@ -169,6 +212,10 @@ public class SettingsComponent {
 
                 rootAppPathLabel.setVisible(isSimpleDirectoryModule);
                 rootAppPathTextField.setVisible(isSimpleDirectoryModule);
+
+                moduleSrcDirectoryTextField.setText("app");
+                moduleSrcDirectoryLabel.setVisible(isSimpleDirectoryModule);
+                moduleSrcDirectoryTextField.setVisible(isSimpleDirectoryModule);
             }
         });
     }

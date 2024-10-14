@@ -36,6 +36,8 @@ final public class ProjectDefaultPaths {
 
     public static final String DB_SEEDER_PATH = "/database/seeders/";
 
+    public static final String MIGRATION_PATH = "/database/migrations/";
+
     public static final String CONTROLLER_PATH = "/Http/Controllers/";
 
     public static final String APP_SERVICE_PROVIDER_PATH = "/app/Providers/AppServiceProvider.php";

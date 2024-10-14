@@ -62,4 +62,32 @@ public class StrUtil {
 
         return afterSlash.substring(lastSpaceIndex + 1);
     }
+
+    public static String snake(String value) {
+        if (!value.equals(value.toLowerCase())) {
+            value = value.replaceAll("([a-z])([A-Z])", "$1" + "_" + "$2").toLowerCase();
+        }
+
+        return value;
+    }
+
+    public static String camel(String value) {
+        String camelCaseValue = toStudlyCase(value);
+
+        return Character.toLowerCase(camelCaseValue.charAt(0)) + camelCaseValue.substring(1);
+    }
+
+    private static String toStudlyCase(String value) {
+        String[] words = value.split("[\\s_-]+");
+
+        StringBuilder result = new StringBuilder();
+        for (String word : words) {
+            if (!word.isEmpty()) {
+                result.append(Character.toUpperCase(word.charAt(0)))
+                    .append(word.substring(1).toLowerCase());
+            }
+        }
+
+        return result.toString();
+    }
 }

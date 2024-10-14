@@ -1,6 +1,5 @@
 package at.alirezamoh.idea_whisperer_for_laravel.settings;
 
-import com.intellij.configurationStore.Property;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
@@ -22,11 +21,6 @@ import org.jetbrains.annotations.Nullable;
 )
 public class SettingsState implements PersistentStateComponent<SettingsState> {
     /**
-     * Flag indicating if the project is a Docker project
-     */
-    private boolean dockerProject;
-
-    /**
      * The name of the PHP Docker container
      */
     private String phpDockerContainerName;
@@ -45,6 +39,11 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
      * The root app path like "app/"
      */
     private String rootAppPath;
+
+    /**
+     * Module src path
+     */
+    private String moduleSrcDirectoryName;
 
     public static SettingsState getInstance(@NotNull Project project) {
         return project.getService(SettingsState.class);
@@ -97,11 +96,37 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
         this.rootAppPath = rootAppPath;
     }
 
+    public String getModuleSrcDirectoryName() {
+        return moduleSrcDirectoryName;
+    }
+
+    public void setModuleSrcDirectoryName(String moduleSrcDirectoryName) {
+        this.moduleSrcDirectoryName = moduleSrcDirectoryName;
+    }
+
     /**
      * Checks if the project is a module-based application
      * @return True if the project is a module-based application, false otherwise
      */
     public boolean isModuleApplication() {
         return "Module based Application".equals(projectType);
+    }
+
+    /**
+     * Replaces backslashes with forward slashes and ensures the path starts and ends with a slash
+     * @param text The text to process
+     * @return The processed text
+     */
+    public String replaceAndSlashes(String text) {
+        text = text.replace("\\", "/");
+
+        if (!text.startsWith("/")) {
+            text = "/" + text;
+        }
+        if (!text.endsWith("/")) {
+            text = text + "/";
+        }
+
+        return text;
     }
 }

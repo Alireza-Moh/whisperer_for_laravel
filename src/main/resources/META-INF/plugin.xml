@@ -24,4 +24,65 @@
 
         <completion.contributor language="PHP" implementationClass="at.alirezamoh.idea_whisperer_for_laravel.formRequest.RuleValidationCompletionContributor"/>
     </extensions>
+
+    <actions>
+    <group id="at.alirezamoh.idea_whisperer_for_laravel.Actions" class="at.alirezamoh.idea_whisperer_for_laravel.actions.StartPluginAction" text="Idea Whisperer For Laravel" popup="true" description="The start point of the laravel plugin helper">
+        <add-to-group group-id="MainMenu" anchor="last"/>
+
+        <action class="at.alirezamoh.idea_whisperer_for_laravel.actions.ActionChooserAction" text="Search for Generation" icon="/icons/laravelIcon.svg">
+            <keyboard-shortcut first-keystroke="control shift PERIOD" keymap="$default" replace-all="false" />
+        </action>
+
+        <separator />
+
+        <group id="at.alirezamoh.idea_whisperer_for_laravel.AllCodeGenerationActionsGroupAction" popup="true" icon="/icons/laravelIcon.svg" text="All Available Code Generations">
+            &gt;
+
+            <action class="at.alirezamoh.idea_whisperer_for_laravel.actions.ControllerAction" text="Create Controller" icon="/icons/laravelIcon.svg">
+            </action>
+
+            <action class="at.alirezamoh.idea_whisperer_for_laravel.actions.ConfigAction" text="Create Config File" icon="/icons/laravelIcon.svg">
+            </action>
+
+            <action class="at.alirezamoh.idea_whisperer_for_laravel.actions.BladeComponentAction" text="Create Blade Component" icon="/icons/laravelIcon.svg">
+            </action>
+
+            <action class="at.alirezamoh.idea_whisperer_for_laravel.actions.ConsoleAction" text="Create Console Command" icon="/icons/laravelIcon.svg">
+            </action>
+
+            <action class="at.alirezamoh.idea_whisperer_for_laravel.actions.ViewAction" text="Create View" icon="/icons/laravelIcon.svg">
+            </action>
+
+            <action class="at.alirezamoh.idea_whisperer_for_laravel.actions.JobAction" text="Create Job" icon="/icons/laravelIcon.svg">
+            </action>
+
+            <action class="at.alirezamoh.idea_whisperer_for_laravel.actions.ValidationRuleAction" text="Create Validation Rule" icon="/icons/laravelIcon.svg">
+            </action>
+
+            <action class="at.alirezamoh.idea_whisperer_for_laravel.actions.PolicyAction" text="Create Policy" icon="/icons/laravelIcon.svg">
+            </action>
+
+            <action class="at.alirezamoh.idea_whisperer_for_laravel.actions.ObserverAction" text="Create Observer" icon="/icons/laravelIcon.svg">
+            </action>
+
+            <action class="at.alirezamoh.idea_whisperer_for_laravel.actions.MailableAction" text="Create Mailable" icon="/icons/laravelIcon.svg">
+            </action>
+
+            <action class="at.alirezamoh.idea_whisperer_for_laravel.actions.ExceptionAction" text="Create Exception" icon="/icons/laravelIcon.svg">
+            </action>
+
+            <action class="at.alirezamoh.idea_whisperer_for_laravel.actions.EventListenerAction" text="Create Event Listener" icon="/icons/laravelIcon.svg">
+            </action>
+
+            <action class="at.alirezamoh.idea_whisperer_for_laravel.actions.MiddlewareAction" text="Create Middleware" icon="/icons/laravelIcon.svg">
+            </action>
+
+            <action class="at.alirezamoh.idea_whisperer_for_laravel.actions.DBSeederAction" text="Create Database Seeder" icon="/icons/laravelIcon.svg">
+            </action>
+
+            <action class="at.alirezamoh.idea_whisperer_for_laravel.actions.MigrationAction" text="Create Migration" icon="/icons/laravelIcon.svg">
+            </action>
+        </group>
+    </group>
+    </actions>
 </idea-plugin>
