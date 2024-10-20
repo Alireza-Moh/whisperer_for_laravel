@@ -33,12 +33,24 @@
             <keyboard-shortcut first-keystroke="control shift PERIOD" keymap="$default" replace-all="false" />
         </action>
 
+        <action class="at.alirezamoh.idea_whisperer_for_laravel.actions.EloquentAction" text="Create Eloquent Model" icon="/icons/laravelIcon.svg">
+        </action>
+
         <separator />
 
         <group id="at.alirezamoh.idea_whisperer_for_laravel.AllCodeGenerationActionsGroupAction" popup="true" icon="/icons/laravelIcon.svg" text="All Available Code Generations">
             &gt;
 
+            <action class="at.alirezamoh.idea_whisperer_for_laravel.actions.EloquentAction" text="Create Eloquent Model" icon="/icons/laravelIcon.svg">
+            </action>
+
+            <action class="at.alirezamoh.idea_whisperer_for_laravel.actions.MigrationAction" text="Create Migration" icon="/icons/laravelIcon.svg">
+            </action>
+
             <action class="at.alirezamoh.idea_whisperer_for_laravel.actions.ControllerAction" text="Create Controller" icon="/icons/laravelIcon.svg">
+            </action>
+
+            <action class="at.alirezamoh.idea_whisperer_for_laravel.actions.DBSeederAction" text="Create Database Seeder" icon="/icons/laravelIcon.svg">
             </action>
 
             <action class="at.alirezamoh.idea_whisperer_for_laravel.actions.ConfigAction" text="Create Config File" icon="/icons/laravelIcon.svg">
@@ -75,12 +87,6 @@
             </action>
 
             <action class="at.alirezamoh.idea_whisperer_for_laravel.actions.MiddlewareAction" text="Create Middleware" icon="/icons/laravelIcon.svg">
-            </action>
-
-            <action class="at.alirezamoh.idea_whisperer_for_laravel.actions.DBSeederAction" text="Create Database Seeder" icon="/icons/laravelIcon.svg">
-            </action>
-
-            <action class="at.alirezamoh.idea_whisperer_for_laravel.actions.MigrationAction" text="Create Migration" icon="/icons/laravelIcon.svg">
             </action>
         </group>
     </group>

@@ -1,5 +1,11 @@
 package at.alirezamoh.idea_whisperer_for_laravel.support.strUtil;
 
+import org.atteo.evo.inflector.English;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Random;
+
 /**
  * Provides utility methods for working with strings
  */
@@ -75,6 +81,23 @@ public class StrUtil {
         String camelCaseValue = toStudlyCase(value);
 
         return Character.toLowerCase(camelCaseValue.charAt(0)) + camelCaseValue.substring(1);
+    }
+
+    public static String getCurrentDate() {
+        LocalDate currentDate = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy_MM_dd");
+
+        return currentDate.format(formatter);
+    }
+
+    public static String generateRandomId() {
+        Random random = new Random();
+
+        return String.format("%06d_", random.nextInt(1000000));
+    }
+
+    public static String plural(String text) {
+        return English.plural(text);
     }
 
     private static String toStudlyCase(String value) {

@@ -244,6 +244,14 @@ abstract public class BaseModel {
         }
     }
 
+    public String getUnformattedModuleFullPath() {
+        return unformattedModuleFullPath;
+    }
+
+    public String getModuleSrcPath() {
+        return moduleSrcPath;
+    }
+
     protected void initFileName() {
         filePath = destination + "/" + getName() + extension;
     }

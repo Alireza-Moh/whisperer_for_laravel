@@ -40,5 +40,7 @@ final public class ProjectDefaultPaths {
 
     public static final String CONTROLLER_PATH = "/Http/Controllers/";
 
+    public static final String ELOQUENT_MODEL_PATH = "/Models/";
+
     public static final String APP_SERVICE_PROVIDER_PATH = "/app/Providers/AppServiceProvider.php";
 }
