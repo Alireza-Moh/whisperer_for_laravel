@@ -1,16 +1,12 @@
-package at.alirezamoh.idea_whisperer_for_laravel.actions.models.codeGenerationHelperModels;
+package at.alirezamoh.idea_whisperer_for_laravel.actions.models;
 
-import at.alirezamoh.idea_whisperer_for_laravel.actions.models.BaseModel;
+import at.alirezamoh.idea_whisperer_for_laravel.actions.models.dataTables.Field;
 import at.alirezamoh.idea_whisperer_for_laravel.support.ProjectDefaultPaths;
 
 import java.util.List;
 
 public class EloquentModel extends BaseModel {
     private List<Field> fields;
-
-    private List<Method> methods;
-
-    private List<Relation> relations;
 
     private String tableName;
 
@@ -47,22 +43,6 @@ public class EloquentModel extends BaseModel {
 
     public void setFields(List<Field> fields) {
         this.fields = fields;
-    }
-
-    public List<Method> getMethods() {
-        return methods;
-    }
-
-    public void setMethods(List<Method> methods) {
-        this.methods = methods;
-    }
-
-    public List<Relation> getRelations() {
-        return relations;
-    }
-
-    public void setRelations(List<Relation> relations) {
-        this.relations = relations;
     }
 
     public String getTableName() {

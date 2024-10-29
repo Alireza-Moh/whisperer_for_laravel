@@ -1,18 +1,17 @@
 package at.alirezamoh.idea_whisperer_for_laravel.routing.util;
 
 import at.alirezamoh.idea_whisperer_for_laravel.settings.SettingsState;
-import at.alirezamoh.idea_whisperer_for_laravel.support.ProjectDefaultPaths;
 import at.alirezamoh.idea_whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 public class RouteUtil {
-    public static List<PsiFile> getAllRouteFiles(Project project) {
-        List<PsiFile> files = new ArrayList<>(DirectoryPsiUtil.getFilesRecursively(project, ProjectDefaultPaths.ROUTE_PATH));
+    public static Collection<PsiFile> getAllRouteFiles(Project project) {
+        Collection<PsiFile> files = new ArrayList<>();
 
         SettingsState settingsState = SettingsState.getInstance(project);
 

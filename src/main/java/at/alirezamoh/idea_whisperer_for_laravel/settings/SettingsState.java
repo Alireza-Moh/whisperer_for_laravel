@@ -129,4 +129,22 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
 
         return text;
     }
+
+    /**
+     * Replaces backslashes with forward slashes and ensures the path starts and ends without a slash
+     * @param text The text to process
+     * @return The processed text
+     */
+    public String replaceAndSlashesToStart(String text) {
+        text = text.replace("\\", "/");
+
+        if (!text.startsWith("/")) {
+            text = "/" + text;
+        }
+        if (text.endsWith("/")) {
+            text = text.substring(0, text.length() - 1);
+        }
+
+        return text;
+    }
 }

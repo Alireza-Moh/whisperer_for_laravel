@@ -100,6 +100,10 @@ public class StrUtil {
         return English.plural(text);
     }
 
+    public static String capitalizeFirstLetter(String input) {
+        return input.substring(0, 1).toUpperCase() + input.substring(1);
+    }
+
     private static String toStudlyCase(String value) {
         String[] words = value.split("[\\s_-]+");
 

@@ -1,7 +1,5 @@
 package at.alirezamoh.idea_whisperer_for_laravel.support.directoryUtil;
 
-import at.alirezamoh.idea_whisperer_for_laravel.support.notification.Notify;
-import com.intellij.notification.NotificationType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
@@ -9,15 +7,12 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
-import com.intellij.psi.impl.source.PsiFileImpl;
 import com.jetbrains.php.lang.psi.PhpFile;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Provides utility methods for working with PsiDirectory and PsiFile objects.
@@ -33,16 +28,9 @@ public class DirectoryPsiUtil {
      * @return                A collection of PsiFile objects representing all files found in the directory and its subdirectories
      */
     public static Collection<PsiFile> getFilesRecursively(Project project, String relativeDirPath) {
-        List<PsiFile> files = new ArrayList<>();
+        Collection<PsiFile> files = new ArrayList<>();
 
-        PsiDirectory directory = PsiManager
-            .getInstance(project)
-            .findDirectory(
-                Objects.requireNonNull(
-                    project.getBaseDir().findFileByRelativePath(relativeDirPath)
-                )
-            );
-
+        PsiDirectory directory = getDirectory(project, relativeDirPath);
         if (directory != null) {
             collectFilesRecursively(directory, files);
         }
@@ -55,7 +43,7 @@ public class DirectoryPsiUtil {
      * @param directory The directory to start collecting files from
      * @param files     The list to store the collected files
      */
-    public static void collectFilesRecursively(PsiDirectory directory, List<PsiFile> files) {
+    public static void collectFilesRecursively(PsiDirectory directory, Collection<PsiFile> files) {
         for (PsiFile file : directory.getFiles()) {
             if (file instanceof PhpFile) {
                 files.add(file);
@@ -93,7 +81,7 @@ public class DirectoryPsiUtil {
      * Retrieves a PsiFile for a given file path relative to the project base directory
      * @param project The project containing the file
      * @param path    The relative path to the file
-     * @return        The PsiFile object, or null if not found
+     * @return        The PsiFile or null if not found
      */
     public static @Nullable PsiFile getFileByName(Project project, String path) {
         String fullPath = project.getBasePath() + path;

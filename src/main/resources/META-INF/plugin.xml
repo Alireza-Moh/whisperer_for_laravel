@@ -29,19 +29,22 @@
     <group id="at.alirezamoh.idea_whisperer_for_laravel.Actions" class="at.alirezamoh.idea_whisperer_for_laravel.actions.StartPluginAction" text="Idea Whisperer For Laravel" popup="true" description="The start point of the laravel plugin helper">
         <add-to-group group-id="MainMenu" anchor="last"/>
 
-        <action class="at.alirezamoh.idea_whisperer_for_laravel.actions.ActionChooserAction" text="Search for Generation" icon="/icons/laravelIcon.svg">
+        <action class="at.alirezamoh.idea_whisperer_for_laravel.actions.ActionChooserAction" text="Search for Code Generation" icon="/icons/laravelIcon.svg">
             <keyboard-shortcut first-keystroke="control shift PERIOD" keymap="$default" replace-all="false" />
         </action>
 
-        <action class="at.alirezamoh.idea_whisperer_for_laravel.actions.EloquentAction" text="Create Eloquent Model" icon="/icons/laravelIcon.svg">
+        <action class="at.alirezamoh.idea_whisperer_for_laravel.actions.GenerateHelperMethodsAction" text="Generate Helper Methods" icon="/icons/laravelIcon.svg">
+        </action>
+
+        <action class="at.alirezamoh.idea_whisperer_for_laravel.actions.EloquentNonGroupAction" text="Create Eloquent Model" icon="/icons/laravelIcon.svg">
         </action>
 
         <separator />
 
-        <group id="at.alirezamoh.idea_whisperer_for_laravel.AllCodeGenerationActionsGroupAction" popup="true" icon="/icons/laravelIcon.svg" text="All Available Code Generations">
+        <group id="at.alirezamoh.idea_whisperer_for_laravel.AllCodeGenerationActionsGroupAction" popup="true" icon="/icons/laravelIcon.svg" text="Available Code Generations">
             &gt;
 
-            <action class="at.alirezamoh.idea_whisperer_for_laravel.actions.EloquentAction" text="Create Eloquent Model" icon="/icons/laravelIcon.svg">
+            <action id="create.EloquentAction" class="at.alirezamoh.idea_whisperer_for_laravel.actions.EloquentAction" text="Create Eloquent Model" icon="/icons/laravelIcon.svg">
             </action>
 
             <action class="at.alirezamoh.idea_whisperer_for_laravel.actions.MigrationAction" text="Create Migration" icon="/icons/laravelIcon.svg">

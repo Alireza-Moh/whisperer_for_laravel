@@ -1,4 +1,4 @@
-package at.alirezamoh.idea_whisperer_for_laravel.actions.models.codeGenerationHelperModels;
+package at.alirezamoh.idea_whisperer_for_laravel.actions.models.dataTables;
 
 public class Relation {
     private String name;

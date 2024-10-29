@@ -1,6 +1,6 @@
 package at.alirezamoh.idea_whisperer_for_laravel.actions.models;
 
-import at.alirezamoh.idea_whisperer_for_laravel.actions.models.codeGenerationHelperModels.Field;
+import at.alirezamoh.idea_whisperer_for_laravel.actions.models.dataTables.Field;
 import at.alirezamoh.idea_whisperer_for_laravel.support.ProjectDefaultPaths;
 import at.alirezamoh.idea_whisperer_for_laravel.support.strUtil.StrUtil;
 

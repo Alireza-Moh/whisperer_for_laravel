@@ -1,4 +1,4 @@
-package at.alirezamoh.idea_whisperer_for_laravel.actions.models.codeGenerationHelperModels;
+package at.alirezamoh.idea_whisperer_for_laravel.actions.models.dataTables;
 
 public class Parameter {
     private String name;
@@ -7,10 +7,16 @@ public class Parameter {
 
     private String defaultValue;
 
+    private String text;
+
     public Parameter(String name, String type, String defaultValue) {
         this.name = name;
         this.type = type;
         this.defaultValue = defaultValue;
+    }
+
+    public Parameter(String text) {
+        this.text = text;
     }
 
     public String getName() {
@@ -23,6 +29,10 @@ public class Parameter {
 
     public String getDefaultValue() {
         return defaultValue;
+    }
+
+    public String getText() {
+        return text;
     }
 
     @Override

@@ -11,7 +11,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import freemarker.cache.ClassTemplateLoader;
@@ -49,6 +48,10 @@ public class TemplateLoader {
      */
     private BaseModel object;
 
+    private boolean showSuccessMessage = true;
+
+    private boolean overwriteFile = false;
+
     /**
      * @param project  The current project
      * @param template The name of the template file
@@ -58,6 +61,21 @@ public class TemplateLoader {
         this.project = project;
         this.template = template;
         this.object = object;
+    }
+
+    /**
+     * @param project                     The current project
+     * @param template                    The name of the template file
+     * @param object                      The data model for the template
+     * @param showSuccessOrErrorMessage   show message to user
+     * @param overwriteFile               should overwrite file
+     */
+    public TemplateLoader(Project project, String template, BaseModel object, boolean showSuccessOrErrorMessage, boolean overwriteFile) {
+        this.project = project;
+        this.template = template;
+        this.object = object;
+        this.showSuccessMessage = showSuccessOrErrorMessage;
+        this.overwriteFile = overwriteFile;
     }
 
     /**
@@ -97,7 +115,7 @@ public class TemplateLoader {
         try {
             String filePath = project.getBasePath() + "/" + object.getFilePath();
             File file = new File(filePath);
-            if (file.exists()) {
+            if (file.exists() && !overwriteFile) {
                 Notify.notifyWarning(
                     project,
                     object.getName() + " file already exists"
@@ -121,10 +139,12 @@ public class TemplateLoader {
                 createdFile = PsiManager.getInstance(project).findFile(virtualFile);
             }
 
-            Notify.notifySuccess(
-                project,
-                object.getName() + " created successfully"
-            );
+            if (showSuccessMessage) {
+                Notify.notifySuccess(
+                    project,
+                    object.getName() + " created successfully"
+                );
+            }
         } catch (IOException | TemplateException ex) {
             Notify.notifyError(
                 project,

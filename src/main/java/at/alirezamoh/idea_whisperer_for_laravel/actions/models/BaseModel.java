@@ -84,6 +84,8 @@ abstract public class BaseModel {
         initFileName();
     }
 
+    public BaseModel() {}
+
     /**
      * Removes the file extension from a filename
      *

@@ -2,7 +2,7 @@ package at.alirezamoh.idea_whisperer_for_laravel.actions;
 
 import at.alirezamoh.idea_whisperer_for_laravel.actions.models.ControllerModel;
 import at.alirezamoh.idea_whisperer_for_laravel.actions.models.MigrationModel;
-import at.alirezamoh.idea_whisperer_for_laravel.actions.models.codeGenerationHelperModels.EloquentModel;
+import at.alirezamoh.idea_whisperer_for_laravel.actions.models.EloquentModel;
 import at.alirezamoh.idea_whisperer_for_laravel.actions.views.EloquentView;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;

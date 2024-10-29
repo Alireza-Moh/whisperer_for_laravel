@@ -1,4 +1,4 @@
-package at.alirezamoh.idea_whisperer_for_laravel.actions.models.codeGenerationHelperModels;
+package at.alirezamoh.idea_whisperer_for_laravel.actions.models.dataTables;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,5 +51,13 @@ public class Method {
 
     public void setParameters(List<Parameter> parameters) {
         this.parameters = parameters;
+    }
+
+    public void addParameter(String name, String type, String defaultValue) {
+        this.parameters.add(new Parameter(name, type, defaultValue));
+    }
+
+    public void addParameter(String text) {
+        this.parameters.add(new Parameter(text));
     }
 }

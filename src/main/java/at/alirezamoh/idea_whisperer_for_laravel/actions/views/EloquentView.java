@@ -1,7 +1,7 @@
 package at.alirezamoh.idea_whisperer_for_laravel.actions.views;
 
-import at.alirezamoh.idea_whisperer_for_laravel.actions.models.codeGenerationHelperModels.EloquentModel;
-import at.alirezamoh.idea_whisperer_for_laravel.actions.models.codeGenerationHelperModels.Field;
+import at.alirezamoh.idea_whisperer_for_laravel.actions.models.EloquentModel;
+import at.alirezamoh.idea_whisperer_for_laravel.actions.models.dataTables.Field;
 import at.alirezamoh.idea_whisperer_for_laravel.support.codeGeneration.ComponentEditor;
 import at.alirezamoh.idea_whisperer_for_laravel.support.strUtil.StrUtil;
 import com.intellij.openapi.project.Project;
