@@ -8,6 +8,7 @@ import at.alirezamoh.idea_whisperer_for_laravel.support.laravelUtils.ClassUtils;
 import at.alirezamoh.idea_whisperer_for_laravel.support.strUtil.StrUtil;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
+import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.elements.impl.*;
@@ -90,7 +91,7 @@ public class MigrationVisitor extends PsiRecursiveElementWalkingVisitor {
 
     private void processMethodReference(MethodReference methodReference) {
         if (isColumnDefinition(methodReference)) {
-            addColumn(methodReference);
+            addColumn(methodReference, isNullable(methodReference));
         }
 
         for (PsiElement childElement : methodReference.getChildren()) {
@@ -128,7 +129,7 @@ public class MigrationVisitor extends PsiRecursiveElementWalkingVisitor {
             .collect(Collectors.toList());
     }
 
-    private void addColumn(MethodReference referenceMethod) {
+    private void addColumn(MethodReference referenceMethod, boolean nullable) {
         Table targetTable = tables.stream()
             .filter(table -> currentTableName.equals(table.name()))
             .findFirst()
@@ -151,9 +152,8 @@ public class MigrationVisitor extends PsiRecursiveElementWalkingVisitor {
                 List<Field> names = getColumnName(referenceMethod);
 
                 for (Field field : names) {
-                    if (doesNotContain(targetTable.fields(), field.getName())) {
-                        targetTable.fields().add(field);
-                    }
+                    field.setNullable(nullable);
+                    targetTable.fields().add(field);
                 }
             }
         }
@@ -222,5 +222,47 @@ public class MigrationVisitor extends PsiRecursiveElementWalkingVisitor {
         }
 
         return fields;
+    }
+
+    private boolean isNullable(MethodReference methodReference) {
+        PsiElement nextSibling = methodReference.getNextSibling();
+
+        if (
+            nextSibling instanceof LeafPsiElement
+                && nextSibling.textMatches("->")
+                && nextSiblingInTreeWithText(nextSibling) != null
+        ) {
+
+            PsiElement nullableSibling = nextSiblingInTreeWithText(nextSibling);
+
+            if (nullableSibling != null && nullableSibling.getNextSibling() != null &&
+                nullableSibling.getNextSibling().getNextSibling() instanceof ParameterList parameterList) {
+
+                PsiElement parameter = parameterList.getParameter(0);
+
+                if (parameter instanceof ConstantReference constantReference) {
+                    String canonicalText = constantReference.getCanonicalText();
+                    return "true".equals(canonicalText);
+                }
+                else {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private PsiElement nextSiblingInTreeWithText(PsiElement element) {
+        PsiElement current = element.getNextSibling();
+
+        while (current != null) {
+            if (current instanceof LeafPsiElement leafPsiElement&& leafPsiElement.textMatches("nullable")) {
+                return current;
+            }
+            current = current.getNextSibling();
+        }
+
+        return null;
     }
 }
