@@ -3,6 +3,7 @@ package at.alirezamoh.idea_whisperer_for_laravel.support.codeGeneration;
 import at.alirezamoh.idea_whisperer_for_laravel.actions.models.codeGenerationHelperModels.LaravelModel;
 import at.alirezamoh.idea_whisperer_for_laravel.actions.models.dataTables.Field;
 import at.alirezamoh.idea_whisperer_for_laravel.actions.models.dataTables.Method;
+import at.alirezamoh.idea_whisperer_for_laravel.actions.models.dataTables.Table;
 import at.alirezamoh.idea_whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.idea_whisperer_for_laravel.support.ProjectDefaultPaths;
 import at.alirezamoh.idea_whisperer_for_laravel.support.codeGeneration.vistors.MigrationVisitor;
@@ -27,6 +28,8 @@ public class MigrationManager {
 
     private Collection<PsiFile> originalModels = new ArrayList<>();
 
+    private List<Table> tables = new ArrayList<>();
+
     public MigrationManager(Project project) {
         this.project = project;
         this.projectSettingsState = SettingsState.getInstance(project);
@@ -34,69 +37,18 @@ public class MigrationManager {
         getAllModels(project);
     }
 
-/*    public List<LaravelModel> visit() {
-        Collection<PsiFile> migrations = DirectoryPsiUtil.getFilesRecursively(project, ProjectDefaultPaths.MIGRATION_PATH);
-
-        if (projectSettingsState.isModuleApplication()) {
-            searchForMigrationsInModules(migrations);
-        }
-
-        for (PsiFile migration : migrations) {
-            MigrationVisitor migrationVisitor = new MigrationVisitor();
-            migration.acceptChildren(migrationVisitor);
-
-            Map<String, List<Field>> tables = migrationVisitor.getTables();
-            for (Map.Entry<String, List<Field>> entry : tables.entrySet()) {
-                String tableName = entry.getKey();
-
-                String modelName = getModelByTableName(tableName);
-                if (modelName != null) {
-                    LaravelModel laravelModel = new LaravelModel();
-                    laravelModel.setModelName(modelName);
-                    laravelModel.setTableName(tableName);
-                    laravelModel.setFields(entry.getValue());
-
-                    createLaravelModelHelperMethods(laravelModel);
-
-                    models.add(laravelModel);
-                }
-            }
-        }
-
-        return models;
-    }*/
-
     public List<LaravelModel> visit() {
-        Collection<PsiFile> migrations = DirectoryPsiUtil.getFilesRecursively(project, ProjectDefaultPaths.MIGRATION_PATH);
+        searchForMigrations();
+        removeDuplicatedTable();
 
-        if (projectSettingsState.isModuleApplication()) {
-            searchForMigrationsInModules(migrations);
-        }
-
-        Map<String, List<Field>> tableFinalState = new HashMap<>();
-
-        for (PsiFile migration : migrations) {
-            MigrationVisitor migrationVisitor = new MigrationVisitor();
-            migration.acceptChildren(migrationVisitor);
-
-            // Merge migration data into the final table state
-            Map<String, List<Field>> tablesInMigration = migrationVisitor.getTables();
-            for (String tableName : tablesInMigration.keySet()) {
-                List<Field> currentFields = tableFinalState.getOrDefault(tableName, new ArrayList<>());
-                mergeTableFields(currentFields, tablesInMigration.get(tableName));
-                tableFinalState.put(tableName, currentFields);
-            }
-        }
-
-        // Use the final state for model generation
-        for (Map.Entry<String, List<Field>> entry : tableFinalState.entrySet()) {
-            String tableName = entry.getKey();
+        for (Table table : tables) {
+            String tableName = table.name();
             String modelName = getModelByTableName(tableName);
             if (modelName != null) {
                 LaravelModel laravelModel = new LaravelModel();
                 laravelModel.setModelName(modelName);
                 laravelModel.setTableName(tableName);
-                laravelModel.setFields(entry.getValue());
+                laravelModel.setFields(table.fields());
                 createLaravelModelHelperMethods(laravelModel);
                 models.add(laravelModel);
             }
@@ -105,20 +57,116 @@ public class MigrationManager {
         return models;
     }
 
-    private void mergeTableFields(List<Field> currentFields, List<Field> newFields) {
-        // Remove fields marked for dropping
-        currentFields.removeIf(existingField -> newFields.stream()
-            .anyMatch(newField -> existingField.getName().equals(newField.getName()) && newField.isDrop()));
+    public List<Table> getTables() {
+        searchForMigrations();
+        removeDuplicatedTable();
 
-        // Add new or modified fields
-        for (Field newField : newFields) {
-            if (!newField.isDrop() && currentFields.stream().noneMatch(field -> field.getName().equals(newField.getName()))) {
-                currentFields.add(newField);
-            }
+        return tables;
+    }
+
+    private void getAllModels(Project project) {
+        ModelProvider modelProvider = new ModelProvider(project, projectSettingsState, true);
+        this.originalModels = modelProvider.getOriginalModels();
+    }
+
+    private void searchForMigrations() {
+        Collection<PsiFile> migrations = DirectoryPsiUtil.getFilesRecursively(project, ProjectDefaultPaths.MIGRATION_PATH);
+
+        if (projectSettingsState.isModuleApplication()) {
+            searchForMigrationsInModules(migrations);
+        }
+
+        for (PsiFile migration : migrations) {
+            MigrationVisitor migrationVisitor = new MigrationVisitor();
+            migration.acceptChildren(migrationVisitor);
+            tables.addAll(migrationVisitor.getTables());
         }
     }
 
-    private static void createLaravelModelHelperMethods(LaravelModel laravelModel) {
+    private void removeDuplicatedTable() {
+        List<Table> mergedTables = new ArrayList<>();
+
+        for (Table currentTable : tables) {
+            Optional<Table> existingTableOptional = mergedTables.stream()
+                .filter(table -> table.name().equals(currentTable.name()))
+                .findFirst();
+
+            if (existingTableOptional.isPresent()) {
+                Table existingTable = existingTableOptional.get();
+
+                existingTable.fields().addAll(currentTable.fields());
+            } else {
+                mergedTables.add(new Table(currentTable.name(), currentTable.fields()));
+            }
+        }
+
+        tables = mergedTables;
+
+        removeDuplicatedFields();
+        dropFields();
+        renameFields();
+    }
+
+    private void removeDuplicatedFields() {
+        for (Table currentTable : tables) {
+            List<Field> fields = currentTable.fields();
+            Set<String> uniqueFieldIdentifiers = new HashSet<>();
+            List<Field> removedFields = new ArrayList<>();
+
+            for (Field currentField : fields) {
+                String identifier = currentField.getName() + "-" + currentField.getType();
+
+                if (uniqueFieldIdentifiers.contains(identifier)) {
+                    removedFields.add(currentField);
+                } else {
+                    uniqueFieldIdentifiers.add(identifier);
+                }
+            }
+
+            fields.removeAll(removedFields);
+        }
+    }
+
+    private void dropFields() {
+        for (Table currentTable : tables) {
+            List<Field> droppedFields = new ArrayList<>();
+            for (Field currentField : currentTable.fields()) {
+                if (currentField.isDrop()) {
+                    List<Field> foundFields = currentTable.fields().stream()
+                        .filter(field -> currentField.getName().equals(field.getName()) && !field.isDrop() && !field.isRename())
+                        .toList();
+
+                    droppedFields.addAll(foundFields);
+                    droppedFields.add(currentField);
+                }
+            }
+
+            currentTable.fields().removeAll(droppedFields);
+        }
+    }
+
+    private void renameFields() {
+        for (Table currentTable : tables) {
+            List<Field> droppedFields = new ArrayList<>();
+            for (Field currentField : currentTable.fields()) {
+                if (currentField.isRename() && currentField.getRenameField() != null) {
+                    Field foundField = currentTable.fields().stream()
+                        .filter(field -> currentField.getRenameField().oldName().equals(field.getName()))
+                        .findFirst()
+                        .orElse(null);
+
+                    if (foundField != null) {
+                        foundField.setName(currentField.getRenameField().newName());
+                        droppedFields.add(currentField);
+                    }
+                }
+            }
+
+            currentTable.fields().removeAll(droppedFields);
+        }
+    }
+
+    private void createLaravelModelHelperMethods(LaravelModel laravelModel) {
         for (Field field : laravelModel.getFields()) {
             if (!field.getName().isEmpty()) {
                 Method method = new Method(
@@ -131,11 +179,6 @@ public class MigrationManager {
                 laravelModel.addMethod(method);
             }
         }
-    }
-
-    private void getAllModels(Project project) {
-        ModelProvider modelProvider = new ModelProvider(project, projectSettingsState, true);
-        this.originalModels = modelProvider.getOriginalModels();
     }
 
     private void searchForMigrationsInModules(Collection<PsiFile> migrations) {
