@@ -2,7 +2,7 @@
 
 /** @noinspection all */
 
-namespace Illuminate\Support\Facades {
+namespace {
 
 <#list facades as facade>
    /**
