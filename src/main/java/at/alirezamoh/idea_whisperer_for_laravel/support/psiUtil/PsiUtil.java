@@ -1,6 +1,8 @@
 package at.alirezamoh.idea_whisperer_for_laravel.support.psiUtil;
 
+import at.alirezamoh.idea_whisperer_for_laravel.support.IdeaWhispererForLaravelIcon;
 import at.alirezamoh.idea_whisperer_for_laravel.support.strUtil.StrUtil;
+import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.util.TextRange;
@@ -24,6 +26,19 @@ import java.util.Objects;
  * or method, and extracting information from PSI elements
  */
 public class PsiUtil {
+    /**
+     * Builds a LookupElementBuilder for a config key
+     *
+     * @param key The config key
+     * @return The LookupElementBuilder
+     */
+    public static LookupElementBuilder buildSimpleLookupElement(String key) {
+        return LookupElementBuilder
+            .create(key)
+            .withLookupString(key)
+            .withIcon(IdeaWhispererForLaravelIcon.LARAVEL_ICON);
+    }
+
     /**
      * Checks if a PSI element is inside a function call with a specific name
      * @param element     The PSI element to check

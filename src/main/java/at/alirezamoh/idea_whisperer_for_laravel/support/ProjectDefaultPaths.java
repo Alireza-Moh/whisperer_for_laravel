@@ -51,4 +51,6 @@ final public class ProjectDefaultPaths {
     public static final String LARAVEL_ELOQUENT_QueryRelationships_PATH = "/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/QueriesRelationships.php";
 
     public static final String LARAVEL_FACADES_DIR_PATH = "/vendor/laravel/framework/src/Illuminate/Support/Facades";
+
+    public static final String IDEA_WHISPERER_FOR_LARAVEL_MODELS_PATH = "/vendor/_idea_whisperer_for_laravel/idea_whisperer_for_laravel_models.php";
 }

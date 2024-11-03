@@ -17,7 +17,7 @@ public class StrUtil {
      */
     public static String removeQuotes(String text) {
         return text.replace("\"", "")
-                .replace("'", "");
+                .replace("'", "").trim();
     }
 
     /**

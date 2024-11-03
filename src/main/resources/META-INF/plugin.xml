@@ -26,7 +26,7 @@
         <completion.contributor language="PHP" implementationClass="at.alirezamoh.idea_whisperer_for_laravel.formRequest.RuleValidationCompletionContributor"/>
         <completion.contributor language="PHP" implementationClass="at.alirezamoh.idea_whisperer_for_laravel.eloquent.DbTableCompletionContributor"/>
         <completion.contributor language="PHP" implementationClass="at.alirezamoh.idea_whisperer_for_laravel.eloquent.DbColumnCompletionContributor"/>
-        <completion.contributor language="PHP" implementationClass="at.alirezamoh.idea_whisperer_for_laravel.eloquent.relation.RelationCompletionContributor"/>
+<!--        <completion.contributor language="PHP" implementationClass="at.alirezamoh.idea_whisperer_for_laravel.eloquent.relation.RelationCompletionContributor"/>-->
     </extensions>
 
     <actions>
