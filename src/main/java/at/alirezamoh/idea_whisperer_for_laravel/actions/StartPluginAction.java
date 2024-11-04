@@ -1,6 +1,6 @@
 package at.alirezamoh.idea_whisperer_for_laravel.actions;
 
-import at.alirezamoh.idea_whisperer_for_laravel.support.ComposerUtils;
+import at.alirezamoh.idea_whisperer_for_laravel.support.laravelUtils.FrameworkUtils;
 import at.alirezamoh.idea_whisperer_for_laravel.support.laravelUtils.MethodUtils;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -18,7 +18,7 @@ public class StartPluginAction extends DefaultActionGroup {
     public void update(@NotNull AnActionEvent e) {
         Project project = e.getProject();
         if (project != null && !MethodUtils.isDumbMode(project)) {
-            if (!ComposerUtils.isLaravelProject(project)) {
+            if (!FrameworkUtils.isLaravelProject(project)) {
                 e.getPresentation().setEnabledAndVisible(false);
             }
         }

@@ -1,9 +1,9 @@
 package at.alirezamoh.idea_whisperer_for_laravel.support.laravelUtils;
 
-import com.intellij.codeInsight.completion.CompletionParameters;
-import com.intellij.openapi.application.ApplicationManager;
+import at.alirezamoh.idea_whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.ArrayUtil;
@@ -21,6 +21,7 @@ public class MethodUtils extends PhpElementVisitor {
         List<PhpClassImpl> classes = new ArrayList<>();
         PhpIndex phpIndex = PhpIndex.getInstance(project);
 
+        //TODO: remove this two lines below
         PhpExpression m = method.getClassReference();
         PhpType s = method.getClassReference().getDeclaredType();
         phpIndex.completeType(project, method.getClassReference().getDeclaredType(), null).getTypes()

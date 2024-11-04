@@ -7,6 +7,7 @@ import at.alirezamoh.idea_whisperer_for_laravel.support.ProjectDefaultPaths;
 import at.alirezamoh.idea_whisperer_for_laravel.support.codeGeneration.MigrationManager;
 import at.alirezamoh.idea_whisperer_for_laravel.support.codeGeneration.vistors.ClassMethodLoader;
 import at.alirezamoh.idea_whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
+import at.alirezamoh.idea_whisperer_for_laravel.support.laravelUtils.FrameworkUtils;
 import at.alirezamoh.idea_whisperer_for_laravel.support.notification.Notify;
 import at.alirezamoh.idea_whisperer_for_laravel.support.template.TemplateLoader;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -31,6 +32,11 @@ public class GenerateHelperMethodsAction extends BaseAction {
     @Override
     public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
         project = anActionEvent.getProject();
+
+        if (FrameworkUtils.isLaravelFrameworkNotInstalled(project)) {
+            Notify.notifyWarning(project, "Laravel Framework is not installed");
+            return;
+        }
 
         ApplicationManager.getApplication().invokeLater(() -> {
             new Task.Modal(project, "Generating Helper Methods", true) {
@@ -59,13 +65,16 @@ public class GenerateHelperMethodsAction extends BaseAction {
         MigrationManager migrationManager = new MigrationManager(project);
         List<LaravelModel> m = migrationManager.visit();
         LaravelModelGeneration g = new LaravelModelGeneration(m);
-        create(
-            g,
-            "laravelModels.ftl"
-        );
+
+        if (!m.isEmpty()) {
+            create(
+                    g,
+                    "laravelModels.ftl"
+            );
+        }
     }
 
-    private @NotNull ClassMethodLoader createBaseQueryBuilderMethods(@NotNull ProgressIndicator indicator) {
+    private void createBaseQueryBuilderMethods(@NotNull ProgressIndicator indicator) {
         indicator.setText("Loading query builder methods...");
 
         ClassMethodLoader methodLoader = new ClassMethodLoader(project);
@@ -81,17 +90,18 @@ public class GenerateHelperMethodsAction extends BaseAction {
             )
         );
 
-        create(
-            new LaravelDbBuilder(baseQueryBuilderMethods),
-            "baseDbQueryBuilder.ftl"
-        );
-        return methodLoader;
+        if (!baseQueryBuilderMethods.isEmpty()) {
+            create(
+                    new LaravelDbBuilder(baseQueryBuilderMethods),
+                    "baseDbQueryBuilder.ftl"
+            );
+        }
     }
 
     private void createFacades(@NotNull ProgressIndicator indicator) {
         indicator.setText("Loading facades...");
 
-        ClassMethodLoader methodLoader = createBaseQueryBuilderMethods(indicator);
+        ClassMethodLoader methodLoader = new ClassMethodLoader(project);
         List<Facade> facades = new ArrayList<>();
         PsiDirectory facadeDir = DirectoryPsiUtil.getDirectory(project, ProjectDefaultPaths.LARAVEL_FACADES_DIR_PATH);
 
