@@ -17,6 +17,8 @@
         <projectConfigurable parentId="language" instance="at.alirezamoh.idea_whisperer_for_laravel.settings.SettingConfigurable" id="idea_whisperer_for_laravel_settings" displayName="Idea Whisperer For Laravel" nonDefaultProject="true"/>
         <projectService serviceImplementation="at.alirezamoh.idea_whisperer_for_laravel.settings.SettingsState"/>
 
+        <statusBarWidgetFactory implementation="at.alirezamoh.idea_whisperer_for_laravel.extension.LaravelVersion" id="LaravelVersion" order="first" />
+
         <psi.referenceContributor  language="PHP" implementation="at.alirezamoh.idea_whisperer_for_laravel.config.ConfigReferenceContributor"/>
         <psi.referenceContributor  language="PHP" implementation="at.alirezamoh.idea_whisperer_for_laravel.blade.BladeReferenceContributor"/>
         <psi.referenceContributor  language="PHP" implementation="at.alirezamoh.idea_whisperer_for_laravel.routing.RouteReferenceContributor"/>
