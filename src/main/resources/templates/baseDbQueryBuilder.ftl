@@ -2,7 +2,7 @@
 
 /** @noinspection all */
 
-namespace LaravelVision\Helper {
+namespace IdeaWhispererForLaravel\Helper {
 
     use Illuminate\Contracts\Database\Query\Expression;
     use Illuminate\Contracts\Support\Arrayable;
