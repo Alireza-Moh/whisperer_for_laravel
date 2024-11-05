@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.file.AccessDeniedException;
 
 /**
  * Loads and processes Freemarker templates
@@ -97,10 +98,20 @@ public class TemplateLoader {
                         openFileInEditor(createdFile);
                     }
                 } catch (IOException e) {
-                    Notify.notifyError(
-                        project,
-                        "Could not create " + object.getName() + " directory"
-                    );
+                    if (e instanceof AccessDeniedException) {
+                        Notify.notifyError(
+                            project,
+                            "Could not create directory.\n" +
+                                "Permission Issue on Folder: It appears that PHPStorm does not have the necessary permissions to access the folder\n" +
+                                "It might be related to WSL"
+                        );
+                    }
+                    else {
+                        Notify.notifyError(
+                            project,
+                            "Could not create " + object.getDestination() + " directory"
+                        );
+                    }
                 }
             });
         });
