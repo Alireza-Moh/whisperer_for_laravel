@@ -2,11 +2,9 @@ package at.alirezamoh.idea_whisperer_for_laravel.config;
 
 import at.alirezamoh.idea_whisperer_for_laravel.config.resolvers.ConfigFileResolver;
 import at.alirezamoh.idea_whisperer_for_laravel.config.resolvers.ConfigKeyCollector;
-import at.alirezamoh.idea_whisperer_for_laravel.support.psiUtil.PsiUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiReferenceBase;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -32,12 +30,8 @@ public class ConfigReference extends PsiReferenceBase<PsiElement> {
      */
     @Override
     public Object @NotNull [] getVariants() {
-        if (PsiUtil.isCaretInMethodFirstParameter(myElement) || PsiUtil.isCaretInFunctionFirstParameter(myElement)) {
-            ConfigKeyCollector configKeyCollector = new ConfigKeyCollector(myElement.getProject());
+        ConfigKeyCollector configKeyCollector = new ConfigKeyCollector(myElement.getProject());
 
-            return configKeyCollector.startSearching().getVariants().toArray();
-        }
-
-        return PsiReference.EMPTY_ARRAY;
+        return configKeyCollector.startSearching().getVariants().toArray();
     }
 }

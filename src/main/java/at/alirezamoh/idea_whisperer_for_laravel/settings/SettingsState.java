@@ -1,5 +1,6 @@
 package at.alirezamoh.idea_whisperer_for_laravel.settings;
 
+import at.alirezamoh.idea_whisperer_for_laravel.support.strUtil.StrUtil;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
@@ -82,6 +83,14 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
 
     public String getModuleRootDirectoryPath() {
         return moduleRootDirectoryPath;
+    }
+
+    public @Nullable String getFormattedModuleRootDirectoryPath() {
+        return StrUtil.addSlashes(
+                getModuleRootDirectoryPath(),
+                false,
+                true
+        );
     }
 
     public void setModuleRootDirectoryPath(String moduleRootDirectoryPath) {

@@ -21,6 +21,10 @@ public class LaravelPaths {
         public static final String ColumnDefinition = "\\Illuminate\\Database\\Schema\\ColumnDefinition";
         public static final String TestCase = "\\Illuminate\\Foundation\\Testing\\TestCase";
         public static final String QueryRelation = "\\Illuminate\\Database\\Eloquent\\Concerns\\QueriesRelationships";
+        public static final String Request = "\\Illuminate\\Http\\Request";
+        public static final String FormRequest = "\\Illuminate\\Foundation\\Http\\FormRequest";
+        public static final String Validator = "\\Illuminate\\Support\\Facades\\Validator";
+        public static final String Gate = "\\Illuminate\\Support\\Facades\\Gate";
     }
 
     public static List<String> RELEVANT_LARAVEL_CLASSES = Arrays.asList(
@@ -37,45 +41,12 @@ public class LaravelPaths {
         LaravelClasses.SchemaFacadeAlias,
         LaravelClasses.ColumnDefinition,
         LaravelClasses.TestCase,
-        LaravelClasses.QueryRelation
+        LaravelClasses.QueryRelation,
+        LaravelClasses.Validator,
+        LaravelClasses.FormRequest,
+        LaravelClasses.Request,
+        LaravelClasses.Gate
     );
-
-    public static final String[] DB_BUILDER_FIELD_METHODS = {
-        "addSelect", "join", "select", "joinWhere", "joinSub", "leftJoin", "leftJoinWhere", "leftJoinSub",
-        "rightJoin", "rightJoinWhere", "rightJoinSub", "crossJoin", "where", "whereNot",
-        "orWhere", "orWhereNot", "whereColumn", "orWhereColumn", "whereIn", "orWhereIn",
-        "whereNotIn", "orWhereNotIn", "whereIntegerInRaw", "orWhereIntegerInRaw",
-        "orWhereIntegerNotInRaw", "whereNull", "orWhereNull", "whereNotNull",
-        "whereBetween", "whereBetweenColumns", "orWhereBetween", "orWhereBetweenColumns",
-        "whereNotBetween", "whereNotBetweenColumns", "orWhereNotBetween",
-        "orWhereNotBetweenColumns", "orWhereNotNull", "whereDate", "orWhereDate",
-        "whereTime", "orWhereTime", "whereDay", "orWhereDay", "whereMonth", "orWhereMonth",
-        "whereYear", "orWhereYear", "whereRowValues", "orWhereRowValues",
-        "whereJsonContains", "orWhereJsonContains", "whereJsonDoesntContain",
-        "orWhereJsonDoesntContain", "whereJsonLength", "orWhereJsonLength", "groupBy",
-        "having", "orHaving", "havingBetween", "orderBy", "orderByDesc", "latest", "oldest",
-        "forPageBeforeId", "forPageAfterId", "reorder", "find", "value", "get", "paginate",
-        "simplePaginate", "getCountForPagination", "pluck", "implode", "count", "min", "max",
-        "sum", "avg", "average", "aggregate", "numericAggregate", "insertUsing", "insertUsing",
-        "increment", "decrement", "updateOrInsert", "update", "on", "hasColumn", "hasColumns",
-        "getColumnType", "dropColumn", "dropColumns", "dropConstrainedForeignId",
-        "renameColumn", "dropSoftDeletes", "dropSoftDeletesTz", "unique", "index",
-        "spatialIndex", "foreign", "indexCommand", "createIndexName", "after", "removeColumn",
-        "primary", "unique", "index", "dropIndex", "dropUnique", "dropPrimary", "dropForeign",
-        "dropSpatialIndex", "foreign", "id", "increments", "integerIncrements",
-        "tinyIncrements", "mediumIncrements", "bigIncrements", "char", "string", "text",
-        "mediumText", "longText", "integer", "tinyInteger", "smallInteger", "mediumInteger",
-        "bigInteger", "unsignedInteger", "unsignedTinyInteger", "unsignedSmallInteger",
-        "unsignedMediumInteger", "unsignedBigInteger", "foreignId", "foreignIdFor",
-        "float", "double", "decimal", "unsignedFloat", "unsignedDouble", "unsignedDecimal", "boolean",
-        "enum", "set", "json", "jsonb", "date", "dateTime", "dateTimeTz", "time", "timeTz",
-        "timestamp", "timestampTz", "softDeletes", "softDeletesTz", "year", "binary", "uuid",
-        "foreignUuid", "ipAddress", "macAddress", "geometry", "point", "lineString", "polygon",
-        "geometryCollection", "multiPoint", "multiLineString", "multiPolygon",
-        "multiPolygonZ", "computed", "create", "update", "fill", "updateOrCreate",
-        "updateOrInsert", "assertDatabaseHas", "assertDatabaseMissing", "assertDeleted",
-        "assertSoftDeleted"
-    };
 
     public static Map<String, List<Integer>> DB_TABLE_METHODS = new HashMap<>() {{
         put("table", Arrays.asList(0));

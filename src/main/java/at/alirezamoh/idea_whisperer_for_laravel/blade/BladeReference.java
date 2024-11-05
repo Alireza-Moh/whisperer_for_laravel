@@ -1,7 +1,6 @@
 package at.alirezamoh.idea_whisperer_for_laravel.blade;
 
 import at.alirezamoh.idea_whisperer_for_laravel.blade.visitors.BladeFileCollector;
-import at.alirezamoh.idea_whisperer_for_laravel.support.psiUtil.PsiUtil;
 import at.alirezamoh.idea_whisperer_for_laravel.support.strUtil.StrUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
@@ -62,10 +61,8 @@ public class BladeReference extends PsiReferenceBase<PsiElement> {
      */
     @Override
     public Object @NotNull [] getVariants() {
-        if (PsiUtil.isCaretInFunctionFirstParameter(myElement) || PsiUtil.isCaretInMethodFirstParameter(myElement)) {
-            bladeFileCollector.setWithPsiFile(false);
-            return bladeFileCollector.startSearching().getVariants().toArray();
-        }
-        return PsiReference.EMPTY_ARRAY;
+        bladeFileCollector.setWithPsiFile(false);
+
+        return bladeFileCollector.startSearching().getVariants().toArray();
     }
 }

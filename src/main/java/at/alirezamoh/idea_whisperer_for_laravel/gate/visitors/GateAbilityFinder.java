@@ -20,7 +20,7 @@ public class GateAbilityFinder extends PsiRecursiveElementWalkingVisitor {
     @Override
     public void visitElement(@NotNull PsiElement element) {
         if (element instanceof MethodReference methodReference) {
-            if (GateUtil.isGateFacadeMethod(methodReference)) {
+            if (GateUtil.isGateFacadeMethod(methodReference, methodReference.getProject())) {
                 this.getAbility(methodReference);
             }
         }

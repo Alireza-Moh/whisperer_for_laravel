@@ -17,7 +17,6 @@ public class GateReference extends PsiReferenceBase<PsiElement> {
 
     @Override
     public @Nullable PsiElement resolve() {
-
         return gateProcessor.findGateAbility(myElement);
     }
 

@@ -26,7 +26,7 @@ public class GateModuleServiceProviderVisitor extends BaseServiceProviderVisitor
     @Override
     public void visitElement(@NotNull PsiElement element) {
         if (element instanceof MethodReference methodReference) {
-            if (GateUtil.isGateFacadeMethod(methodReference)) {
+            if (GateUtil.isGateFacadeMethod(methodReference, project)) {
                 this.getAbilities(methodReference);
             }
         }

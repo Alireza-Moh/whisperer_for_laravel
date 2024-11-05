@@ -30,6 +30,10 @@ public class StrUtil {
     }
 
     public static String addSlashes(String text, boolean removeSlashFromStart, boolean removeSlashFromEnd) {
+        if (text == null) {
+            return text;
+        }
+
         text = text.replaceAll("\\\\", "/");
 
         if (!text.startsWith("/")) {
@@ -48,6 +52,10 @@ public class StrUtil {
         }
 
         return text;
+    }
+
+    public static String addSlashes(String text) {
+        return addSlashes(text, false, false);
     }
 
     public static String removeExtension(String text) {

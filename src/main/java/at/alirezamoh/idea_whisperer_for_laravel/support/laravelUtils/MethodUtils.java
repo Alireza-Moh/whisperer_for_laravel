@@ -1,16 +1,13 @@
 package at.alirezamoh.idea_whisperer_for_laravel.support.laravelUtils;
 
-import at.alirezamoh.idea_whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
-import com.intellij.openapi.progress.ProgressManager;
+
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.ArrayUtil;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.elements.impl.*;
-import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,10 +18,7 @@ public class MethodUtils extends PhpElementVisitor {
         List<PhpClassImpl> classes = new ArrayList<>();
         PhpIndex phpIndex = PhpIndex.getInstance(project);
 
-        //TODO: remove this two lines below
-        PhpExpression m = method.getClassReference();
-        PhpType s = method.getClassReference().getDeclaredType();
-        phpIndex.completeType(project, method.getClassReference().getDeclaredType(), null).getTypes()
+        phpIndex.completeType(project, Objects.requireNonNull(method.getClassReference()).getDeclaredType(), null).getTypes()
             .forEach(className -> collectClasses(project, className, classes));
 
         return classes;
@@ -56,7 +50,7 @@ public class MethodUtils extends PhpElementVisitor {
         MethodReference methodReference = resolveMethodReference(element, 10);
         PhpClass eloquentModel = ClassUtils.getEloquentBaseModel(project);
 
-        if (eloquentModel == null) {
+        if (eloquentModel == null || methodReference == null) {
             return null;
         }
 
@@ -70,79 +64,28 @@ public class MethodUtils extends PhpElementVisitor {
         return null;
     }
 
-    public static MethodReference resolveMethodReference(PsiElement element, int depthLimit) {
+    public static @Nullable MethodReference resolveMethodReference(PsiElement element, int depthLimit) {
         if (element == null || depthLimit <= 0) {
             return null;
         }
 
         if (element.getParent() instanceof MethodReference) {
-            ProgressManager.checkCanceled();
             return (MethodReference) element.getParent();
         }
 
         return resolveMethodReference(element.getParent(), depthLimit - 1);
     }
 
-    public static boolean isTableMethod(MethodReference methodReference) {
-        String methodName = methodReference.getName();
-
-        if (methodName == null) {
-            return false;
+    public static FunctionReference resolveFunctionReference(PsiElement element, int depthLimit) {
+        if (element == null || depthLimit <= 0) {
+            return null;
         }
 
-        return LaravelPaths.DB_TABLE_METHODS.containsKey(methodName);
-    }
-
-    public static boolean isQueryRelationMethod(MethodReference methodReference) {
-        String methodName = methodReference.getName();
-
-        if (methodName == null) {
-            return false;
+        if (element.getParent() instanceof FunctionReference) {
+            return (FunctionReference) element.getParent();
         }
 
-        return LaravelPaths.QUERY_RELATION_PARAMS.containsKey(methodName);
-    }
-
-    public static boolean isColumnIn(PsiElement element, MethodReference method, boolean allowArray) {
-        return isColumnParam(method, element, allowArray) || hasColumnsInAllParams(method);
-    }
-
-    public static boolean isColumnParam(MethodReference method, PsiElement position, boolean allowArray) {
-        int paramIndex = findParamIndex(position, allowArray);
-        return isColumnParam(method, paramIndex);
-    }
-
-    public static boolean isTableParam(MethodReference method, PsiElement position) {
-        int paramIndex = findParamIndex(position, false);
-        return isTableParam(method, paramIndex);
-    }
-
-    public static boolean isQueryRelationParam(MethodReference method, PsiElement position) {
-        int paramIndex = findParamIndex(position, false);
-        return isQueryRelationParam(method, paramIndex);
-    }
-
-    public static boolean isColumnParam(MethodReference methodReference, int index) {
-        List<Integer> paramPositions = LaravelPaths.BUILDER_METHODS.get(methodReference.getName());
-        return paramPositions != null && paramPositions.contains(index);
-    }
-
-    public static boolean isTableParam(MethodReference methodReference, int index) {
-        List<Integer> paramPositions = LaravelPaths.DB_TABLE_METHODS.get(methodReference.getName());
-        return paramPositions != null && paramPositions.contains(index);
-    }
-
-    public static boolean isQueryRelationParam(MethodReference methodReference, int index) {
-        List<Integer> paramPositions = LaravelPaths.QUERY_RELATION_PARAMS.get(methodReference.getName());
-        return paramPositions != null && paramPositions.contains(index);
-    }
-
-    public static boolean hasColumnsInAllParams(MethodReference method) {
-        return isColumnParam(method, -1);
-    }
-
-    public static int findParamIndex(PsiElement element) {
-        return findParamIndex(element, false);
+        return resolveFunctionReference(element.getParent(), depthLimit - 1);
     }
 
     public static int findParamIndex(PsiElement element, boolean allowArray) {
@@ -156,7 +99,6 @@ public class MethodUtils extends PhpElementVisitor {
         }
 
         if (parent instanceof ParameterList parameterList) {
-            int s = ArrayUtil.indexOf(parameterList.getParameters(), element);
             return ArrayUtil.indexOf(parameterList.getParameters(), element);
         } else if (allowArray && parent instanceof ArrayCreationExpressionImpl) {
             PsiElement[] children = parent.getChildren();

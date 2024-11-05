@@ -70,9 +70,9 @@ public class BladeModuleServiceProviderVisitor extends BaseServiceProviderVisito
             return;
         }
 
-        if (moduleRootDirectoryPath != null) {
+        if (moduleRootDirectory != null) {
             viewDirName = StrUtil.getLastWord(viewDirName);
-            for (PsiDirectory module : moduleRootDirectoryPath.getSubdirectories()) {
+            for (PsiDirectory module : moduleRootDirectory.getSubdirectories()) {
                 PsiDirectory resourcesDir = module.findSubdirectory("resources");
 
                 if (resourcesDir != null) {

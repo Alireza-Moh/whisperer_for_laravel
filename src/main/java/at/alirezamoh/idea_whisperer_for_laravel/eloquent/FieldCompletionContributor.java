@@ -1,8 +1,10 @@
 package at.alirezamoh.idea_whisperer_for_laravel.eloquent;
 
 import at.alirezamoh.idea_whisperer_for_laravel.actions.models.codeGenerationHelperModels.LaravelModel;
+import at.alirezamoh.idea_whisperer_for_laravel.eloquent.utls.EloquentUtil;
 import at.alirezamoh.idea_whisperer_for_laravel.support.codeGeneration.MigrationManager;
 import at.alirezamoh.idea_whisperer_for_laravel.support.laravelUtils.ClassUtils;
+import at.alirezamoh.idea_whisperer_for_laravel.support.laravelUtils.FrameworkUtils;
 import at.alirezamoh.idea_whisperer_for_laravel.support.laravelUtils.MethodUtils;
 import at.alirezamoh.idea_whisperer_for_laravel.support.ProjectDefaultPaths;
 import at.alirezamoh.idea_whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
@@ -26,8 +28,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
-public class DbColumnCompletionContributor extends CompletionContributor {
-    DbColumnCompletionContributor() {
+public class FieldCompletionContributor extends CompletionContributor {
+    FieldCompletionContributor() {
         extend(
             CompletionType.BASIC,
             PlatformPatterns.or(
@@ -39,6 +41,10 @@ public class DbColumnCompletionContributor extends CompletionContributor {
                 @Override
                 protected void addCompletions(@NotNull CompletionParameters completionParameters, @NotNull ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
                     PsiElement psiElement = completionParameters.getPosition();
+
+                    if (FrameworkUtils.isLaravelFrameworkNotInstalled(psiElement.getProject())) {
+                        return;
+                    }
 
                     boolean s = shouldComplete(psiElement);
                     if (shouldComplete(psiElement)) {
@@ -60,10 +66,14 @@ public class DbColumnCompletionContributor extends CompletionContributor {
     private boolean shouldComplete(PsiElement psiElement) {
         MethodReference methodReference = MethodUtils.resolveMethodReference(psiElement, 10);
 
-        boolean allowArray = !"whereIn".equals(methodReference.getName())
-            && Objects.requireNonNull(methodReference.getName()).startsWith("where");
+        if (methodReference != null) {
+            boolean allowArray = !"whereIn".equals(methodReference.getName())
+                && Objects.requireNonNull(methodReference.getName()).startsWith("where");
 
-        return !MethodUtils.isTableMethod(methodReference) && MethodUtils.isColumnIn(psiElement, methodReference, allowArray);
+            return !EloquentUtil.isTableMethod(methodReference) && EloquentUtil.isFieldIn(psiElement, methodReference, allowArray);
+        }
+
+        return false;
     }
 
 /*    private @Nullable List<String> getFields(PsiElement psiElement) {
