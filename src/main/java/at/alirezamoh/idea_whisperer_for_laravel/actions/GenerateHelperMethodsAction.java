@@ -79,6 +79,7 @@ public class GenerateHelperMethodsAction extends BaseAction {
 
         ClassMethodLoader methodLoader = new ClassMethodLoader(project);
         List<Method> baseQueryBuilderMethods = new ArrayList<>();
+
         baseQueryBuilderMethods.addAll(
             methodLoader.loadMethods(
                 DirectoryPsiUtil.getFileByName(project, ProjectDefaultPaths.LARAVEL_DB_QUERY_BUILDER_PATH)
@@ -86,7 +87,7 @@ public class GenerateHelperMethodsAction extends BaseAction {
         );
         baseQueryBuilderMethods.addAll(
             methodLoader.loadMethods(
-                DirectoryPsiUtil.getFileByName(project, ProjectDefaultPaths.LARAVEL_ELOQUENT_QueryRelationships_PATH)
+                DirectoryPsiUtil.getFileByName(project, ProjectDefaultPaths.LARAVEL_DB_QUERY_RELATIONSHIPS_PATH)
             )
         );
 

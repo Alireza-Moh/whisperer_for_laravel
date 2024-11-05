@@ -4,7 +4,6 @@
 
 namespace App\Models {
 
-   use LaravelVision\Helper\BaseModel;
    use LaravelVision\Helper\BaseQueryBuilder;
    use Illuminate\Support\Carbon;
    use Illuminate\Database\Eloquent\Collection as _BaseEloquentCollection;
@@ -48,6 +47,7 @@ namespace App\Models {
    * @method static _BaseEloquentCollection|Paginator|${model.modelName}[] simplePaginate(int|null $perPage = null, array|string $columns = ['*'], string $pageName = 'page', int|null $page = null)
    * @method static ${model.modelName} sole(array|string $columns = ['*'])
    * @method static ${model.modelName} updateOrCreate(array $attributes, array $values = [])
+   * @mixin BaseQueryBuilder
    */
    class ${model.modelName} extends BaseModel {}
 
