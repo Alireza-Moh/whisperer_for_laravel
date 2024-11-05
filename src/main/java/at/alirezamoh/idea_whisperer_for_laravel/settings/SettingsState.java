@@ -126,7 +126,11 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
      * @param text The text to process
      * @return The processed text
      */
-    public String replaceAndSlashes(String text) {
+    public String replaceAndSlashes(@Nullable String text) {
+        if (text == null) {
+            return text;
+        }
+
         text = text.replace("\\", "/");
 
         if (!text.startsWith("/")) {

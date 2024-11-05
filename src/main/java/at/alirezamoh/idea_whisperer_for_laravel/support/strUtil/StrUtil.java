@@ -85,6 +85,14 @@ public class StrUtil {
         return value;
     }
 
+    public static String snake(String value, String delimiter) {
+        if (!value.equals(value.toLowerCase())) {
+            value = value.replaceAll("([a-z])([A-Z])", "$1" + delimiter + "$2").toLowerCase();
+        }
+
+        return value;
+    }
+
     public static String camel(String value) {
         String camelCaseValue = toStudlyCase(value);
 

@@ -1,6 +1,7 @@
 package at.alirezamoh.idea_whisperer_for_laravel.actions.models;
 
 import at.alirezamoh.idea_whisperer_for_laravel.support.ProjectDefaultPaths;
+import at.alirezamoh.idea_whisperer_for_laravel.support.strUtil.StrUtil;
 
 /**
  * Model representing a Blade component view
@@ -30,11 +31,17 @@ public class BladeComponentViewModel extends BaseModel {
             moduleSrcPath
         );
 
+        this.name = StrUtil.snake(getName(), "-");
+
+        initSettings();
+    }
+
+    public void initSettings() {
         if (unformattedModuleFullPath.isEmpty()) {
             this.setDestination(ProjectDefaultPaths.BLADE_COMPONENT_VIEW_PATH);
         }
         else {
-            this.setDestination(this.unformattedModuleFullPath + "/" + ProjectDefaultPaths.BLADE_COMPONENT_VIEW_PATH);
+            this.setDestination(unformattedModuleFullPath + "/" + ProjectDefaultPaths.BLADE_COMPONENT_VIEW_PATH);
         }
     }
 }
