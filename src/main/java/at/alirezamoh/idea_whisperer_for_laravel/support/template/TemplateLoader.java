@@ -11,7 +11,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import freemarker.cache.ClassTemplateLoader;
@@ -23,6 +22,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.file.AccessDeniedException;
 
 /**
  * Loads and processes Freemarker templates
@@ -49,6 +49,10 @@ public class TemplateLoader {
      */
     private BaseModel object;
 
+    private boolean showSuccessMessage = true;
+
+    private boolean overwriteFile = false;
+
     /**
      * @param project  The current project
      * @param template The name of the template file
@@ -58,6 +62,21 @@ public class TemplateLoader {
         this.project = project;
         this.template = template;
         this.object = object;
+    }
+
+    /**
+     * @param project                     The current project
+     * @param template                    The name of the template file
+     * @param object                      The data model for the template
+     * @param showSuccessOrErrorMessage   show message to user
+     * @param overwriteFile               should overwrite file
+     */
+    public TemplateLoader(Project project, String template, BaseModel object, boolean showSuccessOrErrorMessage, boolean overwriteFile) {
+        this.project = project;
+        this.template = template;
+        this.object = object;
+        this.showSuccessMessage = showSuccessOrErrorMessage;
+        this.overwriteFile = overwriteFile;
     }
 
     /**
@@ -79,10 +98,20 @@ public class TemplateLoader {
                         openFileInEditor(createdFile);
                     }
                 } catch (IOException e) {
-                    Notify.notifyError(
-                        project,
-                        "Could not create " + object.getName() + " directory"
-                    );
+                    if (e instanceof AccessDeniedException) {
+                        Notify.notifyError(
+                            project,
+                            "Could not create directory.\n" +
+                                "Permission Issue on Folder: It appears that PHPStorm does not have the necessary permissions to access the folder\n" +
+                                "It might be related to WSL"
+                        );
+                    }
+                    else {
+                        Notify.notifyError(
+                            project,
+                            "Could not create " + object.getDestination() + " directory"
+                        );
+                    }
                 }
             });
         });
@@ -97,7 +126,7 @@ public class TemplateLoader {
         try {
             String filePath = project.getBasePath() + "/" + object.getFilePath();
             File file = new File(filePath);
-            if (file.exists()) {
+            if (file.exists() && !overwriteFile) {
                 Notify.notifyWarning(
                     project,
                     object.getName() + " file already exists"
@@ -121,10 +150,12 @@ public class TemplateLoader {
                 createdFile = PsiManager.getInstance(project).findFile(virtualFile);
             }
 
-            Notify.notifySuccess(
-                project,
-                object.getName() + " created successfully"
-            );
+            if (showSuccessMessage) {
+                Notify.notifySuccess(
+                    project,
+                    object.getName() + " created successfully"
+                );
+            }
         } catch (IOException | TemplateException ex) {
             Notify.notifyError(
                 project,

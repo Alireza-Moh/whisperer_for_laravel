@@ -1,13 +1,14 @@
 package at.alirezamoh.idea_whisperer_for_laravel.actions;
 
+import at.alirezamoh.idea_whisperer_for_laravel.support.laravelUtils.FrameworkUtils;
+import at.alirezamoh.idea_whisperer_for_laravel.support.laravelUtils.MethodUtils;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
-import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 
-public class StartPluginAction extends DefaultActionGroup implements DumbAware {
+public class StartPluginAction extends DefaultActionGroup {
 
     StartPluginAction() {
         super("Idea Whisperer For Laravel", true);
@@ -16,8 +17,14 @@ public class StartPluginAction extends DefaultActionGroup implements DumbAware {
     @Override
     public void update(@NotNull AnActionEvent e) {
         Project project = e.getProject();
+        if (project != null && !MethodUtils.isDumbMode(project)) {
+            if (!FrameworkUtils.isLaravelProject(project)) {
+                e.getPresentation().setEnabledAndVisible(false);
+            }
+        }
+
         if (project == null) {
-            return;
+            e.getPresentation().setEnabledAndVisible(false);
         }
     }
 

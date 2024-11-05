@@ -3,7 +3,6 @@ package at.alirezamoh.idea_whisperer_for_laravel.routing;
 import at.alirezamoh.idea_whisperer_for_laravel.routing.util.RouteUtil;
 import at.alirezamoh.idea_whisperer_for_laravel.routing.visitor.RouteNameFinder;
 import at.alirezamoh.idea_whisperer_for_laravel.routing.visitor.RouteNamesCollector;
-import at.alirezamoh.idea_whisperer_for_laravel.support.psiUtil.PsiUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
@@ -44,7 +43,7 @@ public class RouteReference extends PsiReferenceBase<PsiElement> {
      * Resolves the route name reference to the corresponding PSI element
      * This method searches for the route name in route files and, if applicable,
      * in module service providers
-     * @return The resolved route PSI element, or null if not found
+     * @return The resolved route or null
      */
     @Override
     public @Nullable PsiElement resolve() {
@@ -63,15 +62,11 @@ public class RouteReference extends PsiReferenceBase<PsiElement> {
     }
 
     /**
-     * Returns an array of variants (code completion suggestions) for the reference
-     * @return An array of LookupElementBuilder objects representing the route name variants
+     * Returns an array of route names
+     * @return route names list
      */
     @Override
     public Object @NotNull [] getVariants() {
-        if (!PsiUtil.isCaretInFunctionFirstParameter(myElement) && !PsiUtil.isCaretInMethodFirstParameter(myElement)) {
-            return PsiElement.EMPTY_ARRAY;
-        }
-
         return routeNamesCollector.startSearching().toArray();
     }
 }

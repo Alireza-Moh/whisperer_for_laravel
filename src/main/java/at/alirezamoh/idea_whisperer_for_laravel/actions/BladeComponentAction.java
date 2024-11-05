@@ -1,5 +1,7 @@
 package at.alirezamoh.idea_whisperer_for_laravel.actions;
 
+import at.alirezamoh.idea_whisperer_for_laravel.actions.models.BladeComponentClassModel;
+import at.alirezamoh.idea_whisperer_for_laravel.actions.models.BladeComponentViewModel;
 import at.alirezamoh.idea_whisperer_for_laravel.actions.views.BladeComponentView;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
@@ -18,38 +20,39 @@ public class BladeComponentAction extends BaseAction {
 
         if (bladeComponentView.showAndGet()) {
 
+            BladeComponentClassModel componentClass = bladeComponentView.getBladeComponentClassModel();
+            BladeComponentViewModel viewForComponent = bladeComponentView.getBladeComponentViewModel();
+
             if (bladeComponentView.withBladeComponentClassAndBladeView()) {
-                this.create(
-                    bladeComponentView.getBladeComponentViewModel(),
-                    "view.ftl",
-                    true,
-                    project
-                );
-                this.create(
-                    bladeComponentView.getBladeComponentClassModel(),
-                    "bladeComponentClass.ftl",
-                    true,
-                    project
-                );
+                createView(viewForComponent, project);
+                createComponentClass(componentClass, project);
             }
 
             if (bladeComponentView.onlyComponentBladeView()) {
-                this.create(
-                    bladeComponentView.getBladeComponentViewModel(),
-                    "view.ftl",
-                    true,
-                    project
-                );
+                createView(viewForComponent, project);
             }
 
             if (bladeComponentView.onlyComponentClass()) {
-                this.create(
-                    bladeComponentView.getBladeComponentClassModel(),
-                    "bladeComponentClass.ftl",
-                    true,
-                    project
-                );
+                createComponentClass(componentClass, project);
             }
         }
+    }
+
+    private void createView(BladeComponentViewModel model, Project project) {
+        this.create(
+            model,
+            "view.ftl",
+            true,
+            project
+        );
+    }
+
+    private void createComponentClass(BladeComponentClassModel model, Project project) {
+        this.create(
+            model,
+            "bladeComponentClass.ftl",
+            true,
+            project
+        );
     }
 }

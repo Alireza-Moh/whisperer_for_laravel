@@ -18,8 +18,9 @@ class ${name} extends Migration
 <#if createTable>
         Schema::create('${tableName}', function (Blueprint $table) {
         <#if hasFields>
+            $table->id();
         <#list fields as field>
-            $table->${field.getType()}('${field.getName()}')<#if field.isNullable()>->nullable(${field.getNullableString()})</#if>;
+            $table->${field.getType()}('${field.getName()}')<#if field.isNullable()>->nullable()</#if>;
         </#list>
             $table->timestamps();
         </#if>

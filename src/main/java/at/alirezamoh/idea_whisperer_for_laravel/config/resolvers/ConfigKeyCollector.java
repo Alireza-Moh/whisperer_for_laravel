@@ -50,22 +50,40 @@ public class ConfigKeyCollector {
      * Searches for config keys within a given directory
      */
     public ConfigKeyCollector startSearching() {
-        PsiDirectory configDir = DirectoryPsiUtil.getDirectory(project, ProjectDefaultPaths.CONFIG_PATH);
+        PsiDirectory configDir = null;
+        if (projectSettingState.isModuleApplication()) {
+            String rootPath = projectSettingState.getRootAppPath();
+
+            if (rootPath != null) {
+                configDir = DirectoryPsiUtil.getDirectory(project, StrUtil.addSlashes(rootPath) + "config/");
+            }
+
+            if (configDir == null) {
+                configDir = DirectoryPsiUtil.getDirectory(project, ProjectDefaultPaths.CONFIG_PATH);
+            }
+        }
+        else {
+            configDir = DirectoryPsiUtil.getDirectory(project, ProjectDefaultPaths.CONFIG_PATH);
+        }
 
         if (configDir != null) {
             processDirectory(configDir, "");
         }
 
-        String moduleDirectoryRootPath = StrUtil.addSlashes(
-            projectSettingState.getModuleRootDirectoryPath(),
-            false,
-            true
-        );
-
+        String moduleDirectoryRootPath = projectSettingState.getFormattedModuleRootDirectoryPath();
         if (projectSettingState.isModuleApplication() && moduleDirectoryRootPath != null) {
             searchForModulesConfigKeys();
         }
         
+        return this;
+    }
+
+    public ConfigKeyCollector getFromModules() {
+        String moduleDirectoryRootPath = projectSettingState.getFormattedModuleRootDirectoryPath();
+        if (projectSettingState.isModuleApplication() && moduleDirectoryRootPath != null) {
+            searchForModulesConfigKeys();
+        }
+
         return this;
     }
 

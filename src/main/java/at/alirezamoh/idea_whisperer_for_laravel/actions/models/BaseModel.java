@@ -84,6 +84,8 @@ abstract public class BaseModel {
         initFileName();
     }
 
+    public BaseModel() {}
+
     /**
      * Removes the file extension from a filename
      *
@@ -242,6 +244,14 @@ abstract public class BaseModel {
                     + getFolderPath().replace("/", "\\");
             }
         }
+    }
+
+    public String getUnformattedModuleFullPath() {
+        return unformattedModuleFullPath;
+    }
+
+    public String getModuleSrcPath() {
+        return moduleSrcPath;
     }
 
     protected void initFileName() {

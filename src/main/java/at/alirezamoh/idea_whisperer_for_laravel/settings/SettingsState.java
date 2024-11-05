@@ -1,5 +1,6 @@
 package at.alirezamoh.idea_whisperer_for_laravel.settings;
 
+import at.alirezamoh.idea_whisperer_for_laravel.support.strUtil.StrUtil;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
@@ -84,6 +85,14 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
         return moduleRootDirectoryPath;
     }
 
+    public @Nullable String getFormattedModuleRootDirectoryPath() {
+        return StrUtil.addSlashes(
+                getModuleRootDirectoryPath(),
+                false,
+                true
+        );
+    }
+
     public void setModuleRootDirectoryPath(String moduleRootDirectoryPath) {
         this.moduleRootDirectoryPath = moduleRootDirectoryPath;
     }
@@ -117,7 +126,11 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
      * @param text The text to process
      * @return The processed text
      */
-    public String replaceAndSlashes(String text) {
+    public String replaceAndSlashes(@Nullable String text) {
+        if (text == null) {
+            return text;
+        }
+
         text = text.replace("\\", "/");
 
         if (!text.startsWith("/")) {
@@ -125,6 +138,24 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
         }
         if (!text.endsWith("/")) {
             text = text + "/";
+        }
+
+        return text;
+    }
+
+    /**
+     * Replaces backslashes with forward slashes and ensures the path starts and ends without a slash
+     * @param text The text to process
+     * @return The processed text
+     */
+    public String replaceAndSlashesToStart(String text) {
+        text = text.replace("\\", "/");
+
+        if (!text.startsWith("/")) {
+            text = "/" + text;
+        }
+        if (text.endsWith("/")) {
+            text = text.substring(0, text.length() - 1);
         }
 
         return text;

@@ -1,15 +1,25 @@
 package at.alirezamoh.idea_whisperer_for_laravel.config;
 
 
-import at.alirezamoh.idea_whisperer_for_laravel.settings.SettingsState;
+import at.alirezamoh.idea_whisperer_for_laravel.support.laravelUtils.ClassUtils;
+import at.alirezamoh.idea_whisperer_for_laravel.support.laravelUtils.FrameworkUtils;
+import at.alirezamoh.idea_whisperer_for_laravel.support.laravelUtils.MethodUtils;
 import at.alirezamoh.idea_whisperer_for_laravel.support.psiUtil.PsiUtil;
-import com.intellij.openapi.externalSystem.autoimport.ProjectStatus;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.*;
 import com.intellij.util.ProcessingContext;
+import com.jetbrains.php.lang.psi.elements.FunctionReference;
+import com.jetbrains.php.lang.psi.elements.MethodReference;
+import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
+import com.jetbrains.php.lang.psi.elements.impl.PhpClassImpl;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Contributes references to Laravel config keys in the PSI tree
@@ -18,18 +28,24 @@ public class ConfigReferenceContributor extends PsiReferenceContributor {
     /**
      * The namespace of the `Config` facade
      */
-    private final String CONFIG_NAMESPACE = "\\Illuminate\\Support\\Facades\\Config";
+    private final String CONFIG = "\\Illuminate\\Support\\Facades\\Config";
 
     /**
      * The names of the methods in the `Config` facade that can reference config keys
      */
-    private final String[] CONFIG_METHODS = {"get", "has"} ;
-
-    /**
-     * The name of the `config` helper function
-     */
-    private final String CONFIG_FUNCTION = "config" ;
-
+    public static Map<String, List<Integer>> CONFIG_METHODS = new HashMap<>() {{
+        put("get", List.of(0));
+        put("has", List.of(0));
+        put("config", List.of(0));
+        put("array", List.of(0));
+        put("boolean", List.of(0));
+        put("float", List.of(0));
+        put("integer", List.of(0));
+        put("string", List.of(0));
+        put("getMany", List.of(0));
+        put("set", List.of(0));
+        put("prepend", List.of(0));
+    }};
 
     /**
      * Registers the reference provider for config keys
@@ -42,9 +58,13 @@ public class ConfigReferenceContributor extends PsiReferenceContributor {
                 new PsiReferenceProvider() {
                     @Override
                     public PsiReference @NotNull [] getReferencesByElement(@NotNull PsiElement psiElement, @NotNull ProcessingContext processingContext) {
-                        if (isInsideConfigHelperMethod(psiElement) && psiElement instanceof StringLiteralExpression stringLiteralExpression)
+                        if (FrameworkUtils.isLaravelFrameworkNotInstalled(psiElement.getProject())) {
+                            return PsiReference.EMPTY_ARRAY;
+                        }
+
+                        if (isInsideConfigHelperMethod(psiElement))
                         {
-                            String text = stringLiteralExpression.getText();
+                            String text = psiElement.getText();
 
                             return new PsiReference[]{
                                     new ConfigReference(
@@ -65,7 +85,42 @@ public class ConfigReferenceContributor extends PsiReferenceContributor {
      * @return           True if the element is inside a relevant method or function, false otherwise
      */
     private boolean isInsideConfigHelperMethod(@NotNull PsiElement psiElement) {
-        return PsiUtil.isInsideFunction(psiElement, CONFIG_FUNCTION)
-            || PsiUtil.isInsideMethod(psiElement, CONFIG_METHODS, CONFIG_NAMESPACE);
+        MethodReference method = MethodUtils.resolveMethodReference(psiElement, 10);
+        FunctionReference function = MethodUtils.resolveFunctionReference(psiElement, 10);
+        Project project = psiElement.getProject();
+
+        return (method != null && isConfigParam(method, psiElement) && isConfigMethod(method, project))
+                || (function != null && isConfigParam(function, psiElement));
+    }
+
+    /**
+     * General method to check if the given reference and position match the config parameter criteria
+     * @param reference The method or function reference
+     * @param position The PSI element position
+     * @return True or false
+     */
+    private boolean isConfigParam(PsiElement reference, PsiElement position) {
+        int paramIndex = MethodUtils.findParamIndex(position, false);
+        String referenceName = (reference instanceof MethodReference)
+                ? ((MethodReference) reference).getName()
+                : ((FunctionReference) reference).getName();
+
+        List<Integer> paramPositions = CONFIG_METHODS.get(referenceName);
+
+        return paramPositions != null && paramPositions.contains(paramIndex);
+    }
+
+    /**
+     * Checks if the given method reference is a view or route method
+     * @param methodReference The method reference
+     * @param project The project context
+     * @return True or false
+     */
+    private boolean isConfigMethod(MethodReference methodReference, Project project) {
+        List<PhpClassImpl> resolvedClasses = MethodUtils.resolveMethodClasses(methodReference, project);
+
+        PhpClass configClass = ClassUtils.getClassByFQN(project, CONFIG);
+
+        return configClass != null && resolvedClasses.stream().anyMatch(clazz -> ClassUtils.isChildOf(clazz, configClass));
     }
 }

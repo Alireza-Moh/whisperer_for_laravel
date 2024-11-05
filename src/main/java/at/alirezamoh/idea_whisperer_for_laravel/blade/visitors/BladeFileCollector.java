@@ -2,17 +2,16 @@ package at.alirezamoh.idea_whisperer_for_laravel.blade.visitors;
 
 import at.alirezamoh.idea_whisperer_for_laravel.blade.BladeModule;
 import at.alirezamoh.idea_whisperer_for_laravel.settings.SettingsState;
-import at.alirezamoh.idea_whisperer_for_laravel.support.IdeaWhispererForLaravelIcon;
 import at.alirezamoh.idea_whisperer_for_laravel.support.ProjectDefaultPaths;
 import at.alirezamoh.idea_whisperer_for_laravel.support.applicationModules.utils.ApplicationModuleUtil;
 import at.alirezamoh.idea_whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
+import at.alirezamoh.idea_whisperer_for_laravel.support.psiUtil.PsiUtil;
 import at.alirezamoh.idea_whisperer_for_laravel.support.strUtil.StrUtil;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.jetbrains.php.blade.BladeFileType;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,16 +50,27 @@ public class BladeFileCollector {
     }
 
     public BladeFileCollector startSearching() {
-        PsiDirectory defaultViewDir = DirectoryPsiUtil.getDirectory(this.project, ProjectDefaultPaths.VIEW_PATH);
+        PsiDirectory defaultViewDir = null;
+        if (projectSettingState.isModuleApplication()) {
+            String rootPath = projectSettingState.getRootAppPath();
+
+            if (rootPath != null) {
+                defaultViewDir = DirectoryPsiUtil.getDirectory(project, StrUtil.addSlashes(rootPath) + "resources/views/");
+            }
+
+            if (defaultViewDir == null) {
+                defaultViewDir = DirectoryPsiUtil.getDirectory(project, ProjectDefaultPaths.VIEW_PATH);
+            }
+        }
+        else {
+            defaultViewDir = DirectoryPsiUtil.getDirectory(project, ProjectDefaultPaths.VIEW_PATH);
+        }
+
         if (defaultViewDir != null) {
             searchForBladeFiles(defaultViewDir, "", "");
         }
 
-        String moduleDirectoryRootPath = StrUtil.addSlashes(
-            projectSettingState.getModuleRootDirectoryPath(),
-            false,
-            true
-        );
+        String moduleDirectoryRootPath = projectSettingState.getFormattedModuleRootDirectoryPath();
         if (projectSettingState.isModuleApplication() && moduleDirectoryRootPath != null) {
             searchForBladeFilesInModules();
         }
@@ -104,7 +114,7 @@ public class BladeFileCollector {
                     bladeFilesWithCorrectPsiFile.put(file, finalFileName);
                 }
                 else {
-                    variants.add(buildLookupElement(finalFileName));
+                    variants.add(PsiUtil.buildSimpleLookupElement(finalFileName));
                 }
             }
         }
@@ -132,14 +142,5 @@ public class BladeFileCollector {
                 }
             }
         }
-    }
-
-    /**
-     * Builds a LookupElementBuilder with the Laravel icon
-     * @param element The element to create the LookupElementBuilder for
-     * @return        The LookupElement
-     */
-    public LookupElementBuilder buildLookupElement(@NotNull String element) {
-        return LookupElementBuilder.create(element).withIcon(IdeaWhispererForLaravelIcon.LARAVEL_ICON);
     }
 }

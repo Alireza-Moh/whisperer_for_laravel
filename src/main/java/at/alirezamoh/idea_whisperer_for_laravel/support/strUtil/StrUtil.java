@@ -1,5 +1,11 @@
 package at.alirezamoh.idea_whisperer_for_laravel.support.strUtil;
 
+import org.atteo.evo.inflector.English;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Random;
+
 /**
  * Provides utility methods for working with strings
  */
@@ -11,7 +17,7 @@ public class StrUtil {
      */
     public static String removeQuotes(String text) {
         return text.replace("\"", "")
-                .replace("'", "");
+                .replace("'", "").trim();
     }
 
     /**
@@ -24,6 +30,10 @@ public class StrUtil {
     }
 
     public static String addSlashes(String text, boolean removeSlashFromStart, boolean removeSlashFromEnd) {
+        if (text == null) {
+            return text;
+        }
+
         text = text.replaceAll("\\\\", "/");
 
         if (!text.startsWith("/")) {
@@ -42,6 +52,10 @@ public class StrUtil {
         }
 
         return text;
+    }
+
+    public static String addSlashes(String text) {
+        return addSlashes(text, false, false);
     }
 
     public static String removeExtension(String text) {
@@ -71,10 +85,39 @@ public class StrUtil {
         return value;
     }
 
+    public static String snake(String value, String delimiter) {
+        if (!value.equals(value.toLowerCase())) {
+            value = value.replaceAll("([a-z])([A-Z])", "$1" + delimiter + "$2").toLowerCase();
+        }
+
+        return value;
+    }
+
     public static String camel(String value) {
         String camelCaseValue = toStudlyCase(value);
 
         return Character.toLowerCase(camelCaseValue.charAt(0)) + camelCaseValue.substring(1);
+    }
+
+    public static String getCurrentDate() {
+        LocalDate currentDate = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy_MM_dd");
+
+        return currentDate.format(formatter);
+    }
+
+    public static String generateRandomId() {
+        Random random = new Random();
+
+        return String.format("%06d_", random.nextInt(1000000));
+    }
+
+    public static String plural(String text) {
+        return English.plural(text);
+    }
+
+    public static String capitalizeFirstLetter(String input) {
+        return input.substring(0, 1).toUpperCase() + input.substring(1);
     }
 
     private static String toStudlyCase(String value) {

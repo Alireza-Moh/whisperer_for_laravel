@@ -1,11 +1,11 @@
 package at.alirezamoh.idea_whisperer_for_laravel.actions.models;
 
+import at.alirezamoh.idea_whisperer_for_laravel.actions.models.dataTables.Field;
 import at.alirezamoh.idea_whisperer_for_laravel.support.ProjectDefaultPaths;
 import at.alirezamoh.idea_whisperer_for_laravel.support.strUtil.StrUtil;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Random;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Model representing a middleware class
@@ -18,6 +18,8 @@ public class MigrationModel extends BaseModel {
     private boolean hasFields;
 
     private boolean anonymous;
+
+    private List<Field> fields;
 
     /**
      * @param name                      The name of the migration class name
@@ -51,6 +53,7 @@ public class MigrationModel extends BaseModel {
         this.createTable = createTable;
         this.hasFields = hasFields;
         this.anonymous = anonymous;
+        this.fields = new ArrayList<>();
 
         if (unformattedModuleFullPath.equals("/app") || unformattedModuleFullPath.isEmpty()) {
             this.formattedModuleFullPath = "";
@@ -83,28 +86,23 @@ public class MigrationModel extends BaseModel {
         return anonymous;
     }
 
+    public List<Field> getFields() {
+        return fields;
+    }
+
+    public void setFields(List<Field> fields) {
+        this.fields = fields;
+    }
+
     private void modifyFileName() {
         filePath = filePath.replace(getName() + extension, getRealFileName());
     }
 
     private String getRealFileName() {
-        return getCurrentDate()
+        return StrUtil.getCurrentDate()
             + "_"
-            + generateRandomId()
+            + StrUtil.generateRandomId()
             + StrUtil.snake(getName())
             + extension;
-    }
-
-    private String getCurrentDate() {
-        LocalDate currentDate = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy_MM_dd");
-
-        return currentDate.format(formatter);
-    }
-
-    private String generateRandomId() {
-        Random random = new Random();
-
-        return String.format("%06d_", random.nextInt(1000000));
     }
 }

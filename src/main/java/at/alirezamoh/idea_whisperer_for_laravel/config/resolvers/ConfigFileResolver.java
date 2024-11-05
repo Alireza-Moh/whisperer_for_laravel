@@ -49,11 +49,14 @@ public class ConfigFileResolver {
 
     private SettingsState settingsState;
 
+    private Project project;
+
     /**
      * @param project   The current project
      * @param myElement The PSI element representing the config key reference
      */
     public ConfigFileResolver(Project project, PsiElement myElement) {
+        this.project = project;
         configDir = DirectoryPsiUtil.getDirectory(project, ProjectDefaultPaths.CONFIG_PATH);
         configFiles = DirectoryPsiUtil.getFilesRecursively(project, ProjectDefaultPaths.CONFIG_PATH);
         searchedConfigKey = StrUtil.removeQuotes(myElement.getText());
@@ -81,6 +84,22 @@ public class ConfigFileResolver {
      * It checks for both direct file name matches and nested key scenarios
      */
     private void iterateFile() {
+        Collection<PsiFile> configFiles = null;
+        if (settingsState.isModuleApplication()) {
+            String rootPath = settingsState.getRootAppPath();
+
+            if (rootPath != null) {
+                configFiles = DirectoryPsiUtil.getFilesRecursively(project, StrUtil.addSlashes(rootPath) + "config/");
+            }
+
+            if (configFiles == null) {
+                configFiles = DirectoryPsiUtil.getFilesRecursively(project, ProjectDefaultPaths.CONFIG_PATH);
+            }
+        }
+        else {
+            configFiles = DirectoryPsiUtil.getFilesRecursively(project, ProjectDefaultPaths.CONFIG_PATH);
+        }
+
         for (PsiFile configFile : configFiles) {
             if (!(configFile instanceof PhpFile phpFile)) {
                 continue;
@@ -150,7 +169,7 @@ public class ConfigFileResolver {
      * tries to find the searched config key in the modules
      */
     private void searchInModules() {
-        Map<ArrayHashElement, String> configKeys = configKeyCollector.startSearching().getConfigKeyWithCorrectPsiElement();
+        Map<ArrayHashElement, String> configKeys = configKeyCollector.getFromModules().getConfigKeyWithCorrectPsiElement();
 
         for (Map.Entry<ArrayHashElement, String> entry : configKeys.entrySet()) {
             if (entry.getValue().equals(searchedConfigKey)) {

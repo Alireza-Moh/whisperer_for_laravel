@@ -2,6 +2,7 @@ package at.alirezamoh.idea_whisperer_for_laravel.support.applicationModules.visi
 
 import at.alirezamoh.idea_whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.idea_whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
+import at.alirezamoh.idea_whisperer_for_laravel.support.strUtil.StrUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
@@ -23,7 +24,7 @@ abstract public class BaseServiceProviderVisitor extends PsiRecursiveElementWalk
     /**
      * The module root directory path
      */
-    protected PsiDirectory moduleRootDirectoryPath;
+    protected PsiDirectory moduleRootDirectory;
 
     /**
      * @param project The current project
@@ -32,9 +33,17 @@ abstract public class BaseServiceProviderVisitor extends PsiRecursiveElementWalk
         this.project = project;
         this.projectSettingState = SettingsState.getInstance(project);
 
-        moduleRootDirectoryPath = DirectoryPsiUtil.getDirectory(
-            project,
-            projectSettingState.getModuleRootDirectoryPath()
-        );
+        String moduleDirectoryRootPath = StrUtil.addSlashes(
+            projectSettingState.getModuleRootDirectoryPath(),
+            false,
+            false
+        );;
+
+        if (moduleDirectoryRootPath != null) {
+            moduleRootDirectory = DirectoryPsiUtil.getDirectory(
+                project,
+                moduleDirectoryRootPath
+            );
+        }
     }
 }

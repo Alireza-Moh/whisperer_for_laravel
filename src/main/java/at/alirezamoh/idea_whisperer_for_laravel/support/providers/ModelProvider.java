@@ -9,6 +9,7 @@ import com.intellij.psi.PsiFile;
 import com.jetbrains.php.lang.psi.PhpFile;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -24,6 +25,13 @@ public class ModelProvider {
     private List<String> models = new ArrayList<>();
 
     /**
+     * List of laravel models
+     */
+    private Collection<PsiFile> originalModels;
+
+    private boolean withFile;
+
+    /**
      * The current project.
      */
     private Project project;
@@ -34,12 +42,26 @@ public class ModelProvider {
     private SettingsState projectSettingState;
 
     /**
-     * @param project             The current project.
-     * @param projectSettingState The plugin settings.
+     * @param project             The current project
+     * @param projectSettingState The plugin settings
      */
     public ModelProvider(Project project, SettingsState projectSettingState) {
         this.project = project;
         this.projectSettingState = projectSettingState;
+        this.withFile = false;
+    }
+
+
+    /**
+     * @param project             The current project
+     * @param projectSettingState The plugin settings
+     * @param withFile            should save mode files
+     */
+    public ModelProvider(Project project, SettingsState projectSettingState, boolean withFile) {
+        this.project = project;
+        this.projectSettingState = projectSettingState;
+        this.withFile = withFile;
+        this.originalModels = new ArrayList<>();
     }
 
     /**
@@ -47,12 +69,21 @@ public class ModelProvider {
      * @return The list of model namespaces.
      */
     public List<String> getModels() {
-        PsiDirectory modelsDir = DirectoryPsiUtil.getDirectory(project, "/app/Models/");
+        PsiDirectory modelsDir = null;
+        if (projectSettingState.isModuleApplication()) {
+            modelsDir = DirectoryPsiUtil.getDirectory(
+                project,
+                projectSettingState.replaceAndSlashes(projectSettingState.getRootAppPath()) + "Models/"
+            );
+        }
+        else {
+            modelsDir = DirectoryPsiUtil.getDirectory(project, "/app/Models/");
+        }
 
         if (modelsDir != null) {
             for (PsiFile file : modelsDir.getFiles()) {
-                if (file instanceof PhpFile) {
-                    addModelToList((PhpFile) file);
+                if (file instanceof PhpFile modelFile) {
+                    addModelToList(modelFile);
                 }
             }
         }
@@ -62,6 +93,11 @@ public class ModelProvider {
         }
 
         return models;
+    }
+
+    public Collection<PsiFile> getOriginalModels() {
+        getModels();
+        return originalModels;
     }
 
     /**
@@ -108,5 +144,9 @@ public class ModelProvider {
         String namespace = phpFile.getMainNamespaceName() + "\\" + virtualFile.getNameWithoutExtension();
 
         models.add(namespace);
+
+        if (withFile) {
+            originalModels.add(phpFile);
+        }
     }
 }

@@ -75,6 +75,7 @@ public abstract class BaseDialog extends DialogWrapper {
 
     /**
      * Returns the unformatted module full path based on the formatted one
+     *
      * @param formattedModuleFullPath The formatted module full path
      * @return The unformatted module full path
      */
@@ -109,27 +110,28 @@ public abstract class BaseDialog extends DialogWrapper {
      * It adds the module select input to the main panel
      */
     protected void initDefaultContentPaneSettings() {
-       moduleNameComboBox = new ComboBox<>(this.modules.values().toArray(new String[0]));
+        moduleNameComboBox = new ComboBox<>(this.modules.values().toArray(new String[0]));
 
-       gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1.0;
 
-       gbc.gridx = 0;
-       gbc.gridy = 0;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
 
         if (this.isAModuleApplication) {
-           gbc.insets = JBUI.insetsLeft(3);
-           contentPane.add(new JLabel("Module"),gbc);
-           gbc.gridy++;
+            gbc.insets = JBUI.insetsLeft(3);
+            contentPane.add(new JLabel("Module"), gbc);
+            gbc.gridy++;
             gbc.insets = JBUI.insetsLeft(0);
-           gbc.insets = JBUI.insetsBottom(15);
-           contentPane.add(this.moduleNameComboBox,gbc);
-           gbc.gridy++;
+            gbc.insets = JBUI.insetsBottom(15);
+            contentPane.add(this.moduleNameComboBox, gbc);
+            gbc.gridy++;
         }
     }
 
     /**
      * Returns the selected formatted module full path from the select input
+     *
      * @return The selected formatted module full path
      */
     protected String getSelectedFormattedModuleFullPath() {
@@ -146,7 +148,7 @@ public abstract class BaseDialog extends DialogWrapper {
             return selected;
         }
     }
-    
+
     protected String getModuleDirSrcName() {
         String selected = moduleNameComboBox.getItem();
 
@@ -160,10 +162,10 @@ public abstract class BaseDialog extends DialogWrapper {
      * Initializes the project module settings
      */
     private void initProjectModuleSettings() {
-       projectSettingState = SettingsState.getInstance(this.project);
+        projectSettingState = SettingsState.getInstance(this.project);
 
-       isAModuleApplication = projectSettingState.isModuleApplication();
-       moduleRootPath = projectSettingState.replaceAndSlashes(this.projectSettingState.getModuleRootDirectoryPath());
+        isAModuleApplication = projectSettingState.isModuleApplication();
+        moduleRootPath = projectSettingState.replaceAndSlashes(this.projectSettingState.getModuleRootDirectoryPath());
     }
 
     /**
@@ -174,26 +176,27 @@ public abstract class BaseDialog extends DialogWrapper {
             return;
         }
 
-        PsiDirectory rootDir = DirectoryPsiUtil.getDirectory(project,moduleRootPath);
+        PsiDirectory rootDir = DirectoryPsiUtil.getDirectory(project, moduleRootPath);
         if (rootDir != null) {
-           modules.put("/app", "App root path");
+            modules.put("/app", "App root path");
             for (PsiDirectory module : rootDir.getSubdirectories()) {
-               formattedModulePath(module.getName());
+                formattedModulePath(module.getName());
             }
         }
         else {
             Notify.notifyError(
-               project,
-                "Module root path [" +moduleRootPath + "] not found"
+                project,
+                "Module root path [" + moduleRootPath + "] not found"
             );
 
-           isAModuleApplication = false;
+            isAModuleApplication = false;
             getOKAction().setEnabled(false);
         }
     }
 
     /**
      * Formats the module path for display in the select input
+     *
      * @param modulePath The module path to format
      */
     private void formattedModulePath(String modulePath) {
@@ -221,6 +224,6 @@ public abstract class BaseDialog extends DialogWrapper {
             result.deleteCharAt(result.length() - 1);
         }
 
-       modules.put(unformattedModuleFullPath.replace("\\", "/"), result.toString());
+        modules.put(unformattedModuleFullPath.replace("\\", "/"), result.toString());
     }
 }

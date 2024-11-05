@@ -1,0 +1,1 @@
+dd(User::find(1));

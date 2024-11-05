@@ -65,8 +65,8 @@ public class ConfigModuleServiceProviderVisitor extends BaseServiceProviderVisit
             return;
         }
 
-        if (moduleRootDirectoryPath != null) {
-            for (PsiDirectory module : moduleRootDirectoryPath.getSubdirectories()) {
+        if (moduleRootDirectory != null) {
+            for (PsiDirectory module : moduleRootDirectory.getSubdirectories()) {
                 PsiDirectory configDir = module.findSubdirectory("config");
 
                 if (configDir != null) {

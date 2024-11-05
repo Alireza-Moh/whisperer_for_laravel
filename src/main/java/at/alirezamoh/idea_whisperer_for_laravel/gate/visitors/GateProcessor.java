@@ -26,38 +26,47 @@ public class GateProcessor {
     public List<LookupElementBuilder> collectGates() {
         GateModuleServiceProviderVisitor visitor = new GateModuleServiceProviderVisitor(project);
         traverseAndAccept(visitor);
+
         return visitor.getVariants();
     }
 
     public PsiElement findGateAbility(PsiElement element) {
         GateAbilityFinder visitor = new GateAbilityFinder(element);
         traverseAndAccept(visitor);
+
         return visitor.getFoundedAbility();
     }
 
     private void traverseAndAccept(PsiElementVisitor visitor) {
-        String rootAppPath = projectSettingsState.getRootAppPath();
+        PsiFile appServiceProviderFile = null;
 
-        if (rootAppPath != null) {
-            PsiFile appServiceProviderFile = DirectoryPsiUtil.getFileByName(
-                project,
-                ProjectDefaultPaths.APP_SERVICE_PROVIDER_PATH
-            );
-
-            if (appServiceProviderFile != null) {
-                appServiceProviderFile.acceptChildren(visitor);
+        if (projectSettingsState.isModuleApplication()) {
+            String rootAppPath = projectSettingsState.getRootAppPath();
+            if (rootAppPath != null) {
+                appServiceProviderFile = DirectoryPsiUtil.getFileByName(
+                    project,
+                    projectSettingsState.replaceAndSlashes(rootAppPath)
+                    + ProjectDefaultPaths.APP_SERVICE_PROVIDER_PATH
+                );
             }
+        }
+        else {
+            appServiceProviderFile = DirectoryPsiUtil.getFileByName(
+                project,
+                "/app/" + ProjectDefaultPaths.APP_SERVICE_PROVIDER_PATH
+            );
+        }
+
+        if (appServiceProviderFile != null) {
+            appServiceProviderFile.acceptChildren(visitor);
         }
 
         searchInModules(visitor);
     }
 
     private void searchInModules(PsiElementVisitor visitor) {
-        String moduleDirectoryRootPath = StrUtil.addSlashes(
-            projectSettingsState.getModuleRootDirectoryPath(),
-            false,
-            true
-        );
+        String moduleDirectoryRootPath = projectSettingsState.getFormattedModuleRootDirectoryPath();
+
         if (projectSettingsState.isModuleApplication() && moduleDirectoryRootPath != null) {
             for (PsiFile provider : ApplicationModuleUtil.getProviders(project)) {
                 provider.acceptChildren(visitor);
