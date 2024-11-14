@@ -60,4 +60,8 @@ public class Method {
     public void addParameter(String text) {
         this.parameters.add(new Parameter(text));
     }
+
+    public void addParameter(Parameter parameter) {
+        this.parameters.add(parameter);
+    }
 }

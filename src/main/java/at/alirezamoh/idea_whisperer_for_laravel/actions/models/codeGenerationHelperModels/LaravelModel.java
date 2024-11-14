@@ -68,4 +68,12 @@ public class LaravelModel {
     public void addMethod(Method method) {
         this.methods.add(method);
     }
+
+    public void addMethods(List<Method> methods) {
+        this.methods.addAll(methods);
+    }
+
+    public void addField(Field field) {
+        this.fields.add(field);
+    }
 }

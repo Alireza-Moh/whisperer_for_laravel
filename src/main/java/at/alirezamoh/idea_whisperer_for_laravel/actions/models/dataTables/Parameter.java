@@ -15,6 +15,9 @@ public class Parameter {
         this.defaultValue = defaultValue;
     }
 
+    public Parameter() {
+    }
+
     public Parameter(String text) {
         this.text = text;
     }
@@ -43,5 +46,17 @@ public class Parameter {
         else {
             return type + " $" + name + " = " + defaultValue;
         }
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public void setDefaultValue(String defaultValue) {
+        this.defaultValue = defaultValue;
     }
 }

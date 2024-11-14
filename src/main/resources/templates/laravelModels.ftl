@@ -7,6 +7,7 @@ namespace App\Models {
    use IdeaWhispererForLaravel\Helper\BaseQueryBuilder;
    use Illuminate\Support\Carbon;
    use Illuminate\Database\Eloquent\Collection as _BaseEloquentCollection;
+   use Illuminate\Database\Eloquent\Model;
 
 <#list models as model>
   /**
@@ -14,8 +15,20 @@ namespace App\Models {
    * @property ${field.type}<#if field.nullable>|null</#if> $${field.name}
 </#list>
 <#list model.methods as method>
-   * @method static ${method.returnType} ${method.name}(<#list method.parameters as parameter>${parameter.type} $${parameter.name}<#if parameter?has_next>, </#if></#list>)
+   * @method static ${method.returnType} ${method.name}(<#list method.parameters as parameter>${parameter.toString()}<#if parameter?has_next>, </#if></#list>)
 </#list>
+<#list model.relations as relation>
+   * @method ${relation.returnType} ${relation.name}()
+</#list>
+   * @method static \Illuminate\Database\Eloquent\Builder onWriteConnection()
+   * @method \Illuminate\Database\Eloquent\Builder newQuery()
+   * @method static \Illuminate\Database\Eloquent\Builder on(null|string $connection = null)
+   * @method static \Illuminate\Database\Eloquent\Builder query()
+   * @method static \Illuminate\Database\Eloquent\Builder with(array|string $relations)
+   * @method \Illuminate\Database\Eloquent\Builder newModelQuery()
+   * @method false|int increment(string $column, float|int $amount = 1, array $extra = [])
+   * @method false|int decrement(string $column, float|int $amount = 1, array $extra = [])
+   * @method static _BaseEloquentCollection|${model.modelName}[] all()
    * @method static ${model.modelName} create(array $attributes = [])
    * @method static ${model.modelName} createOrFirst(array $attributes = [], array $values = [])
    * @method static _BaseEloquentCollection|${model.modelName}[] cursor()
@@ -49,7 +62,7 @@ namespace App\Models {
    * @method static ${model.modelName} updateOrCreate(array $attributes, array $values = [])
    * @mixin BaseQueryBuilder
    */
-   class ${model.modelName} extends BaseModel {}
+   class ${model.modelName} extends Model {}
 
 </#list>
 }

@@ -5,17 +5,14 @@ public class Relation {
 
     private String type;
 
-    private String related;
-
-    private String relatedModelName;
-
     private boolean arrayOrCollection;
 
-    public Relation(String name, String type, String related) {
+    private String returnType;
+
+    public Relation(String name, String type, String returnType) {
         this.name = name;
         this.type = type;
-        this.related = related;
-        this.relatedModelName = related.substring(related.lastIndexOf("\\") + 1);
+        this.returnType = returnType;
         this.validateAdditionalParameterType();
     }
 
@@ -27,12 +24,8 @@ public class Relation {
         return type;
     }
 
-    public String getRelated() {
-        return related;
-    }
-
-    public String getRelatedModelName() {
-        return relatedModelName;
+    public String getReturnType() {
+        return returnType;
     }
 
     public boolean isArrayOrCollection() {
