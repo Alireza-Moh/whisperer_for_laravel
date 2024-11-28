@@ -10,6 +10,9 @@ import at.alirezamoh.idea_whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.idea_whisperer_for_laravel.support.ProjectDefaultPaths;
 import at.alirezamoh.idea_whisperer_for_laravel.support.codeGeneration.vistors.MigrationVisitor;
 import at.alirezamoh.idea_whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
+import at.alirezamoh.idea_whisperer_for_laravel.support.laravelUtils.ClassUtils;
+import at.alirezamoh.idea_whisperer_for_laravel.support.laravelUtils.LaravelPaths;
+import at.alirezamoh.idea_whisperer_for_laravel.support.laravelUtils.MethodUtils;
 import at.alirezamoh.idea_whisperer_for_laravel.support.providers.ModelProvider;
 import at.alirezamoh.idea_whisperer_for_laravel.support.strUtil.StrUtil;
 import com.intellij.openapi.project.Project;
@@ -18,9 +21,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
-import com.jetbrains.php.lang.psi.elements.impl.GroupStatementImpl;
-import com.jetbrains.php.lang.psi.elements.impl.MethodReferenceImpl;
-import com.jetbrains.php.lang.psi.elements.impl.PhpReturnImpl;
+import com.jetbrains.php.lang.psi.elements.impl.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,6 +29,21 @@ import java.util.*;
 
 public class MigrationManager {
     static final String ELOQUENT_BUILDER_NAMESPACE = "\\Illuminate\\Database\\Eloquent\\Builder";
+
+    public static Map<String, Integer> RELATION_METHODS = new HashMap<>() {{
+        put("belongsTo", 0);
+        put("belongsToMany", 0);
+        put("hasMany", 0);
+        put("hasManyThrough", 0);
+        put("hasOne", 0);
+        put("hasOneOrMany", 0);
+        put("hasOneOrManyThrough", 0);
+        put("hasOneThrough", 0);
+        put("morphMany", 0);
+        put("morphOne", 0);
+        put("morphTo", 0);
+        put("morphToMany", 0);
+    }};
 
     private Project project;
 
@@ -60,7 +76,7 @@ public class MigrationManager {
                 laravelModel.setFields(table.fields());
 
                 List<Relation> relations = new ArrayList<>();
-                for (com.jetbrains.php.lang.psi.elements.Method method : RelationResolver.resolveAllRelations(modelClass, project)) {
+                for (com.jetbrains.php.lang.psi.elements.Method method : resolveAllRelations(modelClass, project)) {
                     Map.Entry<String, PhpClass> methodNameAndRelatedModel = findRelationships(method);
                     if (methodNameAndRelatedModel != null) {
                         relations.add(
@@ -268,13 +284,62 @@ public class MigrationManager {
             .filter(child2 -> child2 instanceof MethodReferenceImpl)
             .map(child2 -> (MethodReferenceImpl) child2)
             .map(methodReference -> {
-                PhpClass relatedModel = RelationResolver.findRelatedModelFromMethod(foundedMethod);
+                PhpClass relatedModel = findRelatedModelFromMethod(foundedMethod);
                 if (relatedModel != null) {
                     return new AbstractMap.SimpleEntry<>(methodReference.getName(), relatedModel);
                 }
                 return null;
             })
             .filter(Objects::nonNull)
+            .findFirst()
+            .orElse(null);
+    }
+
+    public static List<com.jetbrains.php.lang.psi.elements.Method> resolveAllRelations(PhpClass model, Project project) {
+        List<com.jetbrains.php.lang.psi.elements.Method> relations = new ArrayList<>();
+
+        for (com.jetbrains.php.lang.psi.elements.Method method : model.getOwnMethods()) {
+            if (isRelationshipMethod(method, project)) {
+                relations.add(method);
+            }
+        }
+
+        return relations;
+    }
+
+    public static boolean isRelationshipMethod(com.jetbrains.php.lang.psi.elements.Method method, Project project) {
+        return Arrays.stream(method.getChildren())
+            .filter(element -> element instanceof GroupStatementImpl)
+            .flatMap(element -> Arrays.stream(element.getChildren()))
+            .filter(child -> child instanceof PhpReturnImpl)
+            .flatMap(child -> Arrays.stream(child.getChildren()))
+            .filter(child2 -> child2 instanceof MethodReferenceImpl)
+            .map(child2 -> (MethodReferenceImpl) child2)
+            .anyMatch(methodReference -> {
+                List<PhpClassImpl> classes = MethodUtils.resolveMethodClasses(methodReference, project);
+                PhpClass relationClass = ClassUtils.getClassByFQN(project, LaravelPaths.LaravelClasses.Model);
+
+                return RELATION_METHODS.containsKey(methodReference.getName())
+                    && relationClass != null
+                    && classes.stream().anyMatch(clazz -> ClassUtils.isChildOf(clazz, relationClass));
+            });
+    }
+
+    public static @Nullable PhpClass findRelatedModelFromMethod(com.jetbrains.php.lang.psi.elements.Method foundedMethod) {
+        return Arrays.stream(foundedMethod.getChildren())
+            .filter(element -> element instanceof GroupStatementImpl)
+            .flatMap(groupStatement -> Arrays.stream(groupStatement.getChildren()))
+            .filter(child -> child instanceof PhpReturnImpl)
+            .flatMap(phpReturn -> Arrays.stream(phpReturn.getChildren()))
+            .filter(child2 -> child2 instanceof MethodReferenceImpl)
+            .map(child2 -> (MethodReferenceImpl) child2)
+            .map(methodReference -> methodReference.getParameter(0))
+            .filter(parameter -> parameter instanceof ClassConstantReferenceImpl)
+            .map(parameter -> ((ClassConstantReferenceImpl) parameter).getClassReference())
+            .filter(phpExpression -> phpExpression instanceof ClassReferenceImpl)
+            .map(phpExpression -> ((ClassReferenceImpl) phpExpression).resolve())
+            .filter(resolvedClass -> resolvedClass instanceof PhpClass)
+            .map(resolvedClass -> (PhpClass) resolvedClass)
             .findFirst()
             .orElse(null);
     }

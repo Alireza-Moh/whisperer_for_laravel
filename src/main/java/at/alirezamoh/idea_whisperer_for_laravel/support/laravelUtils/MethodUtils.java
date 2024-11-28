@@ -8,6 +8,7 @@ import com.intellij.util.ArrayUtil;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.elements.impl.*;
+import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,10 +19,26 @@ public class MethodUtils extends PhpElementVisitor {
         List<PhpClassImpl> classes = new ArrayList<>();
         PhpIndex phpIndex = PhpIndex.getInstance(project);
 
+        PhpExpression e = Objects.requireNonNull(method.getClassReference());
+        PhpType t = Objects.requireNonNull(method.getClassReference()).getDeclaredType();
         phpIndex.completeType(project, Objects.requireNonNull(method.getClassReference()).getDeclaredType(), null).getTypes()
             .forEach(className -> collectClasses(project, className, classes));
 
         return classes;
+    }
+
+    public static @Nullable PhpClass resolveMethodClass(MethodReference method, Project project) {
+        List<PhpClassImpl> classes = new ArrayList<>();
+        PhpIndex phpIndex = PhpIndex.getInstance(project);
+
+        PhpExpression e = method.getClassReference();
+
+        if (e instanceof ClassReferenceImpl classReference) {
+            PsiElement resolved = classReference.resolve();
+
+            return (resolved instanceof PhpClass phpClass) ? phpClass : null;
+        }
+        return null;
     }
 
     public static @Nullable String resolveModelName(PsiElement element, Project project) {
@@ -48,6 +65,23 @@ public class MethodUtils extends PhpElementVisitor {
 
     public static @Nullable PhpClass getEloquentModel(PsiElement element, Project project) {
         MethodReference methodReference = resolveMethodReference(element, 10);
+        PhpClass eloquentModel = ClassUtils.getEloquentBaseModel(project);
+
+        if (eloquentModel == null || methodReference == null) {
+            return null;
+        }
+
+        List<PhpClassImpl> resolvedClasses = resolveMethodClasses(methodReference, project);
+        for (PhpClassImpl clazz : resolvedClasses) {
+            if (ClassUtils.isChildOf(clazz, eloquentModel)) {
+                return clazz;
+            }
+        }
+
+        return null;
+    }
+
+    public static @Nullable PhpClass getEloquentModel(MethodReference methodReference, Project project) {
         PhpClass eloquentModel = ClassUtils.getEloquentBaseModel(project);
 
         if (eloquentModel == null || methodReference == null) {

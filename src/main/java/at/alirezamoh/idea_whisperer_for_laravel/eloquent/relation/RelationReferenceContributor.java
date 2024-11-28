@@ -6,6 +6,7 @@ import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.*;
 import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.lang.lexer.PhpTokenTypes;
+import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,10 +23,10 @@ public class RelationReferenceContributor extends PsiReferenceContributor {
                         return PsiReference.EMPTY_ARRAY;
                     }
 
+                    boolean s = EloquentUtil.isInsideCorrectRelationMethodMethod(psiElement);
                     if (psiElement instanceof StringLiteralExpression && EloquentUtil.isInsideCorrectRelationMethodMethod(psiElement)) {
-
                         return new PsiReference[]{
-                            new RelationReference(psiElement)
+                            new RelationReference(psiElement.getOriginalElement())
                         };
                     }
                     return PsiReference.EMPTY_ARRAY;

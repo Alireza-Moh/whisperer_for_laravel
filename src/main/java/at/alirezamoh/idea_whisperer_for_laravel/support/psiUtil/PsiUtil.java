@@ -24,6 +24,7 @@ public class PsiUtil {
         return LookupElementBuilder
             .create(key)
             .withLookupString(key)
+            .bold()
             .withIcon(IdeaWhispererForLaravelIcon.LARAVEL_ICON);
     }
 
