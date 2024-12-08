@@ -13,7 +13,7 @@ namespace IdeaWhispererForLaravel\Helper {
    /**
 <#list methods as method>
    * @see ${method.see}::${method.name}
-   * @method ${method.returnType} ${method.name}(<#list method.parameters as parameter>${parameter.toString()}<#if parameter?has_next>, </#if></#list>)
+   * @method static ${method.returnType} ${method.name}(<#list method.parameters as parameter>${parameter.toString()}<#if parameter?has_next>, </#if></#list>)
 </#list>
    */
    class BaseQueryBuilder extends EloquentBuilder {}

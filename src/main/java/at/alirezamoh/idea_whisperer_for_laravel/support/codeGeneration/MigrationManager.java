@@ -5,7 +5,6 @@ import at.alirezamoh.idea_whisperer_for_laravel.actions.models.dataTables.Field;
 import at.alirezamoh.idea_whisperer_for_laravel.actions.models.dataTables.Method;
 import at.alirezamoh.idea_whisperer_for_laravel.actions.models.dataTables.Relation;
 import at.alirezamoh.idea_whisperer_for_laravel.actions.models.dataTables.Table;
-import at.alirezamoh.idea_whisperer_for_laravel.eloquent.relation.utils.RelationResolver;
 import at.alirezamoh.idea_whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.idea_whisperer_for_laravel.support.ProjectDefaultPaths;
 import at.alirezamoh.idea_whisperer_for_laravel.support.codeGeneration.vistors.MigrationVisitor;
