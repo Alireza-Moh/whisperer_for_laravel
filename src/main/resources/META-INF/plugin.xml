@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>at.alirezamoh.idea_whisperer_for_laravel</id>
 
-    <name>Idea Whisperer For Laravel</name>
+    <name>Whisperer For Laravel</name>
 
     <vendor email="" url="https://github.com/Alireza-Moh/idea_whisperer_for_laravel">Idea Whisperer For Laravel</vendor>
 
