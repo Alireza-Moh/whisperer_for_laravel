@@ -3,22 +3,46 @@ package at.alirezamoh.idea_whisperer_for_laravel.support.codeGeneration;
 import at.alirezamoh.idea_whisperer_for_laravel.actions.models.codeGenerationHelperModels.LaravelModel;
 import at.alirezamoh.idea_whisperer_for_laravel.actions.models.dataTables.Field;
 import at.alirezamoh.idea_whisperer_for_laravel.actions.models.dataTables.Method;
+import at.alirezamoh.idea_whisperer_for_laravel.actions.models.dataTables.Relation;
 import at.alirezamoh.idea_whisperer_for_laravel.actions.models.dataTables.Table;
 import at.alirezamoh.idea_whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.idea_whisperer_for_laravel.support.ProjectDefaultPaths;
 import at.alirezamoh.idea_whisperer_for_laravel.support.codeGeneration.vistors.MigrationVisitor;
 import at.alirezamoh.idea_whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
+import at.alirezamoh.idea_whisperer_for_laravel.support.laravelUtils.ClassUtils;
+import at.alirezamoh.idea_whisperer_for_laravel.support.laravelUtils.LaravelPaths;
+import at.alirezamoh.idea_whisperer_for_laravel.support.laravelUtils.MethodUtils;
 import at.alirezamoh.idea_whisperer_for_laravel.support.providers.ModelProvider;
 import at.alirezamoh.idea_whisperer_for_laravel.support.strUtil.StrUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
+import com.jetbrains.php.lang.psi.elements.PhpClass;
+import com.jetbrains.php.lang.psi.elements.impl.*;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
 public class MigrationManager {
     static final String ELOQUENT_BUILDER_NAMESPACE = "\\Illuminate\\Database\\Eloquent\\Builder";
+
+    public static Map<String, Integer> RELATION_METHODS = new HashMap<>() {{
+        put("belongsTo", 0);
+        put("belongsToMany", 0);
+        put("hasMany", 0);
+        put("hasManyThrough", 0);
+        put("hasOne", 0);
+        put("hasOneOrMany", 0);
+        put("hasOneOrManyThrough", 0);
+        put("hasOneThrough", 0);
+        put("morphMany", 0);
+        put("morphOne", 0);
+        put("morphTo", 0);
+        put("morphToMany", 0);
+    }};
 
     private Project project;
 
@@ -43,12 +67,31 @@ public class MigrationManager {
 
         for (Table table : tables) {
             String tableName = table.name();
-            String modelName = getModelByTableName(tableName);
-            if (modelName != null) {
+            PhpClass modelClass = getModelByTableName(tableName);
+            if (modelClass != null) {
                 LaravelModel laravelModel = new LaravelModel();
-                laravelModel.setModelName(modelName);
+                laravelModel.setModelName(modelClass.getName());
                 laravelModel.setTableName(tableName);
                 laravelModel.setFields(table.fields());
+
+                List<Relation> relations = new ArrayList<>();
+                for (com.jetbrains.php.lang.psi.elements.Method method : resolveAllRelations(modelClass, project)) {
+                    Map.Entry<String, PhpClass> methodNameAndRelatedModel = findRelationships(method);
+                    if (methodNameAndRelatedModel != null) {
+                        relations.add(
+                            new Relation(
+                                method.getName(),
+                                methodNameAndRelatedModel.getKey(),
+                                "\\Illuminate\\Database\\Eloquent\\Relations\\" + StrUtil.capitalizeFirstLetter(methodNameAndRelatedModel.getKey())
+                                    + "|"+ methodNameAndRelatedModel.getValue().getName()
+                            )
+                        );
+                        laravelModel.addField(
+                            new Field(methodNameAndRelatedModel.getValue().getName(), method.getName(), false)
+                        );
+                    }
+                }
+                laravelModel.setRelations(relations);
                 createLaravelModelHelperMethods(laravelModel);
                 models.add(laravelModel);
             }
@@ -194,23 +237,34 @@ public class MigrationManager {
         }
     }
 
-    private @Nullable String getModelByTableName(String tableName) {
+    private @Nullable PhpClass getModelByTableName(String tableName) {
+        final PhpClass[] finalModel = {null};
         for (PsiFile model : originalModels) {
-            String finalModelName = "";
-            String modelNameWithoutExtension = StrUtil.removeExtension(model.getName());
-            if (StrUtil.isCamelCase(modelNameWithoutExtension)) {
-                String[] parts = StrUtil.snake(modelNameWithoutExtension).split("_");
-                String lastWord = parts[parts.length - 1];
+            model.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
+                @Override
+                public void visitElement(@NotNull PsiElement element) {
+                    if (element instanceof PhpClass modelClass) {
+                        String finalModelName = "";
+                        String modelNameWithoutExtension = StrUtil.removeExtension(modelClass.getName());
+                        if (StrUtil.isCamelCase(modelNameWithoutExtension)) {
+                            String[] parts = StrUtil.snake(modelNameWithoutExtension).split("_");
+                            String lastWord = parts[parts.length - 1];
 
-                parts[parts.length - 1] = StrUtil.plural(lastWord);
-                finalModelName = String.join("_", parts);
-            }
+                            parts[parts.length - 1] = StrUtil.plural(lastWord);
+                            finalModelName = String.join("_", parts);
+                        }
 
-            if (decapitalize(finalModelName).equals(tableName)) {
-                return modelNameWithoutExtension;
-            }
+                        if (decapitalize(finalModelName).equals(tableName)) {
+                            finalModel[0] = modelClass;
+                        }
+                    }
+                    super.visitElement(element);
+                }
+            });
         }
-        return null;
+
+
+        return finalModel[0];
     }
 
     private String decapitalize(String str) {
@@ -218,5 +272,74 @@ public class MigrationManager {
             return str;
         }
         return str.substring(0, 1).toLowerCase() + str.substring(1);
+    }
+
+    public static @Nullable Map.Entry<String, PhpClass> findRelationships(com.jetbrains.php.lang.psi.elements.Method foundedMethod) {
+        return Arrays.stream(foundedMethod.getChildren())
+            .filter(element -> element instanceof GroupStatementImpl)
+            .flatMap(groupStatement -> Arrays.stream(groupStatement.getChildren()))
+            .filter(child -> child instanceof PhpReturnImpl)
+            .flatMap(phpReturn -> Arrays.stream(phpReturn.getChildren()))
+            .filter(child2 -> child2 instanceof MethodReferenceImpl)
+            .map(child2 -> (MethodReferenceImpl) child2)
+            .map(methodReference -> {
+                PhpClass relatedModel = findRelatedModelFromMethod(foundedMethod);
+                if (relatedModel != null) {
+                    return new AbstractMap.SimpleEntry<>(methodReference.getName(), relatedModel);
+                }
+                return null;
+            })
+            .filter(Objects::nonNull)
+            .findFirst()
+            .orElse(null);
+    }
+
+    public static List<com.jetbrains.php.lang.psi.elements.Method> resolveAllRelations(PhpClass model, Project project) {
+        List<com.jetbrains.php.lang.psi.elements.Method> relations = new ArrayList<>();
+
+        for (com.jetbrains.php.lang.psi.elements.Method method : model.getOwnMethods()) {
+            if (isRelationshipMethod(method, project)) {
+                relations.add(method);
+            }
+        }
+
+        return relations;
+    }
+
+    public static boolean isRelationshipMethod(com.jetbrains.php.lang.psi.elements.Method method, Project project) {
+        return Arrays.stream(method.getChildren())
+            .filter(element -> element instanceof GroupStatementImpl)
+            .flatMap(element -> Arrays.stream(element.getChildren()))
+            .filter(child -> child instanceof PhpReturnImpl)
+            .flatMap(child -> Arrays.stream(child.getChildren()))
+            .filter(child2 -> child2 instanceof MethodReferenceImpl)
+            .map(child2 -> (MethodReferenceImpl) child2)
+            .anyMatch(methodReference -> {
+                List<PhpClassImpl> classes = MethodUtils.resolveMethodClasses(methodReference, project);
+                PhpClass relationClass = ClassUtils.getClassByFQN(project, LaravelPaths.LaravelClasses.Model);
+
+                return RELATION_METHODS.containsKey(methodReference.getName())
+                    && relationClass != null
+                    && classes.stream().anyMatch(clazz -> ClassUtils.isChildOf(clazz, relationClass));
+            });
+    }
+
+    public static @Nullable PhpClass findRelatedModelFromMethod(com.jetbrains.php.lang.psi.elements.Method foundedMethod) {
+        return Arrays.stream(foundedMethod.getChildren())
+            .filter(element -> element instanceof GroupStatementImpl)
+            .flatMap(groupStatement -> Arrays.stream(groupStatement.getChildren()))
+            .filter(child -> child instanceof PhpReturnImpl)
+            .flatMap(phpReturn -> Arrays.stream(phpReturn.getChildren()))
+            .filter(child2 -> child2 instanceof MethodReferenceImpl)
+            .map(child2 -> (MethodReferenceImpl) child2)
+            .map(methodReference -> methodReference.getParameter(0))
+            .filter(parameter -> parameter instanceof ClassConstantReferenceImpl)
+            .map(parameter -> ((ClassConstantReferenceImpl) parameter).getClassReference())
+            .filter(phpExpression -> phpExpression instanceof ClassReferenceImpl)
+            .map(phpExpression -> ((ClassReferenceImpl) phpExpression).resolve())
+            .filter(resolvedClass -> resolvedClass instanceof PhpClass)
+            .map(resolvedClass -> (PhpClass) resolvedClass)
+            .findFirst()
+            .orElse(null);
     }
 }

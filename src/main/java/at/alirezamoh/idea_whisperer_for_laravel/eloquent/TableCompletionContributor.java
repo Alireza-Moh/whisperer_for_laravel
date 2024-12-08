@@ -1,10 +1,10 @@
 package at.alirezamoh.idea_whisperer_for_laravel.eloquent;
 
 import at.alirezamoh.idea_whisperer_for_laravel.actions.models.dataTables.Table;
-import at.alirezamoh.idea_whisperer_for_laravel.eloquent.utls.EloquentUtil;
 import at.alirezamoh.idea_whisperer_for_laravel.support.codeGeneration.MigrationManager;
 import at.alirezamoh.idea_whisperer_for_laravel.support.laravelUtils.ClassUtils;
 import at.alirezamoh.idea_whisperer_for_laravel.support.laravelUtils.FrameworkUtils;
+import at.alirezamoh.idea_whisperer_for_laravel.support.laravelUtils.LaravelPaths;
 import at.alirezamoh.idea_whisperer_for_laravel.support.laravelUtils.MethodUtils;
 import at.alirezamoh.idea_whisperer_for_laravel.support.psiUtil.PsiUtil;
 import com.intellij.codeInsight.completion.*;
@@ -48,7 +48,24 @@ public class TableCompletionContributor extends CompletionContributor {
         MethodReference methodReference = MethodUtils.resolveMethodReference(psiElement, 10);
 
         return methodReference != null && ClassUtils.isLaravelRelatedClass(methodReference, psiElement.getProject())
-            && EloquentUtil.isTableMethod(methodReference)
-            && EloquentUtil.isTableParam(methodReference, psiElement);
+            && isTableMethod(methodReference)
+            && isTableParam(methodReference, psiElement);
+    }
+
+    private boolean isTableMethod(MethodReference methodReference) {
+        String methodName = methodReference.getName();
+
+        if (methodName == null) {
+            return false;
+        }
+
+        return LaravelPaths.DB_TABLE_METHODS.containsKey(methodName);
+    }
+
+    private boolean isTableParam(MethodReference method, PsiElement position) {
+        int paramIndex = MethodUtils.findParamIndex(position, false);
+        Integer paramPosition = LaravelPaths.DB_TABLE_METHODS.get(method.getName());
+
+        return paramPosition == paramIndex;
     }
 }

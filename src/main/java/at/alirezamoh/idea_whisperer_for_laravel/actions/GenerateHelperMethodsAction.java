@@ -15,19 +15,41 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Condition;
-import com.intellij.psi.PsiDirectory;
-import com.intellij.psi.PsiFile;
-import com.jetbrains.php.lang.psi.PhpFile;
-import com.jetbrains.php.lang.psi.PhpPsiUtil;
-import com.jetbrains.php.lang.psi.elements.PhpClass;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class GenerateHelperMethodsAction extends BaseAction {
     private Project project;
+
+    List<String> ignoreMethods = Arrays.asList(
+        "__call",
+        "__construct",
+        "afterQuery",
+        "applyAfterQueryCallbacks",
+        "clone",
+        "cursor",
+        "cursorPaginate",
+        "decrement",
+        "delete",
+        "find",
+        "findOr",
+        "get",
+        "increment",
+        "latest",
+        "oldest",
+        "orWhereNot",
+        "paginate",
+        "pluck",
+        "simplePaginate",
+        "soleValue",
+        "update",
+        "upsert",
+        "value"
+    );
+
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
@@ -47,7 +69,6 @@ public class GenerateHelperMethodsAction extends BaseAction {
                         ApplicationManager.getApplication().runReadAction(() -> {
                             createModelsHelperData(indicator);
                             createBaseQueryBuilderMethods(indicator);
-                            createFacades(indicator);
                         });
 
                         Notify.notifySuccess(project, "Code generation successful");
@@ -64,12 +85,12 @@ public class GenerateHelperMethodsAction extends BaseAction {
 
         MigrationManager migrationManager = new MigrationManager(project);
         List<LaravelModel> m = migrationManager.visit();
-        LaravelModelGeneration g = new LaravelModelGeneration(m);
 
         if (!m.isEmpty()) {
+            LaravelModelGeneration g = new LaravelModelGeneration(m);
             create(
-                    g,
-                    "laravelModels.ftl"
+                g,
+                "laravelModels.ftl"
             );
         }
     }
@@ -81,8 +102,9 @@ public class GenerateHelperMethodsAction extends BaseAction {
         List<Method> baseQueryBuilderMethods = new ArrayList<>();
 
         baseQueryBuilderMethods.addAll(
-            methodLoader.loadMethods(
-                DirectoryPsiUtil.getFileByName(project, ProjectDefaultPaths.LARAVEL_DB_QUERY_BUILDER_PATH)
+            methodLoader.loadMethodsWithIgnore(
+                DirectoryPsiUtil.getFileByName(project, ProjectDefaultPaths.LARAVEL_DB_QUERY_BUILDER_PATH),
+                ignoreMethods
             )
         );
         baseQueryBuilderMethods.addAll(
@@ -93,48 +115,12 @@ public class GenerateHelperMethodsAction extends BaseAction {
 
         if (!baseQueryBuilderMethods.isEmpty()) {
             create(
-                    new LaravelDbBuilder(baseQueryBuilderMethods),
-                    "baseDbQueryBuilder.ftl"
+                new LaravelDbBuilder(baseQueryBuilderMethods),
+                "baseDbQueryBuilder.ftl"
             );
         }
     }
 
-    private void createFacades(@NotNull ProgressIndicator indicator) {
-        indicator.setText("Loading facades...");
-
-        ClassMethodLoader methodLoader = new ClassMethodLoader(project);
-        List<Facade> facades = new ArrayList<>();
-        PsiDirectory facadeDir = DirectoryPsiUtil.getDirectory(project, ProjectDefaultPaths.LARAVEL_FACADES_DIR_PATH);
-
-        if (facadeDir != null) {
-            for (PsiFile facadePsiFile : facadeDir.getFiles()) {
-                if (facadePsiFile instanceof PhpFile facadePhpFile) {
-                    Condition<PhpClass> condition = phpClass -> phpClass.getName().equals(facadePhpFile.getName().replace(".php", ""));
-                    PhpClass facadeClass = PhpPsiUtil.findClass(facadePhpFile, condition);
-                    List<Method> facadeMethods = methodLoader.loadMethods(facadePhpFile);
-
-                    if (facadeClass != null) {
-                        PhpClass facadeSuperClass = facadeClass.getSuperClass();
-                        if (facadeSuperClass != null) {
-                            facadeMethods.addAll(methodLoader.loadMethods(facadeSuperClass.getContainingFile()));
-                        }
-
-                        facades.add(new Facade(facadeClass.getName(), facadeClass.getFQN(), facadeMethods));
-                    }
-                }
-            }
-            create(
-                new FacadeBuilder(facades),
-                "facades.ftl"
-            );
-        }
-    }
-
-    /**
-     * Creates a file from a template
-     * @param model         The data model for the template.
-     * @param templateName  The name of the template file.
-     */
     protected void create(BaseModel model, String templateName) {
         TemplateLoader templateProcessor = new TemplateLoader(
             project,

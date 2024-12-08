@@ -19,36 +19,6 @@ public class ClassUtils {
             .orElse(null);
     }
 
-    public static boolean isEloquentModel(MethodReference method, Project project) {
-        PhpClass eloquentModel = ClassUtils.getEloquentBaseModel(project);
-        if (eloquentModel == null) {
-            return false;
-        }
-
-        List<PhpClassImpl> classes = MethodUtils.resolveMethodClasses(method, project);
-        for (PhpClassImpl clazz : classes) {
-            if (ClassUtils.isChildOf(clazz, eloquentModel)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static @Nullable PhpClass getEloquentModel(MethodReference method, Project project) {
-        PhpClass eloquentModel = ClassUtils.getEloquentBaseModel(project);
-        if (eloquentModel == null) {
-            return null;
-        }
-
-        List<PhpClassImpl> classes = MethodUtils.resolveMethodClasses(method, project);
-        for (PhpClassImpl clazz : classes) {
-            if (ClassUtils.isChildOf(clazz, eloquentModel)) {
-                return clazz;
-            }
-        }
-        return null;
-    }
-
     public static @Nullable PhpClass getClassByFQN(Project project, String path) {
         return PhpIndex.getInstance(project)
             .getClassesByFQN(path)
