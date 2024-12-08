@@ -15,7 +15,7 @@ repositories {
 
 dependencies {
     intellijPlatform {
-        phpstorm("2024.2.3")
+        phpstorm("2024.3")
         bundledPlugin("com.jetbrains.php")
         bundledPlugin("com.jetbrains.php.blade")
 
