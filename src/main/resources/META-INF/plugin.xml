@@ -11,6 +11,8 @@
     <depends>com.intellij.modules.platform</depends>
     <depends>com.jetbrains.php.blade</depends>
 
+    <version>1.0.0</version>
+
     <idea-version since-build="232" until-build="243.*" />
 
     <extensions defaultExtensionNs="com.intellij">
