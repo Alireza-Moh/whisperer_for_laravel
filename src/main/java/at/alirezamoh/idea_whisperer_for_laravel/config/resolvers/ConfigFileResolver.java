@@ -40,11 +40,6 @@ public class ConfigFileResolver {
      * The visitor for traversing config keys
      */
     private ConfigKeyVisitor configKeyVisitor;
-
-    /**
-     * The collection of config files
-     */
-    private Collection<PsiFile> configFiles;
     
     private ConfigKeyCollector configKeyCollector;
 
@@ -59,7 +54,6 @@ public class ConfigFileResolver {
     public ConfigFileResolver(Project project, PsiElement myElement) {
         this.project = project;
         configDir = DirectoryPsiUtil.getDirectory(project, ProjectDefaultPaths.CONFIG_PATH);
-        configFiles = DirectoryPsiUtil.getFilesRecursively(project, ProjectDefaultPaths.CONFIG_PATH);
         searchedConfigKey = StrUtil.removeQuotes(myElement.getText());
         configKeyVisitor = new ConfigKeyVisitor();
         configKeyCollector = new ConfigKeyCollector(project);

@@ -7,7 +7,6 @@ import at.alirezamoh.idea_whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.idea_whisperer_for_laravel.support.ProjectDefaultPaths;
 import at.alirezamoh.idea_whisperer_for_laravel.support.applicationModules.utils.ApplicationModuleUtil;
 import at.alirezamoh.idea_whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
-import at.alirezamoh.idea_whisperer_for_laravel.support.strUtil.StrUtil;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
@@ -116,7 +115,7 @@ public class ConfigKeyCollector {
         }
 
         for (PsiDirectory subDir : directory.getSubdirectories()) {
-            String dirFullPath = (currentDirName.isEmpty() || currentDirName.isBlank())
+            String dirFullPath = (currentDirName.isBlank())
                 ? subDir.getName()
                 : currentDirName + "." + subDir.getName();
 
@@ -137,7 +136,7 @@ public class ConfigKeyCollector {
         ArrayReturnPsiRecursiveVisitor visitor = new ArrayReturnPsiRecursiveVisitor(dirName, filename, "", configFileKeyIdentifier);
         configFile.acceptChildren(visitor);
 
-        String fileFullPath = (dirName.isEmpty() || dirName.isBlank())
+        String fileFullPath = (dirName.isBlank())
             ? filename
             : dirName + "." + filename;
 
@@ -176,7 +175,7 @@ public class ConfigKeyCollector {
         }
 
         for (PsiDirectory subDir : directory.getSubdirectories()) {
-            String dirFullPath = (currentDirName.isEmpty() || currentDirName.isBlank())
+            String dirFullPath = (currentDirName.isBlank())
                 ? subDir.getName()
                 : currentDirName + "." + subDir.getName();
 

@@ -6,7 +6,6 @@ import at.alirezamoh.idea_whisperer_for_laravel.support.ProjectDefaultPaths;
 import at.alirezamoh.idea_whisperer_for_laravel.support.applicationModules.utils.ApplicationModuleUtil;
 import at.alirezamoh.idea_whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
 import at.alirezamoh.idea_whisperer_for_laravel.support.psiUtil.PsiUtil;
-import at.alirezamoh.idea_whisperer_for_laravel.support.strUtil.StrUtil;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
