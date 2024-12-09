@@ -124,7 +124,9 @@ public class MigrationVisitor extends PsiRecursiveElementWalkingVisitor {
             .filter(child -> child instanceof GroupStatement)
             .flatMap(groupStatement -> Arrays.stream(groupStatement.getChildren()))
             .filter(statement -> statement instanceof Statement)
-            .map(statement -> (MethodReference) statement.getFirstChild())
+            .map(PsiElement::getFirstChild)
+            .filter(child -> child instanceof MethodReference)
+            .map(child -> (MethodReference) child)
             .filter(methodReference -> !isCreateOrTable(methodReference))
             .collect(Collectors.toList());
     }
