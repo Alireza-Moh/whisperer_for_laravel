@@ -31,11 +31,6 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
     private String moduleRootDirectoryPath;
 
     /**
-     * The root app path like "app/"
-     */
-    private String rootAppPath;
-
-    /**
      * Module src path
      */
     private String moduleSrcDirectoryName;
@@ -81,14 +76,6 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
 
     public void setModuleRootDirectoryPath(String moduleRootDirectoryPath) {
         this.moduleRootDirectoryPath = moduleRootDirectoryPath;
-    }
-
-    public String getRootAppPath() {
-        return rootAppPath;
-    }
-
-    public void setRootAppPath(String rootAppPath) {
-        this.rootAppPath = rootAppPath;
     }
 
     public String getModuleSrcDirectoryName() {

@@ -41,8 +41,6 @@ public class SettingConfigurable implements Configurable {
 
             || !settingsComponent.getModuleRootDirectoryPath().equals(settingsState.getModuleRootDirectoryPath())
 
-            || !settingsComponent.getRootAppPath().equals(settingsState.getRootAppPath())
-
             || !settingsComponent.getModuleSrcDirectoryName().equals(settingsState.getModuleSrcDirectoryName());
     }
 
@@ -50,7 +48,6 @@ public class SettingConfigurable implements Configurable {
     public void apply() {
         settingsState.setProjectType(settingsComponent.getProjectType());
         settingsState.setModuleRootDirectoryPath(settingsComponent.getModuleRootDirectoryPath());
-        settingsState.setRootAppPath(settingsComponent.getRootAppPath());
         settingsState.setModuleSrcDirectoryName(settingsComponent.getModuleSrcDirectoryName());
     }
 
@@ -58,7 +55,6 @@ public class SettingConfigurable implements Configurable {
     public void reset() {
         settingsComponent.setProjectTypeComboBox(settingsState.getProjectType());
         settingsComponent.setModuleRootDirectoryPathTextField(settingsState.getModuleRootDirectoryPath());
-        settingsComponent.setRootAppPathTextField(settingsState.getRootAppPath());
         settingsComponent.setModuleSrcDirectoryName(settingsState.getModuleSrcDirectoryName());
     }
 

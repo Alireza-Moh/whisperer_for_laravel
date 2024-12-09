@@ -22,9 +22,9 @@ public class SettingsComponent {
     private final ComboBox<String> projectTypeComboBox = new ComboBox<>(new String[]{"Standard Application", "Module based Application"});
 
     /**
-     * Label for the root directory path field
+     * Label for the root directory path
      */
-    private final JBLabel moduleRootDirectoryPathLabel = new JBLabel("Module root directory:");
+    private final JBLabel moduleRootDirectoryPathLabel = new JBLabel("Module root directory path:");
 
     /**
      * Label for the module src directory name
@@ -35,11 +35,6 @@ public class SettingsComponent {
      * Text field to input module src directory name for module-based projects
      */
     private final JBTextField moduleSrcDirectoryTextField = new JBTextField();
-
-    /**
-     * Label for the root app path field
-     */
-    private final JBLabel rootAppPathLabel = new JBLabel("Root app path:");
 
     /**
      * Text field to input the root directory path for module-based projects
@@ -111,7 +106,6 @@ public class SettingsComponent {
         moduleSrcDirectoryLabel.setVisible(false);
         moduleSrcDirectoryTextField.setVisible(false);
 
-        rootAppPathLabel.setVisible(false);
         rootAppPathTextField.setVisible(false);
     }
 
@@ -134,12 +128,6 @@ public class SettingsComponent {
         .addLabeledComponent(
             moduleSrcDirectoryLabel,
             moduleSrcDirectoryTextField,
-            10,
-            false
-        )
-        .addLabeledComponent(
-            rootAppPathLabel,
-            rootAppPathTextField,
             10,
             false
         );
@@ -176,7 +164,6 @@ public class SettingsComponent {
                 moduleRootDirectoryPathTextField.setText("/Modules/");
                 moduleRootDirectoryPathTextField.setText("/app/");
 
-                rootAppPathLabel.setVisible(isSimpleDirectoryModule);
                 rootAppPathTextField.setVisible(isSimpleDirectoryModule);
 
                 moduleSrcDirectoryTextField.setText("app");
