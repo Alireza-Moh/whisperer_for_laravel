@@ -12,7 +12,6 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Manages the persistent state of project settings for the plugin
  * This class stores and retrieves project-specific settings, such as
- * whether the project is a Docker project, the PHP Docker container name,
  * the project type (Standard or Module-based), and the root directory path
  * for module-based projects
  */
@@ -21,11 +20,6 @@ import org.jetbrains.annotations.Nullable;
     storages = {@Storage("idea_whisperer_for_laravel.xml")}
 )
 public class SettingsState implements PersistentStateComponent<SettingsState> {
-    /**
-     * The name of the PHP Docker container
-     */
-    private String phpDockerContainerName;
-
     /**
      * The type of the project (Standard or Module-based)
      */
@@ -63,14 +57,6 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
     @Override
     public void initializeComponent() {
         PersistentStateComponent.super.initializeComponent();
-    }
-
-    public String getPhpDockerContainerName() {
-        return phpDockerContainerName;
-    }
-
-    public void setPhpDockerContainerName(String phpDockerContainerName) {
-        this.phpDockerContainerName = phpDockerContainerName;
     }
 
     public String getProjectType() {
@@ -138,24 +124,6 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
         }
         if (!text.endsWith("/")) {
             text = text + "/";
-        }
-
-        return text;
-    }
-
-    /**
-     * Replaces backslashes with forward slashes and ensures the path starts and ends without a slash
-     * @param text The text to process
-     * @return The processed text
-     */
-    public String replaceAndSlashesToStart(String text) {
-        text = text.replace("\\", "/");
-
-        if (!text.startsWith("/")) {
-            text = "/" + text;
-        }
-        if (text.endsWith("/")) {
-            text = text.substring(0, text.length() - 1);
         }
 
         return text;

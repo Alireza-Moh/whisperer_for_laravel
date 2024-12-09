@@ -37,9 +37,7 @@ public class SettingConfigurable implements Configurable {
 
     @Override
     public boolean isModified() {
-        return !settingsComponent.getPhpDockerContainerName().equals(settingsState.getPhpDockerContainerName())
-
-            || !settingsComponent.getProjectType().equals(settingsState.getProjectType())
+        return !settingsComponent.getProjectType().equals(settingsState.getProjectType())
 
             || !settingsComponent.getModuleRootDirectoryPath().equals(settingsState.getModuleRootDirectoryPath())
 
@@ -50,7 +48,6 @@ public class SettingConfigurable implements Configurable {
 
     @Override
     public void apply() {
-        settingsState.setPhpDockerContainerName(settingsComponent.getPhpDockerContainerName());
         settingsState.setProjectType(settingsComponent.getProjectType());
         settingsState.setModuleRootDirectoryPath(settingsComponent.getModuleRootDirectoryPath());
         settingsState.setRootAppPath(settingsComponent.getRootAppPath());
@@ -59,16 +56,10 @@ public class SettingConfigurable implements Configurable {
 
     @Override
     public void reset() {
-        settingsComponent.setPhpDockerContainerNameTextField(settingsState.getPhpDockerContainerName());
         settingsComponent.setProjectTypeComboBox(settingsState.getProjectType());
         settingsComponent.setModuleRootDirectoryPathTextField(settingsState.getModuleRootDirectoryPath());
         settingsComponent.setRootAppPathTextField(settingsState.getRootAppPath());
         settingsComponent.setModuleSrcDirectoryName(settingsState.getModuleSrcDirectoryName());
-    }
-
-    @Override
-    public @Nullable JComponent getPreferredFocusedComponent() {
-        return settingsComponent.getPreferredFocusedComponent();
     }
 
     @Override

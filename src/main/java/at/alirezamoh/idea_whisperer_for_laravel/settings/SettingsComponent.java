@@ -17,11 +17,6 @@ public class SettingsComponent {
     private final FormBuilder formBuilder;
 
     /**
-     * Text field to input the name of the PHP Docker container
-     */
-    private final JBTextField phpDockerContainerNameTextField = new JBTextField();
-
-    /**
      * Combo box to select the project type (Standard or Module-based)
      */
     private final ComboBox<String> projectTypeComboBox = new ComboBox<>(new String[]{"Standard Application", "Module based Application"});
@@ -61,7 +56,6 @@ public class SettingsComponent {
 
         hideModuleTextFields();
 
-        addDockerSettingsComponent();
         addModuleSettingsComponent();
         fillPanel();
 
@@ -74,22 +68,6 @@ public class SettingsComponent {
      */
     public JPanel getPanel() {
         return formBuilder.getPanel();
-    }
-
-    /**
-     * Return the preferred focused text field for the main panel
-     * @return preferred focused text field
-     */
-    public JTextField getPreferredFocusedComponent() {
-        return phpDockerContainerNameTextField;
-    }
-
-    public String getPhpDockerContainerName() {
-        return phpDockerContainerNameTextField.getText();
-    }
-
-    public void setPhpDockerContainerNameTextField(String newContainerName) {
-        this.phpDockerContainerNameTextField.setText(newContainerName);
     }
 
     public String getRootAppPath() {
@@ -135,18 +113,6 @@ public class SettingsComponent {
 
         rootAppPathLabel.setVisible(false);
         rootAppPathTextField.setVisible(false);
-    }
-
-    /**
-     * Adds the text filed for saving the php docker container name
-     */
-    private void addDockerSettingsComponent() {
-        formBuilder.addLabeledComponent(
-            new JBLabel("PHP docker container name:"),
-            phpDockerContainerNameTextField,
-            0,
-            false
-        );
     }
 
     /**
