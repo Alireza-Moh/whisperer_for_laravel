@@ -52,23 +52,22 @@ public class ConfigKeyCollector {
     public ConfigKeyCollector startSearching() {
         PsiDirectory configDir = null;
         if (projectSettingState.isModuleApplication()) {
-            String rootPath = projectSettingState.getRootAppPath();
+            String rootPath = projectSettingState.getFormattedModuleRootDirectoryPath();
 
             if (rootPath != null) {
-                configDir = DirectoryPsiUtil.getDirectory(project, StrUtil.addSlashes(rootPath) + "config/");
+                configDir = DirectoryPsiUtil.getDirectory(project, rootPath + ProjectDefaultPaths.CONFIG_PATH);
             }
-
-            if (configDir == null) {
-                configDir = DirectoryPsiUtil.getDirectory(project, ProjectDefaultPaths.CONFIG_PATH);
-            }
-        }
-        else {
-            configDir = DirectoryPsiUtil.getDirectory(project, ProjectDefaultPaths.CONFIG_PATH);
         }
 
         if (configDir != null) {
             processDirectory(configDir, "");
         }
+
+        PsiDirectory rootConfig = DirectoryPsiUtil.getDirectory(project, ProjectDefaultPaths.CONFIG_PATH);
+        if (rootConfig != null) {
+            processDirectory(rootConfig, "");
+        }
+
 
         String moduleDirectoryRootPath = projectSettingState.getFormattedModuleRootDirectoryPath();
         if (projectSettingState.isModuleApplication() && moduleDirectoryRootPath != null) {

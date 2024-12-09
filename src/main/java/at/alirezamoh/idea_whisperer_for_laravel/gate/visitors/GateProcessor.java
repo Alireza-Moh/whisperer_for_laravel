@@ -41,11 +41,11 @@ public class GateProcessor {
         PsiFile appServiceProviderFile = null;
 
         if (projectSettingsState.isModuleApplication()) {
-            String rootAppPath = projectSettingsState.getRootAppPath();
+            String rootAppPath = projectSettingsState.getFormattedModuleRootDirectoryPath();
             if (rootAppPath != null) {
                 appServiceProviderFile = DirectoryPsiUtil.getFileByName(
                     project,
-                    projectSettingsState.replaceAndSlashes(rootAppPath)
+                    rootAppPath
                     + ProjectDefaultPaths.APP_SERVICE_PROVIDER_PATH
                 );
             }

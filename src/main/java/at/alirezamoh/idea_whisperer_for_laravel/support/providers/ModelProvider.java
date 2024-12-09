@@ -1,6 +1,7 @@
 package at.alirezamoh.idea_whisperer_for_laravel.support.providers;
 
 import at.alirezamoh.idea_whisperer_for_laravel.settings.SettingsState;
+import at.alirezamoh.idea_whisperer_for_laravel.support.ProjectDefaultPaths;
 import at.alirezamoh.idea_whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -69,16 +70,10 @@ public class ModelProvider {
      * @return The list of model namespaces.
      */
     public List<String> getModels() {
-        PsiDirectory modelsDir = null;
-        if (projectSettingState.isModuleApplication()) {
-            modelsDir = DirectoryPsiUtil.getDirectory(
+        PsiDirectory modelsDir = DirectoryPsiUtil.getDirectory(
                 project,
-                projectSettingState.replaceAndSlashes(projectSettingState.getRootAppPath()) + "Models/"
-            );
-        }
-        else {
-            modelsDir = DirectoryPsiUtil.getDirectory(project, "/app/Models/");
-        }
+                "/app" + ProjectDefaultPaths.ELOQUENT_MODEL_PATH
+        );
 
         if (modelsDir != null) {
             for (PsiFile file : modelsDir.getFiles()) {

@@ -12,6 +12,7 @@ import com.intellij.psi.PsiFile;
 import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.ArrayHashElement;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
@@ -84,21 +85,16 @@ public class ConfigFileResolver {
      * It checks for both direct file name matches and nested key scenarios
      */
     private void iterateFile() {
-        Collection<PsiFile> configFiles = null;
+        Collection<PsiFile> configFiles = new ArrayList<>();
         if (settingsState.isModuleApplication()) {
-            String rootPath = settingsState.getRootAppPath();
+            String rootPath = settingsState.getFormattedModuleRootDirectoryPath();
 
             if (rootPath != null) {
-                configFiles = DirectoryPsiUtil.getFilesRecursively(project, StrUtil.addSlashes(rootPath) + "config/");
+                configFiles.addAll(DirectoryPsiUtil.getFilesRecursively(project, rootPath + ProjectDefaultPaths.CONFIG_PATH));
             }
+        }
 
-            if (configFiles == null) {
-                configFiles = DirectoryPsiUtil.getFilesRecursively(project, ProjectDefaultPaths.CONFIG_PATH);
-            }
-        }
-        else {
-            configFiles = DirectoryPsiUtil.getFilesRecursively(project, ProjectDefaultPaths.CONFIG_PATH);
-        }
+        configFiles.addAll(DirectoryPsiUtil.getFilesRecursively(project, ProjectDefaultPaths.CONFIG_PATH));
 
         for (PsiFile configFile : configFiles) {
             if (!(configFile instanceof PhpFile phpFile)) {

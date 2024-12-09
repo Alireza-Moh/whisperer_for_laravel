@@ -40,6 +40,7 @@ public class RouteNamesCollector {
                 variants.addAll(routeFileVisitor.getSuggestions());
             }
         }
+
         return variants;
     }
 }

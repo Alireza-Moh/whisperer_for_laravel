@@ -48,16 +48,7 @@ public class EventProvider {
      * @return The list of event namespaces.
      */
     public List<String> getEvents() {
-        PsiDirectory eventsDir = null;
-        if (projectSettingState.isModuleApplication()) {
-            eventsDir = DirectoryPsiUtil.getDirectory(
-                project,
-                projectSettingState.replaceAndSlashes(projectSettingState.getRootAppPath()) + "Events/"
-            );
-        }
-        else {
-            eventsDir = DirectoryPsiUtil.getDirectory(this.project, "/app/Events/");
-        }
+        PsiDirectory eventsDir = DirectoryPsiUtil.getDirectory(this.project, "/app/Events/");
 
         if (eventsDir != null) {
             for (PsiFile file : eventsDir.getFiles()) {

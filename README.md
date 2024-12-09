@@ -62,7 +62,7 @@ Install my-project with npm
 Contributions are always welcome!
 
 If you encounter any issues, feel free to open an issue on the [GitHub Issues page](https://github.com/Alireza-Moh/idea_whisperer_for_laravel/issues).
-If you want to contribute to the project, please fork the repository and submit a pull request
+If you want to contribute to the project, please do not hesitate :)
 
 ## License
 

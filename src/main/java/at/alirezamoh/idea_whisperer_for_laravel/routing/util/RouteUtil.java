@@ -27,20 +27,18 @@ public class RouteUtil {
     }
 
     private static void addRootRouteFiles(Project project, SettingsState settingsState, Collection<PsiFile> files) {
-        String rootPath = settingsState.getRootAppPath();
+        String rootPath = settingsState.getFormattedModuleRootDirectoryPath();
         PsiDirectory rootRouteDir = null;
 
         if (rootPath != null) {
-            rootRouteDir = DirectoryPsiUtil.getDirectory(project, StrUtil.addSlashes(rootPath) + "routes/");
-        }
-
-        if (rootRouteDir == null) {
-            rootRouteDir = DirectoryPsiUtil.getDirectory(project, ProjectDefaultPaths.ROUTE_PATH);
+            rootRouteDir = DirectoryPsiUtil.getDirectory(project, rootPath + ProjectDefaultPaths.ROUTE_PATH);
         }
 
         if (rootRouteDir != null) {
             DirectoryPsiUtil.collectFilesRecursively(rootRouteDir, files);
         }
+
+        addDefaultRouteFiles(project, files);
     }
 
     private static void addModuleRouteFiles(Project project, SettingsState settingsState, Collection<PsiFile> files) {

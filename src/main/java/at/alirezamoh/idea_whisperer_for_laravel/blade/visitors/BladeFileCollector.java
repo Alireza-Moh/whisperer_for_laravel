@@ -52,18 +52,17 @@ public class BladeFileCollector {
     public BladeFileCollector startSearching() {
         PsiDirectory defaultViewDir = null;
         if (projectSettingState.isModuleApplication()) {
-            String rootPath = projectSettingState.getRootAppPath();
+            String rootPath = projectSettingState.getFormattedModuleRootDirectoryPath();
 
             if (rootPath != null) {
-                defaultViewDir = DirectoryPsiUtil.getDirectory(project, StrUtil.addSlashes(rootPath) + "resources/views/");
-            }
-
-            if (defaultViewDir == null) {
-                defaultViewDir = DirectoryPsiUtil.getDirectory(project, ProjectDefaultPaths.VIEW_PATH);
+                defaultViewDir = DirectoryPsiUtil.getDirectory(project, rootPath + ProjectDefaultPaths.VIEW_PATH);
             }
         }
-        else {
-            defaultViewDir = DirectoryPsiUtil.getDirectory(project, ProjectDefaultPaths.VIEW_PATH);
+
+        PsiDirectory defaultResDir = DirectoryPsiUtil.getDirectory(project, ProjectDefaultPaths.VIEW_PATH);
+
+        if (defaultResDir != null) {
+            searchForBladeFiles(defaultResDir, "", "");
         }
 
         if (defaultViewDir != null) {

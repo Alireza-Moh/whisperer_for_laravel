@@ -5,7 +5,31 @@
 
     <vendor email="" url="https://github.com/Alireza-Moh/idea_whisperer_for_laravel">Idea Whisperer For Laravel</vendor>
 
-    <description>Idea Whisperer For Laravel enables you to develop faster</description>
+    <description>
+        <![CDATA[
+        Idea Whisperer For Laravel is a PhpStorm plugin designed to boost your productivity by streamlining the development process for Laravel applications.
+        With a set of powerful features, this plugin helps you work faster when developing Laravel applications in PhpStorm.
+
+        <h3>Features include:</h3>
+        <ul>
+            <li><strong>Code Generation Helpers:</strong> Eloquent Models, Migrations, Controllers, Database Seeders, Config Files, Blade Components, Console Commands, Views, Jobs, Validation Rules, Policies, Observers, Mailables, Exceptions, Event Listeners, Middleware.</li>
+            <li><strong>Code Completion and Resolution:</strong> Form Request Validation Rules, Eloquent Table Names, Config File References, Blade Templates, Routing, Gates.</li>
+            <li><strong>Postfix Templates:</strong> A custom postfix template for dd() is included, allowing you to quickly wrap an expression in the dd() function for debugging purposes.</li>
+            <li><strong>Laravel Version Indicator:</strong> A status bar widget that displays the current version of Laravel used in the project.</li>
+        </ul>
+
+        <h3>Installation:</h3>
+        <ol>
+            <li>Open PhpStorm</li>
+            <li>Navigate to File > Settings > Plugins</li>
+            <li>Search for Whisperer For Laravel</li>
+        </ol>
+
+        <h3>Contributions:</h3>
+        <p>Contributions are always welcome! If you encounter any issues, feel free to open an issue on the <a href="https://github.com/Alireza-Moh/idea_whisperer_for_laravel/issues">GitHub Issues page</a>. If you want to contribute to the project, do not hesitate</p>
+        ]]>
+    </description>
+
 
     <depends>com.jetbrains.php</depends>
     <depends>com.intellij.modules.platform</depends>
@@ -30,6 +54,8 @@
         <completion.contributor language="PHP" implementationClass="at.alirezamoh.idea_whisperer_for_laravel.eloquent.TableCompletionContributor"/>
 
         <codeInsight.template.postfixTemplateProvider language="PHP" implementationClass="at.alirezamoh.idea_whisperer_for_laravel.postfixes.dd.DDPostfixProvider" />
+
+        <errorHandler implementation="com.intellij.diagnostic.JetBrainsMarketplaceErrorReportSubmitter"/>
     </extensions>
 
     <actions>
