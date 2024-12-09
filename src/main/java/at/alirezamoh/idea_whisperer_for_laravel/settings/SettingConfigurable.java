@@ -2,6 +2,7 @@ package at.alirezamoh.idea_whisperer_for_laravel.settings;
 
 
 import com.intellij.openapi.options.Configurable;
+import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.NlsContexts;
 import org.jetbrains.annotations.Nullable;
@@ -45,7 +46,8 @@ public class SettingConfigurable implements Configurable {
     }
 
     @Override
-    public void apply() {
+    public void apply() throws ConfigurationException {
+        validate();
         settingsState.setProjectType(settingsComponent.getProjectType());
         settingsState.setModuleRootDirectoryPath(settingsComponent.getModuleRootDirectoryPath());
         settingsState.setModuleSrcDirectoryName(settingsComponent.getModuleSrcDirectoryName());
@@ -61,5 +63,17 @@ public class SettingConfigurable implements Configurable {
     @Override
     public void disposeUIResources() {
         settingsComponent = null;
+    }
+
+    private void validate() throws ConfigurationException {
+        if (settingsComponent.getProjectType().isEmpty()) {
+            throw new ConfigurationException("Project type must not be empty.");
+        }
+        if (settingsComponent.getModuleRootDirectoryPath().isEmpty()) {
+            throw new ConfigurationException("Module root directory path must not be empty.");
+        }
+        if (settingsComponent.getModuleSrcDirectoryName().isEmpty()) {
+            throw new ConfigurationException("Module source directory name must not be empty.");
+        }
     }
 }

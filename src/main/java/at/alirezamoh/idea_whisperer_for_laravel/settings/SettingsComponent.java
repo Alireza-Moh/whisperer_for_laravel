@@ -41,11 +41,6 @@ public class SettingsComponent {
      */
     private final JBTextField moduleRootDirectoryPathTextField = new JBTextField();
 
-    /**
-     * Text field to input the root app path
-     */
-    private final JBTextField rootAppPathTextField = new JBTextField();
-
     SettingsComponent() {
         formBuilder = FormBuilder.createFormBuilder();
 
@@ -63,14 +58,6 @@ public class SettingsComponent {
      */
     public JPanel getPanel() {
         return formBuilder.getPanel();
-    }
-
-    public String getRootAppPath() {
-        return rootAppPathTextField.getText();
-    }
-
-    public void setRootAppPathTextField(String newPath) {
-        this.rootAppPathTextField.setText(newPath);
     }
 
     public String getModuleRootDirectoryPath() {
@@ -105,8 +92,6 @@ public class SettingsComponent {
 
         moduleSrcDirectoryLabel.setVisible(false);
         moduleSrcDirectoryTextField.setVisible(false);
-
-        rootAppPathTextField.setVisible(false);
     }
 
     /**
@@ -141,11 +126,6 @@ public class SettingsComponent {
             .setLocation(HelpTooltip.Alignment.RIGHT)
             .setDescription("The folder name containing the core code for directories like (e.g., Controllers, Commands)")
             .installOn(moduleSrcDirectoryTextField);
-
-        new HelpTooltip()
-            .setLocation(HelpTooltip.Alignment.RIGHT)
-            .setDescription("The folder path containing the primary code for your application default is app")
-            .installOn(rootAppPathTextField);
     }
 
     private void fillPanel() {
@@ -163,8 +143,6 @@ public class SettingsComponent {
                 moduleRootDirectoryPathTextField.setVisible(isSimpleDirectoryModule);
                 moduleRootDirectoryPathTextField.setText("/Modules/");
                 moduleRootDirectoryPathTextField.setText("/app/");
-
-                rootAppPathTextField.setVisible(isSimpleDirectoryModule);
 
                 moduleSrcDirectoryTextField.setText("app");
                 moduleSrcDirectoryLabel.setVisible(isSimpleDirectoryModule);
