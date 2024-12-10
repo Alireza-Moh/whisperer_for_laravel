@@ -79,9 +79,9 @@ abstract public class BaseModel {
         this.extension = extension;
         this.moduleSrcPath = moduleSrcPath;
 
-        initDestination(unformattedModuleFullPath, defaultDestination, moduleSrcPath);
+        initDestination(unformattedModuleFullPath, defaultDestination);
         initNamespace(namespace);
-        initFileName();
+        initFilePath();
     }
 
     public BaseModel() {}
@@ -254,22 +254,18 @@ abstract public class BaseModel {
         return moduleSrcPath;
     }
 
-    protected void initFileName() {
-        filePath = destination + "/" + getName() + extension;
+    protected void initFilePath() {
+        filePath = normalizeSlashes(destination + "/" + getName() + extension);
     }
 
-    protected void initDestination(String unformattedModuleFullPath, String defaultDestination, String moduleSrcPath) {
+    protected void initDestination(String unformattedModuleFullPath, String defaultDestination) {
         StringBuilder destinationBuilder = new StringBuilder(unformattedModuleFullPath);
-
-        if (!moduleSrcPath.isEmpty()) {
-            destinationBuilder.append('/').append(moduleSrcPath);
-        }
 
         destinationBuilder.append(defaultDestination);
 
         String normalizedFolderPath = normalizeFolderPath();
         if (!normalizedFolderPath.isEmpty()) {
-            destinationBuilder.append(normalizedFolderPath);
+            destinationBuilder.append(normalizeSlashes(normalizedFolderPath));
         }
 
         this.destination = destinationBuilder.toString();
@@ -287,6 +283,13 @@ abstract public class BaseModel {
         }
 
         return normalizedPath;
+    }
+
+    private String normalizeSlashes(String input) {
+        if (input == null || input.isEmpty()) {
+            return input;
+        }
+        return input.replaceAll("//+", "/");
     }
 
     /**

@@ -32,14 +32,14 @@ public class DBSeederModel extends BaseModel {
 
         if (unformattedModuleFullPath.equals("/app") || unformattedModuleFullPath.isEmpty()) {
             this.formattedModuleFullPath = "";
-            initDestination("", ProjectDefaultPaths.DB_SEEDER_PATH, "");
+            initDestination("", ProjectDefaultPaths.DB_SEEDER_PATH);
             initNamespace("Database\\Seeders");
-            initFileName();
+            initFilePath();
         }
         else {
-            initDestination(unformattedModuleFullPath, ProjectDefaultPaths.DB_SEEDER_PATH, "");
+            initDestination(unformattedModuleFullPath, ProjectDefaultPaths.DB_SEEDER_PATH);
             initNamespace("Database\\Seeders");
-            initFileName();
+            initFilePath();
         }
     }
 }

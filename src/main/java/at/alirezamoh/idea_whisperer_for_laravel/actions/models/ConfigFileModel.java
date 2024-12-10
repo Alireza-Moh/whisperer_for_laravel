@@ -31,14 +31,14 @@ public class ConfigFileModel extends BaseModel {
         );
 
         if (unformattedModuleFullPath.equals("/app")) {
-            initDestination("", ProjectDefaultPaths.CONFIG_PATH, "");
+            initDestination("", ProjectDefaultPaths.CONFIG_PATH);
             initNamespace("");
-            initFileName();
+            initFilePath();
         }
         else {
-            initDestination(unformattedModuleFullPath, ProjectDefaultPaths.CONFIG_PATH, "");
+            initDestination(unformattedModuleFullPath, ProjectDefaultPaths.CONFIG_PATH);
             initNamespace("");
-            initFileName();
+            initFilePath();
         }
     }
 }

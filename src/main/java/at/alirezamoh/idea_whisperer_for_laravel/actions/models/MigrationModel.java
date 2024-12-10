@@ -57,14 +57,14 @@ public class MigrationModel extends BaseModel {
 
         if (unformattedModuleFullPath.equals("/app") || unformattedModuleFullPath.isEmpty()) {
             this.formattedModuleFullPath = "";
-            initDestination("", ProjectDefaultPaths.MIGRATION_PATH, "");
+            initDestination("", ProjectDefaultPaths.MIGRATION_PATH);
             initNamespace("");
-            initFileName();
+            initFilePath();
         }
         else {
-            initDestination(unformattedModuleFullPath, ProjectDefaultPaths.MIGRATION_PATH, "");
+            initDestination(unformattedModuleFullPath, ProjectDefaultPaths.MIGRATION_PATH);
             initNamespace("");
-            initFileName();
+            initFilePath();
         }
 
         modifyFileName();
