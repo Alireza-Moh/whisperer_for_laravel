@@ -47,11 +47,6 @@ abstract public class BaseModel {
     protected String filePath;
 
     /**
-     * Module src path
-     */
-    protected String moduleSrcPath;
-
-    /**
      * @param name                      The name of the file or entity
      * @param unformattedModuleFullPath The unformatted full path to the module
      * @param formattedModuleFullPath   The formatted full path to the module
@@ -59,7 +54,6 @@ abstract public class BaseModel {
      * @param slug                      The slug for the file
      * @param extension                 The file extension
      * @param namespace                 The namespace for the PHP class
-     * @param moduleSrcPath             Module src path
      */
     public BaseModel(
         String name,
@@ -68,8 +62,7 @@ abstract public class BaseModel {
         String defaultDestination,
         String slug,
         String extension,
-        String namespace,
-        String moduleSrcPath
+        String namespace
     )
     {
         this.name = removeFileExtension(name, extension);
@@ -77,7 +70,6 @@ abstract public class BaseModel {
         this.formattedModuleFullPath = formattedModuleFullPath;
         this.slug = slug;
         this.extension = extension;
-        this.moduleSrcPath = moduleSrcPath;
 
         initDestination(unformattedModuleFullPath, defaultDestination);
         initNamespace(namespace);
@@ -248,10 +240,6 @@ abstract public class BaseModel {
 
     public String getUnformattedModuleFullPath() {
         return unformattedModuleFullPath;
-    }
-
-    public String getModuleSrcPath() {
-        return moduleSrcPath;
     }
 
     protected void initFilePath() {

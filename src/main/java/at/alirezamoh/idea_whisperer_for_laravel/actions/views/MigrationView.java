@@ -63,7 +63,6 @@ public class MigrationView extends BaseDialog {
             this.migrationClassNameTextField.getText(),
             unformattedModuleFullPath,
             this.getSelectedFormattedModuleFullPath(),
-            getModuleDirSrcName(),
             migrationTableNameTextField.getText(),
             createTableRadioButton.isSelected(),
             false,

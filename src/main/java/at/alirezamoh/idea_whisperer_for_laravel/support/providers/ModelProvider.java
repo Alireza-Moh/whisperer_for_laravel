@@ -111,13 +111,8 @@ public class ModelProvider {
      * Searches for models within module
      */
     private void searchInModuleForModels(PsiDirectory rootDir) {
-        String moduleSrcDirName = projectSettingState.replaceAndSlashes(projectSettingState.getModuleSrcDirectoryName());
-
         for (PsiDirectory module : rootDir.getSubdirectories()) {
-            PsiDirectory moduleModelsDir = DirectoryPsiUtil.getDirectory(
-                project,
-                module.getName() + moduleSrcDirName + "/Models"
-            );
+            PsiDirectory moduleModelsDir = module.findSubdirectory(ProjectDefaultPaths.ELOQUENT_MODEL_PATH);
 
             if (moduleModelsDir != null) {
                 for (PsiFile file : moduleModelsDir.getFiles()) {

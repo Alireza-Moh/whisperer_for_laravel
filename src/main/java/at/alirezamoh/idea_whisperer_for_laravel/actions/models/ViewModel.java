@@ -10,13 +10,11 @@ public class ViewModel extends BaseModel {
      * @param name                      The name of the view file
      * @param unformattedModuleFullPath The unformatted module full path
      * @param formattedModuleFullPath   The formatted module full path
-     * @param moduleSrcPath             The module src path
      */
     public ViewModel(
         String name,
         String unformattedModuleFullPath,
-        String formattedModuleFullPath,
-        String moduleSrcPath
+        String formattedModuleFullPath
     )
     {
         super(
@@ -26,8 +24,7 @@ public class ViewModel extends BaseModel {
             ProjectDefaultPaths.VIEW_PATH,
             "",
             ".blade.php",
-            "",
-            moduleSrcPath
+            ""
         );
     }
 }

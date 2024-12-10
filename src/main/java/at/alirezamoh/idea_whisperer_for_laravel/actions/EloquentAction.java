@@ -38,8 +38,7 @@ public class EloquentAction extends BaseAction {
         ControllerModel controllerModel = new ControllerModel(
             eloquentView.getControllerName(),
             eloquentModel.getUnformattedModuleFullPath(),
-            eloquentModel.getFormattedModuleFullPath(),
-            eloquentModel.getModuleSrcPath()
+            eloquentModel.getFormattedModuleFullPath()
         );
         this.create(
             controllerModel,
@@ -54,7 +53,6 @@ public class EloquentAction extends BaseAction {
             eloquentView.getMigrationFileName(),
             eloquentModel.getUnformattedModuleFullPath(),
             eloquentModel.getFormattedModuleFullPath(),
-            eloquentModel.getModuleSrcPath(),
             eloquentView.getTableName(),
             true,
             !eloquentModel.getFields().isEmpty(),

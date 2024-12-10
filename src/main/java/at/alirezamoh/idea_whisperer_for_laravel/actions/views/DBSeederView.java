@@ -40,8 +40,7 @@ public class DBSeederView extends BaseDialog {
         return new DBSeederModel(
             this.dbSeederNameTextField.getText(),
             unformattedModuleFullPath,
-            this.getSelectedFormattedModuleFullPath(),
-            getModuleDirSrcName()
+            this.getSelectedFormattedModuleFullPath()
         );
     }
 

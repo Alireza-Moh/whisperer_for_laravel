@@ -35,8 +35,7 @@ public class ExceptionView extends BaseDialog {
         return new ExceptionModel(
             this.exceptionNameTextField.getText(),
             this.getUnformattedModuleFullPath(this.moduleNameComboBox.getItem()),
-            this.getSelectedFormattedModuleFullPath(),
-            getModuleDirSrcName()
+            this.getSelectedFormattedModuleFullPath()
         );
     }
 

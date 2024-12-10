@@ -10,13 +10,11 @@ public class DBSeederModel extends BaseModel {
      * @param name                      The name of the db seeder
      * @param unformattedModuleFullPath The unformatted module full path
      * @param formattedModuleFullPath   The formatted module full path
-     * @param moduleSrcPath             The module src path
      */
     public DBSeederModel(
         String name,
         String unformattedModuleFullPath,
-        String formattedModuleFullPath,
-        String moduleSrcPath
+        String formattedModuleFullPath
     )
     {
         super(
@@ -26,8 +24,7 @@ public class DBSeederModel extends BaseModel {
             ProjectDefaultPaths.DB_SEEDER_PATH,
             "Seeder",
             ".php",
-            "Database\\Seeders",
-            moduleSrcPath
+            "Database\\Seeders"
         );
 
         if (unformattedModuleFullPath.equals("/app") || unformattedModuleFullPath.isEmpty()) {

@@ -35,8 +35,7 @@ public class MiddlewareView extends BaseDialog {
         return new MiddlewareModel(
             this.middlewareNameTextField.getText(),
             this.getUnformattedModuleFullPath(this.moduleNameComboBox.getItem()),
-            this.getSelectedFormattedModuleFullPath(),
-            getModuleDirSrcName()
+            this.getSelectedFormattedModuleFullPath()
         );
     }
 

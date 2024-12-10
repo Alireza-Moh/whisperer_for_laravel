@@ -35,8 +35,7 @@ public class ConfigFileView extends BaseDialog {
         return new ConfigFileModel(
             configFileNameTextField.getText(),
             getUnformattedModuleFullPathForNoneAppDir(),
-            getSelectedFormattedModuleFullPath(),
-            getModuleDirSrcName()
+            getSelectedFormattedModuleFullPath()
         );
     }
 

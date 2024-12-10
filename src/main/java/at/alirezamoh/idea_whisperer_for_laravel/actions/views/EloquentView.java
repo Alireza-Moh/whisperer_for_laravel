@@ -68,7 +68,6 @@ public class EloquentView extends BaseDialog {
             eloquentNameTextField.getText(),
             getUnformattedModuleFullPath(this.moduleNameComboBox.getItem()),
             getSelectedFormattedModuleFullPath(),
-            getModuleDirSrcName(),
             getFields()
         );
     }

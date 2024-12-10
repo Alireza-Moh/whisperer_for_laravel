@@ -149,15 +149,6 @@ public abstract class BaseDialog extends DialogWrapper {
         }
     }
 
-    protected String getModuleDirSrcName() {
-        String selected = moduleNameComboBox.getItem();
-
-        if (selected == null || getUnformattedModuleFullPath(selected).equals("/app")) {
-            return "";
-        }
-        return projectSettingState.getModuleSrcDirectoryName();
-    }
-
     /**
      * Initializes the project module settings
      */

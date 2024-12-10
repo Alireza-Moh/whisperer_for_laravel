@@ -94,8 +94,7 @@ public class ObserverView extends BaseDialog {
             this.addRetrievedMethodCheckBox.isSelected(),
             this.addForceDeletingMethodCheckBox.isSelected(),
             this.addForceDeletedMethodCheckBox.isSelected(),
-            this.addReplicatingMethodCheckBox.isSelected(),
-            getModuleDirSrcName()
+            this.addReplicatingMethodCheckBox.isSelected()
         );
     }
 

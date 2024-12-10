@@ -35,8 +35,7 @@ public class ControllerView extends BaseDialog {
         return new ControllerModel(
            controllerNameTextField.getText(),
            getUnformattedModuleFullPath(this.moduleNameComboBox.getItem()),
-           getSelectedFormattedModuleFullPath(),
-            getModuleDirSrcName()
+           getSelectedFormattedModuleFullPath()
         );
     }
 

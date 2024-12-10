@@ -48,7 +48,6 @@ public class ObserverModel extends BaseModel {
      * @param name                      The name of policy class
      * @param unformattedModuleFullPath The unformatted module full path
      * @param formattedModuleFullPath   The formatted module full path
-     * @param moduleSrcPath             The module src path
      */
     public ObserverModel(
         String name,
@@ -68,8 +67,7 @@ public class ObserverModel extends BaseModel {
         boolean addRetrievedMethod,
         boolean addForceDeletingMethod,
         boolean addForceDeletedMethod,
-        boolean addReplicatingMethod,
-        String moduleSrcPath
+        boolean addReplicatingMethod
     )
     {
         super(
@@ -79,8 +77,7 @@ public class ObserverModel extends BaseModel {
             ProjectDefaultPaths.OBSERVER_PATH,
             "Observer",
             ".php",
-            "Observers",
-            moduleSrcPath
+            "Observers"
         );
 
         if (eloquentModelPath != null && !eloquentModelPath.isEmpty()) {

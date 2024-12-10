@@ -35,8 +35,7 @@ public class ViewFileView extends BaseDialog {
         return new ViewModel(
             bladeViewFileNameTextField.getText(),
             getUnformattedModuleFullPathForNoneAppDir(),
-            getSelectedFormattedModuleFullPath(),
-            getModuleDirSrcName()
+            getSelectedFormattedModuleFullPath()
         );
     }
 

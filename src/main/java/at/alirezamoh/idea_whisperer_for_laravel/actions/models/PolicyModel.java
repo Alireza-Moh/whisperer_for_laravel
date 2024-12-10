@@ -19,14 +19,12 @@ public class PolicyModel extends BaseModel {
      * @param name                      The name of policy class
      * @param unformattedModuleFullPath The unformatted module full path
      * @param formattedModuleFullPath   The formatted module full path
-     * @param moduleSrcPath             The module src path
      */
     public PolicyModel(
         String name,
         @Nullable String eloquentModelPath,
         String unformattedModuleFullPath,
-        String formattedModuleFullPath,
-        String moduleSrcPath
+        String formattedModuleFullPath
     )
     {
         super(
@@ -36,8 +34,7 @@ public class PolicyModel extends BaseModel {
             ProjectDefaultPaths.POLICY_PATH,
             "Policy",
             ".php",
-            "Policies",
-            moduleSrcPath
+            "Policies"
         );
 
         if (eloquentModelPath != null && !eloquentModelPath.isEmpty()) {

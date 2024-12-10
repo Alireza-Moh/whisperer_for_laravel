@@ -35,8 +35,7 @@ public class JobView extends BaseDialog {
         return new JobModel(
             jobNameTextField.getText(),
             getUnformattedModuleFullPath(moduleNameComboBox.getItem()),
-            getSelectedFormattedModuleFullPath(),
-            getModuleDirSrcName()
+            getSelectedFormattedModuleFullPath()
         );
     }
 

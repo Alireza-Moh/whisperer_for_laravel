@@ -27,16 +27,6 @@ public class SettingsComponent {
     private final JBLabel moduleRootDirectoryPathLabel = new JBLabel("Module root directory path:");
 
     /**
-     * Label for the module src directory name
-     */
-    private final JBLabel moduleSrcDirectoryLabel = new JBLabel("Module src directory name:");
-
-    /**
-     * Text field to input module src directory name for module-based projects
-     */
-    private final JBTextField moduleSrcDirectoryTextField = new JBTextField();
-
-    /**
      * Text field to input the root directory path for module-based projects
      */
     private final JBTextField moduleRootDirectoryPathTextField = new JBTextField();
@@ -76,22 +66,11 @@ public class SettingsComponent {
         this.projectTypeComboBox.setSelectedItem(selectedItem);
     }
 
-    public String getModuleSrcDirectoryName() {
-        return moduleSrcDirectoryTextField.getText();
-    }
-
-    public void setModuleSrcDirectoryName(String srcDirName) {
-        this.moduleSrcDirectoryTextField.setText(srcDirName);
-    }
-
     private void hideModuleTextFields() {
         projectTypeComboBox.setPreferredSize(new java.awt.Dimension(300, projectTypeComboBox.getPreferredSize().height));
 
         moduleRootDirectoryPathLabel.setVisible(false);
         moduleRootDirectoryPathTextField.setVisible(false);
-
-        moduleSrcDirectoryLabel.setVisible(false);
-        moduleSrcDirectoryTextField.setVisible(false);
     }
 
     /**
@@ -109,23 +88,12 @@ public class SettingsComponent {
             moduleRootDirectoryPathTextField,
             10,
             false
-        )
-        .addLabeledComponent(
-            moduleSrcDirectoryLabel,
-            moduleSrcDirectoryTextField,
-            10,
-            false
         );
 
         new HelpTooltip()
             .setLocation(HelpTooltip.Alignment.RIGHT)
             .setDescription("The main folder where all your project modules are located")
             .installOn(moduleRootDirectoryPathTextField);
-
-        new HelpTooltip()
-            .setLocation(HelpTooltip.Alignment.RIGHT)
-            .setDescription("The folder name containing the core code for directories like (e.g., Controllers, Commands)")
-            .installOn(moduleSrcDirectoryTextField);
     }
 
     private void fillPanel() {
@@ -143,10 +111,6 @@ public class SettingsComponent {
                 moduleRootDirectoryPathTextField.setVisible(isSimpleDirectoryModule);
                 moduleRootDirectoryPathTextField.setText("/Modules/");
                 moduleRootDirectoryPathTextField.setText("/app/");
-
-                moduleSrcDirectoryTextField.setText("app");
-                moduleSrcDirectoryLabel.setVisible(isSimpleDirectoryModule);
-                moduleSrcDirectoryTextField.setVisible(isSimpleDirectoryModule);
             }
         });
     }

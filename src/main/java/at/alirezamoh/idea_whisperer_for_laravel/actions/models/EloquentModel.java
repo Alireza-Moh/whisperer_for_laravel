@@ -14,13 +14,11 @@ public class EloquentModel extends BaseModel {
      * @param name                      The name of the eloquent model
      * @param unformattedModuleFullPath The unformatted full path to the module
      * @param formattedModuleFullPath   The formatted full path to the module
-     * @param moduleSrcPath             Module src path
      */
     public EloquentModel(
         String name,
         String unformattedModuleFullPath,
         String formattedModuleFullPath,
-        String moduleSrcPath,
         List<Field> fields
     ) {
         super(
@@ -30,8 +28,7 @@ public class EloquentModel extends BaseModel {
             ProjectDefaultPaths.ELOQUENT_MODEL_PATH,
             "",
             ".php",
-            "Models",
-            moduleSrcPath
+            "Models"
         );
 
         this.fields = fields;

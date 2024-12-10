@@ -50,8 +50,7 @@ public class MailableView extends BaseDialog {
             this.viewNameTextField.getText(),
             this.shouldQueueCheckBox.isSelected(),
             this.markDownViewCheckBox.isSelected(),
-            this.useNewSyntaxCheckBox.isSelected(),
-            getModuleDirSrcName()
+            this.useNewSyntaxCheckBox.isSelected()
         );
     }
 

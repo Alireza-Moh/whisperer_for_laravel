@@ -1,6 +1,7 @@
 package at.alirezamoh.idea_whisperer_for_laravel.support.providers;
 
 import at.alirezamoh.idea_whisperer_for_laravel.settings.SettingsState;
+import at.alirezamoh.idea_whisperer_for_laravel.support.ProjectDefaultPaths;
 import at.alirezamoh.idea_whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -81,13 +82,8 @@ public class EventProvider {
      * @param rootDir The root directory of the modules
      */
     private void searchInModuleForEvents(PsiDirectory rootDir) {
-        String moduleSrcDirName = projectSettingState.replaceAndSlashes(projectSettingState.getModuleSrcDirectoryName());
-
         for (PsiDirectory module : rootDir.getSubdirectories()) {
-            PsiDirectory moduleEventsDir = DirectoryPsiUtil.getDirectory(
-                project,
-                module.getName() + moduleSrcDirName + "/Events"
-            );
+            PsiDirectory moduleEventsDir = module.findSubdirectory("/Events/");
 
             if (moduleEventsDir != null) {
                 for (PsiFile file : moduleEventsDir.getFiles()) {

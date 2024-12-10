@@ -15,14 +15,12 @@ public class ConsoleModel extends BaseModel {
      * @param name                      The name of the console command class
      * @param unformattedModuleFullPath The unformatted module full path
      * @param formattedModuleFullPath   The formatted module full path
-     * @param moduleSrcPath             The module src path
      */
     public ConsoleModel(
         String name,
         String unformattedModuleFullPath,
         String formattedModuleFullPath,
-        String signature,
-        String moduleSrcPath
+        String signature
     )
     {
         super(
@@ -32,8 +30,7 @@ public class ConsoleModel extends BaseModel {
             ProjectDefaultPaths.CONSOLE_PATH,
             "Command",
             ".php",
-            "Console\\Commands",
-            moduleSrcPath
+            "Console\\Commands"
         );
 
         this.signature = signature;

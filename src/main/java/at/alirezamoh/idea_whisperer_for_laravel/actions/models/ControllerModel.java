@@ -10,13 +10,11 @@ public class ControllerModel extends BaseModel {
      * @param name                      The name of the controller
      * @param unformattedModuleFullPath The unformatted module full path
      * @param formattedModuleFullPath   The formatted module full path
-     * @param moduleSrcPath             The module src path
      */
     public ControllerModel(
         String name,
         String unformattedModuleFullPath,
-        String formattedModuleFullPath,
-        String moduleSrcPath
+        String formattedModuleFullPath
     )
     {
         super(
@@ -26,8 +24,7 @@ public class ControllerModel extends BaseModel {
             ProjectDefaultPaths.CONTROLLER_PATH,
             "Controller",
             ".php",
-            "Http\\Controllers",
-            moduleSrcPath
+            "Http\\Controllers"
         );
     }
 }

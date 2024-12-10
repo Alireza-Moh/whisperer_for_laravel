@@ -19,14 +19,12 @@ public class EventListenerModel extends BaseModel {
      * @param name                      The name of event listener class
      * @param unformattedModuleFullPath The unformatted module full path
      * @param formattedModuleFullPath   The formatted module full path
-     * @param moduleSrcPath             The module src path
      */
     public EventListenerModel(
         String name,
         String unformattedModuleFullPath,
         String formattedModuleFullPath,
-        @Nullable String eventClassPath,
-        String moduleSrcPath
+        @Nullable String eventClassPath
     )
     {
         super(
@@ -36,8 +34,7 @@ public class EventListenerModel extends BaseModel {
             ProjectDefaultPaths.EVENT_LISTENER_PATH,
             "Listener",
             ".php",
-            "Listeners",
-            moduleSrcPath
+            "Listeners"
         );
 
         if (eventClassPath != null && !eventClassPath.isEmpty()) {

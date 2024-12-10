@@ -52,8 +52,7 @@ public class PolicyView extends BaseDialog {
             this.policyNameTextField.getText(),
             this.eloquentModelNameTextField.getText(),
             this.getUnformattedModuleFullPath(this.moduleNameComboBox.getItem()),
-            this.getSelectedFormattedModuleFullPath(),
-            getModuleDirSrcName()
+            this.getSelectedFormattedModuleFullPath()
         );
     }
 

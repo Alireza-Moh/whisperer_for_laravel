@@ -46,8 +46,7 @@ public class EventListenerView extends BaseDialog {
             this.eventListenerTextField.getText(),
             this.getUnformattedModuleFullPath(moduleNameComboBox.getItem()),
             this.getSelectedFormattedModuleFullPath(),
-            eventClassTextField.getText(),
-            getModuleDirSrcName()
+            eventClassTextField.getText()
         );
     }
 

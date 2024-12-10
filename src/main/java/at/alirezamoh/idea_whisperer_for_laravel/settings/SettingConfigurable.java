@@ -40,9 +40,7 @@ public class SettingConfigurable implements Configurable {
     public boolean isModified() {
         return !settingsComponent.getProjectType().equals(settingsState.getProjectType())
 
-            || !settingsComponent.getModuleRootDirectoryPath().equals(settingsState.getModuleRootDirectoryPath())
-
-            || !settingsComponent.getModuleSrcDirectoryName().equals(settingsState.getModuleSrcDirectoryName());
+            || !settingsComponent.getModuleRootDirectoryPath().equals(settingsState.getModuleRootDirectoryPath());
     }
 
     @Override
@@ -50,14 +48,12 @@ public class SettingConfigurable implements Configurable {
         validate();
         settingsState.setProjectType(settingsComponent.getProjectType());
         settingsState.setModuleRootDirectoryPath(settingsComponent.getModuleRootDirectoryPath());
-        settingsState.setModuleSrcDirectoryName(settingsComponent.getModuleSrcDirectoryName());
     }
 
     @Override
     public void reset() {
         settingsComponent.setProjectTypeComboBox(settingsState.getProjectType());
         settingsComponent.setModuleRootDirectoryPathTextField(settingsState.getModuleRootDirectoryPath());
-        settingsComponent.setModuleSrcDirectoryName(settingsState.getModuleSrcDirectoryName());
     }
 
     @Override
@@ -71,9 +67,6 @@ public class SettingConfigurable implements Configurable {
         }
         if (settingsComponent.getModuleRootDirectoryPath().isEmpty()) {
             throw new ConfigurationException("Module root directory path must not be empty.");
-        }
-        if (settingsComponent.getModuleSrcDirectoryName().isEmpty()) {
-            throw new ConfigurationException("Module source directory name must not be empty.");
         }
     }
 }

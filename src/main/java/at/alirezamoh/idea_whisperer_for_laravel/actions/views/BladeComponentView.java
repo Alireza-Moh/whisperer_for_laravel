@@ -42,8 +42,7 @@ public class BladeComponentView extends BaseDialog {
         return new BladeComponentClassModel(
             componentNameTextField.getText(),
             getUnformattedModuleFullPath(moduleNameComboBox.getItem()),
-            getSelectedFormattedModuleFullPath(),
-            getModuleDirSrcName()
+            getSelectedFormattedModuleFullPath()
         );
     }
 
@@ -60,8 +59,7 @@ public class BladeComponentView extends BaseDialog {
         return new BladeComponentViewModel(
             componentNameTextField.getText(),
             unformattedModuleFullPath,
-            getSelectedFormattedModuleFullPath(),
-            getModuleDirSrcName()
+            getSelectedFormattedModuleFullPath()
         );
     }
 

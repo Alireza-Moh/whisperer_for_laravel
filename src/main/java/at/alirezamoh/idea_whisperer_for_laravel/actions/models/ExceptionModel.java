@@ -16,8 +16,7 @@ public class ExceptionModel extends BaseModel {
     public ExceptionModel(
         String name,
         String unformattedModuleFullPath,
-        String formattedModuleFullPath,
-        String moduleSrcPath
+        String formattedModuleFullPath
     )
     {
         super(
@@ -27,8 +26,7 @@ public class ExceptionModel extends BaseModel {
             ProjectDefaultPaths.EXCEPTION_PATH,
             "Exception",
             ".php",
-            "Exceptions",
-            moduleSrcPath
+            "Exceptions"
         );
     }
 }

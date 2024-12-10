@@ -19,7 +19,6 @@ public class MailableModel extends BaseModel {
      * @param name                      The name of the mailable class
      * @param unformattedModuleFullPath The unformatted module full path
      * @param formattedModuleFullPath   The formatted module full path
-     * @param moduleSrcPath             The module src path
      */
     public MailableModel(
         String name,
@@ -28,8 +27,7 @@ public class MailableModel extends BaseModel {
         String viewName,
         boolean shouldQueue,
         boolean markdownView,
-        boolean useNewSyntax,
-        String moduleSrcPath
+        boolean useNewSyntax
     )
     {
         super(
@@ -39,8 +37,7 @@ public class MailableModel extends BaseModel {
             ProjectDefaultPaths.MAILABLE_PATH,
             "Mail",
             ".php",
-            "Mail",
-            moduleSrcPath
+            "Mail"
         );
 
         this.shouldQueue = shouldQueue;

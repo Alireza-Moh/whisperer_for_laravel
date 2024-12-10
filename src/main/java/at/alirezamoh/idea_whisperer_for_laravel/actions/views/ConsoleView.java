@@ -41,8 +41,7 @@ public class ConsoleView extends BaseDialog {
             consoleNameTextField.getText(),
             getUnformattedModuleFullPath(moduleNameComboBox.getItem()),
             getSelectedFormattedModuleFullPath(),
-            signatureTextField.getText(),
-            getModuleDirSrcName()
+            signatureTextField.getText()
         );
     }
 

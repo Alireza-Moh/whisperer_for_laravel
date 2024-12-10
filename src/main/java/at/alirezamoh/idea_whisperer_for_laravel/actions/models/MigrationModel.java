@@ -25,13 +25,11 @@ public class MigrationModel extends BaseModel {
      * @param name                      The name of the migration class name
      * @param unformattedModuleFullPath The unformatted module full path
      * @param formattedModuleFullPath   The formatted module full path
-     * @param moduleSrcPath             The module src path
      */
     public MigrationModel(
         String name,
         String unformattedModuleFullPath,
         String formattedModuleFullPath,
-        String moduleSrcPath,
         String tableName,
         boolean createTable,
         boolean hasFields,
@@ -45,8 +43,7 @@ public class MigrationModel extends BaseModel {
             ProjectDefaultPaths.MIGRATION_PATH,
             "",
             ".php",
-            "",
-            moduleSrcPath
+            ""
         );
 
         this.tableName = tableName;

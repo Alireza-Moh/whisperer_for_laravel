@@ -30,11 +30,6 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
      */
     private String moduleRootDirectoryPath;
 
-    /**
-     * Module src path
-     */
-    private String moduleSrcDirectoryName;
-
     public static SettingsState getInstance(@NotNull Project project) {
         return project.getService(SettingsState.class);
     }
@@ -76,14 +71,6 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
 
     public void setModuleRootDirectoryPath(String moduleRootDirectoryPath) {
         this.moduleRootDirectoryPath = moduleRootDirectoryPath;
-    }
-
-    public String getModuleSrcDirectoryName() {
-        return moduleSrcDirectoryName;
-    }
-
-    public void setModuleSrcDirectoryName(String moduleSrcDirectoryName) {
-        this.moduleSrcDirectoryName = moduleSrcDirectoryName;
     }
 
     /**
