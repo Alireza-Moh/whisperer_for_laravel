@@ -40,6 +40,8 @@
     <extensions defaultExtensionNs="com.intellij">
         <notificationGroup id="NotificationGroup" displayType="BALLOON"/>
 
+        <postStartupActivity implementation="at.alirezamoh.idea_whisperer_for_laravel.settings.LaravelStartupActivity"/>
+
         <projectConfigurable parentId="language" instance="at.alirezamoh.idea_whisperer_for_laravel.settings.SettingConfigurable" id="idea_whisperer_for_laravel_settings" displayName="Idea Whisperer For Laravel" nonDefaultProject="true"/>
         <projectService serviceImplementation="at.alirezamoh.idea_whisperer_for_laravel.settings.SettingsState"/>
 

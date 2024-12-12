@@ -20,6 +20,13 @@ import org.jetbrains.annotations.Nullable;
     storages = {@Storage("idea_whisperer_for_laravel.xml")}
 )
 public class SettingsState implements PersistentStateComponent<SettingsState> {
+    private static Project project;
+
+    /**
+     * The root directory where the whole laravel project is ===> default value = the root of the opened project
+     */
+    private String laravelDirectoryPath;
+
     /**
      * The type of the project (Standard or Module-based)
      */
@@ -28,10 +35,20 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
     /**
      * The root directory path for module-based projects
      */
-    private String moduleRootDirectoryPath;
+    private String modulesDirectoryPath;
 
-    public static SettingsState getInstance(@NotNull Project project) {
-        return project.getService(SettingsState.class);
+    /**
+     * The src directory path for module-based projects
+     */
+    private String moduleSrcDirectoryPath;
+
+    public static SettingsState getInstance(@NotNull Project foundedProject) {
+        project = foundedProject;
+        return foundedProject.getService(SettingsState.class);
+    }
+
+    public Project getProject() {
+        return project;
     }
 
     @Override
@@ -49,6 +66,14 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
         PersistentStateComponent.super.initializeComponent();
     }
 
+    public String getLaravelDirectoryPath() {
+        return laravelDirectoryPath;
+    }
+
+    public void setLaravelDirectoryPath(String laravelDirectoryPath) {
+        this.laravelDirectoryPath = laravelDirectoryPath;
+    }
+
     public String getProjectType() {
         return projectType;
     }
@@ -57,20 +82,28 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
         this.projectType = projectType;
     }
 
-    public String getModuleRootDirectoryPath() {
-        return moduleRootDirectoryPath;
+    public String getModulesDirectoryPath() {
+        return modulesDirectoryPath;
     }
 
-    public @Nullable String getFormattedModuleRootDirectoryPath() {
+    public void setModulesDirectoryPath(String modulesDirectoryPath) {
+        this.modulesDirectoryPath = modulesDirectoryPath;
+    }
+
+    public String getModuleSrcDirectoryPath() {
+        return moduleSrcDirectoryPath;
+    }
+
+    public void setModuleSrcDirectoryPath(String moduleSrcDirectoryPath) {
+        this.moduleSrcDirectoryPath = moduleSrcDirectoryPath;
+    }
+
+    public @Nullable String getFormattedModulesDirectoryPath() {
         return StrUtil.addSlashes(
-                getModuleRootDirectoryPath(),
+                getModulesDirectoryPath(),
                 false,
                 true
         );
-    }
-
-    public void setModuleRootDirectoryPath(String moduleRootDirectoryPath) {
-        this.moduleRootDirectoryPath = moduleRootDirectoryPath;
     }
 
     /**
@@ -79,6 +112,14 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
      */
     public boolean isModuleApplication() {
         return "Module based Application".equals(projectType);
+    }
+
+    public boolean isDefaultLaravelDirectoryEmpty() {
+        return laravelDirectoryPath.isEmpty();
+    }
+
+    public boolean isModuleSrcDirectoryEmpty() {
+        return moduleSrcDirectoryPath.isEmpty();
     }
 
     /**
