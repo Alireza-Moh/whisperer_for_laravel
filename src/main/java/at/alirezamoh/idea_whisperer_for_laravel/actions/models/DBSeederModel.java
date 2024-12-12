@@ -1,5 +1,6 @@
 package at.alirezamoh.idea_whisperer_for_laravel.actions.models;
 
+import at.alirezamoh.idea_whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.idea_whisperer_for_laravel.support.ProjectDefaultPaths;
 
 /**
@@ -12,12 +13,14 @@ public class DBSeederModel extends BaseModel {
      * @param formattedModuleFullPath   The formatted module full path
      */
     public DBSeederModel(
+        SettingsState settingsState,
         String name,
         String unformattedModuleFullPath,
         String formattedModuleFullPath
     )
     {
         super(
+            settingsState,
             name,
             unformattedModuleFullPath,
             formattedModuleFullPath,
@@ -29,12 +32,12 @@ public class DBSeederModel extends BaseModel {
 
         if (unformattedModuleFullPath.equals("/app") || unformattedModuleFullPath.isEmpty()) {
             this.formattedModuleFullPath = "";
-            initDestination("", ProjectDefaultPaths.DB_SEEDER_PATH);
+            initDestination("", ProjectDefaultPaths.DB_SEEDER_PATH, true);
             initNamespace("Database\\Seeders");
             initFilePath();
         }
         else {
-            initDestination(unformattedModuleFullPath, ProjectDefaultPaths.DB_SEEDER_PATH);
+            initDestination(unformattedModuleFullPath, ProjectDefaultPaths.DB_SEEDER_PATH, true);
             initNamespace("Database\\Seeders");
             initFilePath();
         }

@@ -38,6 +38,7 @@ public class ConsoleView extends BaseDialog {
      */
     public ConsoleModel getConsoleModel() {
         return new ConsoleModel(
+            projectSettingState,
             consoleNameTextField.getText(),
             getUnformattedModuleFullPath(moduleNameComboBox.getItem()),
             getSelectedFormattedModuleFullPath(),

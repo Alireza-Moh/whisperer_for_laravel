@@ -1,11 +1,16 @@
 package at.alirezamoh.idea_whisperer_for_laravel.actions.models;
 
+import at.alirezamoh.idea_whisperer_for_laravel.settings.SettingsState;
+import at.alirezamoh.idea_whisperer_for_laravel.support.strUtil.StrUtil;
+
 import java.util.Arrays;
 
 /**
  * Base class for model objects
  */
 abstract public class BaseModel {
+    protected SettingsState settingsState;
+
     /**
      * The name of the file or entity
      */
@@ -56,6 +61,7 @@ abstract public class BaseModel {
      * @param namespace                 The namespace for the PHP class
      */
     public BaseModel(
+        SettingsState settingsState,
         String name,
         String unformattedModuleFullPath,
         String formattedModuleFullPath,
@@ -65,13 +71,14 @@ abstract public class BaseModel {
         String namespace
     )
     {
+        this.settingsState = settingsState;
         this.name = removeFileExtension(name, extension);
         this.unformattedModuleFullPath = unformattedModuleFullPath;
         this.formattedModuleFullPath = formattedModuleFullPath;
         this.slug = slug;
         this.extension = extension;
 
-        initDestination(unformattedModuleFullPath, defaultDestination);
+        initDestination(unformattedModuleFullPath, defaultDestination, false);
         initNamespace(namespace);
         initFilePath();
     }
@@ -243,17 +250,32 @@ abstract public class BaseModel {
     }
 
     protected void initFilePath() {
-        filePath = normalizeSlashes(destination + "/" + getName() + extension);
+        filePath = StrUtil.removeDoubleSlashes(destination + "/" + getName() + extension);
     }
 
-    protected void initDestination(String unformattedModuleFullPath, String defaultDestination) {
+    protected void initDestination(String unformattedModuleFullPath, String defaultDestination, boolean withoutModuleSrcPath) {
         StringBuilder destinationBuilder = new StringBuilder(unformattedModuleFullPath);
 
-        destinationBuilder.append(defaultDestination);
+        String modulePath;
+
+        if (withoutModuleSrcPath) {
+            modulePath = StrUtil.addSlashes(defaultDestination);
+        }
+        else {
+            if (settingsState.isModuleSrcDirectoryEmpty()) {
+                modulePath = StrUtil.addSlashes(defaultDestination);
+            } else {
+                modulePath = StrUtil.removeDoubleSlashes(
+                    StrUtil.addSlashes(settingsState.getModuleSrcDirectoryPath()) + defaultDestination
+                );
+            }
+        }
+
+        destinationBuilder.append(modulePath);
 
         String normalizedFolderPath = normalizeFolderPath();
         if (!normalizedFolderPath.isEmpty()) {
-            destinationBuilder.append(normalizeSlashes(normalizedFolderPath));
+            destinationBuilder.append(StrUtil.removeDoubleSlashes(normalizedFolderPath));
         }
 
         this.destination = destinationBuilder.toString();
@@ -271,13 +293,6 @@ abstract public class BaseModel {
         }
 
         return normalizedPath;
-    }
-
-    private String normalizeSlashes(String input) {
-        if (input == null || input.isEmpty()) {
-            return input;
-        }
-        return input.replaceAll("//+", "/");
     }
 
     /**

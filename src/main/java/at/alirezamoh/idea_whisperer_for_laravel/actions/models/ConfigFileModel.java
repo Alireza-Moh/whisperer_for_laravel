@@ -1,5 +1,6 @@
 package at.alirezamoh.idea_whisperer_for_laravel.actions.models;
 
+import at.alirezamoh.idea_whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.idea_whisperer_for_laravel.support.ProjectDefaultPaths;
 
 /**
@@ -12,12 +13,14 @@ public class ConfigFileModel extends BaseModel {
      * @param formattedModuleFullPath   The formatted module full path
      */
     public ConfigFileModel(
+        SettingsState settingsState,
         String name,
         String unformattedModuleFullPath,
         String formattedModuleFullPath
     )
     {
         super(
+            settingsState,
             name,
             unformattedModuleFullPath,
             formattedModuleFullPath,
@@ -28,12 +31,12 @@ public class ConfigFileModel extends BaseModel {
         );
 
         if (unformattedModuleFullPath.equals("/app")) {
-            initDestination("", ProjectDefaultPaths.CONFIG_PATH);
+            initDestination("", ProjectDefaultPaths.CONFIG_PATH, true);
             initNamespace("");
             initFilePath();
         }
         else {
-            initDestination(unformattedModuleFullPath, ProjectDefaultPaths.CONFIG_PATH);
+            initDestination(unformattedModuleFullPath, ProjectDefaultPaths.CONFIG_PATH, true);
             initNamespace("");
             initFilePath();
         }

@@ -44,6 +44,7 @@ public class MailableView extends BaseDialog {
      */
     public MailableModel getMailableModel() {
         return new MailableModel(
+            projectSettingState,
             this.mailableNameTextField.getText(),
             this.getUnformattedModuleFullPath(this.moduleNameComboBox.getItem()),
             this.getSelectedFormattedModuleFullPath(),

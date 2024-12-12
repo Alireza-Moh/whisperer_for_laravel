@@ -6,11 +6,13 @@ import at.alirezamoh.idea_whisperer_for_laravel.support.ProjectDefaultPaths;
 import at.alirezamoh.idea_whisperer_for_laravel.support.applicationModules.utils.ApplicationModuleUtil;
 import at.alirezamoh.idea_whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
 import at.alirezamoh.idea_whisperer_for_laravel.support.psiUtil.PsiUtil;
+import at.alirezamoh.idea_whisperer_for_laravel.support.strUtil.StrUtil;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.jetbrains.php.blade.BladeFileType;
+import com.jetbrains.php.lang.psi.elements.PhpClass;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,28 +51,30 @@ public class BladeFileCollector {
     }
 
     public BladeFileCollector startSearching() {
-        PsiDirectory defaultViewDir = null;
-        if (projectSettingState.isModuleApplication()) {
-            String rootPath = projectSettingState.getFormattedModuleRootDirectoryPath();
-
-            if (rootPath != null) {
-                defaultViewDir = DirectoryPsiUtil.getDirectory(project, rootPath + ProjectDefaultPaths.VIEW_PATH);
-            }
+        String defaultViewPath = ProjectDefaultPaths.VIEW_PATH;
+        if (!projectSettingState.isDefaultLaravelDirectoryEmpty()) {
+            defaultViewPath = StrUtil.addSlashes(
+                projectSettingState.getLaravelDirectoryPath(),
+                false,
+                true
+            ) + ProjectDefaultPaths.VIEW_PATH;
         }
 
-        PsiDirectory defaultResDir = DirectoryPsiUtil.getDirectory(project, ProjectDefaultPaths.VIEW_PATH);
+        PsiDirectory defaultResDir = DirectoryPsiUtil.getDirectory(project, defaultViewPath);
 
         if (defaultResDir != null) {
             searchForBladeFiles(defaultResDir, "", "");
         }
 
-        if (defaultViewDir != null) {
-            searchForBladeFiles(defaultViewDir, "", "");
-        }
-
-        String moduleDirectoryRootPath = projectSettingState.getFormattedModuleRootDirectoryPath();
+        String moduleDirectoryRootPath = projectSettingState.getFormattedModulesDirectoryPath();
         if (projectSettingState.isModuleApplication() && moduleDirectoryRootPath != null) {
-            searchForBladeFilesInModules();
+            PsiDirectory modulesDir = DirectoryPsiUtil.getDirectory(project, moduleDirectoryRootPath);
+
+            if (modulesDir != null) {
+                for (PsiDirectory moduleDir : modulesDir.getSubdirectories()) {
+                    searchForBladeFilesInModules(moduleDir);
+                }
+            }
         }
 
         return this;
@@ -126,12 +130,11 @@ public class BladeFileCollector {
     /**
      * Searches for bladeFiles within module
      */
-    private void searchForBladeFilesInModules() {
+    private void searchForBladeFilesInModules(PsiDirectory moduleDir) {
         BladeModuleServiceProviderVisitor bladeModuleServiceProviderVisitor = new BladeModuleServiceProviderVisitor(project);
 
-        for (PsiFile serviceProviderFile : ApplicationModuleUtil.getProviders(project)) {
-            serviceProviderFile.acceptChildren(bladeModuleServiceProviderVisitor);
-
+        for (PhpClass serviceProvider : ApplicationModuleUtil.getProviders(moduleDir)) {
+            serviceProvider.acceptChildren(bladeModuleServiceProviderVisitor);
             List<BladeModule> bladeModules = bladeModuleServiceProviderVisitor.getBladeFilesInModule();
 
             if (!bladeModules.isEmpty()) {

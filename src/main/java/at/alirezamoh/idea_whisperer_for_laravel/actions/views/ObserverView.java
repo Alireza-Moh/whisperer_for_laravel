@@ -77,6 +77,7 @@ public class ObserverView extends BaseDialog {
      */
     public ObserverModel getObserverModel() {
         return new ObserverModel(
+            projectSettingState,
             this.observerNameTextField.getText(),
             this.eloquentModelNameTextField.getText(),
             this.getUnformattedModuleFullPath(this.moduleNameComboBox.getItem()),

@@ -34,7 +34,7 @@ abstract public class BaseServiceProviderVisitor extends PsiRecursiveElementWalk
         this.projectSettingState = SettingsState.getInstance(project);
 
         String moduleDirectoryRootPath = StrUtil.addSlashes(
-            projectSettingState.getModuleRootDirectoryPath(),
+            projectSettingState.getModulesDirectoryPath(),
             false,
             false
         );;

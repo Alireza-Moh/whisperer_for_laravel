@@ -1,6 +1,5 @@
 package at.alirezamoh.idea_whisperer_for_laravel.settings;
 
-import com.intellij.ide.HelpTooltip;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.components.JBLabel;
@@ -14,120 +13,18 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class SettingsComponent {
-//    /**
-//     * The form builder factory
-//     */
-//    private final FormBuilder formBuilder;
-//
-//    /**
-//     * Combo box to select the project type (Standard or Module-based)
-//     */
-//    private final ComboBox<String> projectTypeComboBox = new ComboBox<>(new String[]{"Standard Application", "Module based Application"});
-//
-//    /**
-//     * Label for the root directory path
-//     */
-//    private final JBLabel moduleRootDirectoryPathLabel = new JBLabel("Module root directory path:");
-//
-//    /**
-//     * Text field to input the root directory path for module-based projects
-//     */
-//    private final JBTextField moduleRootDirectoryPathTextField = new JBTextField();
-//
-//    SettingsComponent() {
-//        formBuilder = FormBuilder.createFormBuilder();
-//
-//        hideModuleTextFields();
-//
-//        addModuleSettingsComponent();
-//        fillPanel();
-//
-//        addEventListenerToProjectTypeComboBox();
-//    }
-//
-//    /**
-//     * Returns main panel with the necessary components
-//     * @return main panel
-//     */
-//    public JPanel getPanel() {
-//        return formBuilder.getPanel();
-//    }
-//
-//    public String getModuleRootDirectoryPath() {
-//        return moduleRootDirectoryPathTextField.getText();
-//    }
-//
-//    public void setModuleRootDirectoryPathTextField(String newPath) {
-//        this.moduleRootDirectoryPathTextField.setText(newPath);
-//    }
-//
-//    public String getProjectType() {
-//        return projectTypeComboBox.getItem();
-//    }
-//
-//    public void setProjectTypeComboBox(String selectedItem) {
-//        this.projectTypeComboBox.setSelectedItem(selectedItem);
-//    }
-//
-//    private void hideModuleTextFields() {
-//        projectTypeComboBox.setPreferredSize(new java.awt.Dimension(300, projectTypeComboBox.getPreferredSize().height));
-//
-//        moduleRootDirectoryPathLabel.setVisible(false);
-//        moduleRootDirectoryPathTextField.setVisible(false);
-//    }
-//
-//    /**
-//     * Adds the text fields for saving the based module data
-//     */
-//    private void addModuleSettingsComponent() {
-//        formBuilder.addLabeledComponent(
-//            new JBLabel("Project type:"),
-//            projectTypeComboBox,
-//            20,
-//            false
-//        )
-//        .addLabeledComponent(
-//            moduleRootDirectoryPathLabel,
-//            moduleRootDirectoryPathTextField,
-//            10,
-//            false
-//        );
-//
-//        new HelpTooltip()
-//            .setLocation(HelpTooltip.Alignment.RIGHT)
-//            .setDescription("The main folder where all your project modules are located")
-//            .installOn(moduleRootDirectoryPathTextField);
-//    }
-//
-//    private void fillPanel() {
-//        formBuilder.addComponentFillVertically(new JPanel(), 0);
-//    }
-//
-//    private void addEventListenerToProjectTypeComboBox() {
-//        projectTypeComboBox.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                String selectedItem = (String) projectTypeComboBox.getSelectedItem();
-//                boolean isSimpleDirectoryModule = "Module based Application".equals(selectedItem);
-//
-//                moduleRootDirectoryPathLabel.setVisible(isSimpleDirectoryModule);
-//                moduleRootDirectoryPathTextField.setVisible(isSimpleDirectoryModule);
-//                moduleRootDirectoryPathTextField.setText("/Modules/");
-//                moduleRootDirectoryPathTextField.setText("/app/");
-//            }
-//        });
-//    }
-
     private final JBTabbedPane tabbedPane = new JBTabbedPane();
 
-
     /*==============Components for General Settings==============*/
-    private final JBTextField projectRootDirectoryTextField = new JBTextField();
+    private final JPanel laravelDirectoryPanel = new JPanel(new BorderLayout());
+    private final JPanel moduleSrcDirectoryPanel = new JPanel(new BorderLayout());
+    private final JPanel modulesDirectoryPanel = new JPanel(new BorderLayout());
+    private final JBTextField laravelDirectoryTextField = new JBTextField();
     private final ComboBox<String> projectTypeComboBox = new ComboBox<>(new String[]{"Standard Application", "Module based Application"});
     private final JBTextField modulesDirectoryPathTextField = new JBTextField();
-    private final JBLabel modulesDirectoryPathLabel = new JBLabel("Modules directory path:");
+    private final JBLabel modulesDirectoryPathLabel = new JBLabel("Root directory:");
     private final JBTextField moduleSrcDirectoryPathTextField = new JBTextField();
-    private final JBLabel moduleSrcDirectoryPathLabel = new JBLabel("Module src directory path:");
+    private final JBLabel moduleSrcDirectoryPathLabel = new JBLabel("Module source:");
 
 
     public SettingsComponent(Project project) {
@@ -149,11 +46,11 @@ public class SettingsComponent {
     }
 
     public String getProjectRootDirectoryPath() {
-        return projectRootDirectoryTextField.getText();
+        return laravelDirectoryTextField.getText();
     }
 
     public void setProjectRootDirectoryPath(String newPath) {
-        this.projectRootDirectoryTextField.setText(newPath);
+        this.laravelDirectoryTextField.setText(newPath);
     }
 
     public String getProjectType() {
@@ -193,21 +90,29 @@ public class SettingsComponent {
      * @return JPanel
      */
     private JPanel createGeneralSettingsPanel() {
+        laravelDirectoryPanel.add(laravelDirectoryTextField, BorderLayout.NORTH);
+        JBLabel laravelDirectoryHintLabel = new JBLabel("Leave blank if the Laravel project is in the root directory.");
+        laravelDirectoryHintLabel.setFont(laravelDirectoryHintLabel.getFont().deriveFont(Font.ITALIC));
+        laravelDirectoryHintLabel.setForeground(Color.GRAY);
+        laravelDirectoryPanel.add(laravelDirectoryHintLabel, BorderLayout.CENTER);
+
+        modulesDirectoryPanel.add(modulesDirectoryPathTextField, BorderLayout.NORTH);
+        JBLabel modulesDirectoryHintLabel = new JBLabel("The main folder path for all modules");
+        modulesDirectoryHintLabel.setFont(modulesDirectoryHintLabel.getFont().deriveFont(Font.ITALIC));
+        modulesDirectoryHintLabel.setForeground(Color.GRAY);
+        modulesDirectoryPanel.add(modulesDirectoryHintLabel, BorderLayout.CENTER);
+
+        moduleSrcDirectoryPanel.add(moduleSrcDirectoryPathTextField, BorderLayout.NORTH);
+        JBLabel moduleSrcDirectoryHintLabel = new JBLabel("Leave blank if the source directory is is app");
+        moduleSrcDirectoryHintLabel.setFont(moduleSrcDirectoryHintLabel.getFont().deriveFont(Font.ITALIC));
+        moduleSrcDirectoryHintLabel.setForeground(Color.GRAY);
+        moduleSrcDirectoryPanel.add(moduleSrcDirectoryHintLabel, BorderLayout.CENTER);
+
         FormBuilder builder = FormBuilder.createFormBuilder()
-            .addLabeledComponent(new JBLabel("Laravel directory:"), projectRootDirectoryTextField, 10, false)
+            .addLabeledComponent(new JBLabel("Laravel directory:"), laravelDirectoryPanel, 10, false)
             .addLabeledComponent(new JBLabel("Project type:"), createComboBoxPanel(projectTypeComboBox), 10, false)
-            .addLabeledComponent(modulesDirectoryPathLabel, modulesDirectoryPathTextField, 10, false)
-            .addLabeledComponent(moduleSrcDirectoryPathLabel, moduleSrcDirectoryPathTextField, 10, false);
-
-        new HelpTooltip()
-            .setLocation(HelpTooltip.Alignment.RIGHT)
-            .setDescription("The main folder path where all your modules are located")
-            .installOn(modulesDirectoryPathTextField);
-
-        new HelpTooltip()
-            .setLocation(HelpTooltip.Alignment.RIGHT)
-            .setDescription("The folder path containing the core code for directories like (e.g., Controllers, Models) in each module")
-            .installOn(moduleSrcDirectoryPathTextField);
+            .addLabeledComponent(modulesDirectoryPathLabel, modulesDirectoryPanel, 10, false)
+            .addLabeledComponent(moduleSrcDirectoryPathLabel, moduleSrcDirectoryPanel, 10, false);
 
         return builder.getPanel();
     }

@@ -4,10 +4,16 @@ import at.alirezamoh.idea_whisperer_for_laravel.support.ProjectDefaultPaths;
 import at.alirezamoh.idea_whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
 import at.alirezamoh.idea_whisperer_for_laravel.support.applicationModules.visitors.BootstrapFileVisitor;
 import com.intellij.openapi.project.Project;
+import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
+import com.jetbrains.php.lang.psi.PhpFile;
+import com.jetbrains.php.lang.psi.elements.PhpClass;
+import com.jetbrains.php.lang.psi.elements.PhpNamedElement;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -44,5 +50,43 @@ public class ApplicationModuleUtil {
         }
 
         return providers;
+    }
+
+    /**
+     * Retrieves a list of service providers from the bootstrap service provider class
+     * This method locates the bootstrap service provider file and uses a visitor to extract
+     * the registered service providers
+     * @param moduleDir Module directory
+     * @return A list of PsiFile objects representing the service providers
+     */
+    public static Collection<PhpClass> getProviders(PsiDirectory moduleDir) {
+        List<PhpClass> serviceProviderClasses = new ArrayList<>();
+        collectPhpClassesFromDirectory(moduleDir, serviceProviderClasses);
+
+        String serviceProviderFQN = "\\Illuminate\\Support\\ServiceProvider";
+        return serviceProviderClasses.stream()
+            .filter(phpClass -> phpClass.getSuperClass() != null && serviceProviderFQN.equals(phpClass.getSuperClass().getFQN()))
+            .filter(phpClass -> !phpClass.isAbstract())
+            .toList();
+    }
+
+    /**
+     * Recursively collect all PHP classes within a directory
+     *
+     * @param directory          The VirtualFile directory to search in
+     * @param collectedClasses   A list to collect found PhpClass objects
+     */
+    private static void collectPhpClassesFromDirectory(@NotNull PsiDirectory directory, @NotNull List<PhpClass> collectedClasses) {
+        for (PsiFile file : directory.getFiles()) {
+            if (file.isDirectory()) {
+                collectPhpClassesFromDirectory((PsiDirectory) file, collectedClasses);
+            } else if (file instanceof PhpFile phpFile) {
+                for (PhpNamedElement element : phpFile.getTopLevelDefs().values()) {
+                    if (element instanceof PhpClass) {
+                        collectedClasses.add((PhpClass) element);
+                    }
+                }
+            }
+        }
     }
 }

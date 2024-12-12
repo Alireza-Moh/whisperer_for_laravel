@@ -99,7 +99,7 @@ public class ModelProvider {
      * Searches for models within modules in a module-based project.
      */
     private void searchForModelsInModules() {
-        String moduleRootPath = projectSettingState.replaceAndSlashes(projectSettingState.getModuleRootDirectoryPath());
+        String moduleRootPath = projectSettingState.replaceAndSlashes(projectSettingState.getModulesDirectoryPath());
         PsiDirectory rootDir = DirectoryPsiUtil.getDirectory(project, moduleRootPath);
 
         if (rootDir != null) {

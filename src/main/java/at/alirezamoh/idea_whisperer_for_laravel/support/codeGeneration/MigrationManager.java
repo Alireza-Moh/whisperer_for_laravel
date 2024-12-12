@@ -225,7 +225,7 @@ public class MigrationManager {
     }
 
     private void searchForMigrationsInModules(Collection<PsiFile> migrations) {
-        String moduleRootPath = projectSettingsState.replaceAndSlashes(projectSettingsState.getModuleRootDirectoryPath());
+        String moduleRootPath = projectSettingsState.replaceAndSlashes(projectSettingsState.getModulesDirectoryPath());
         PsiDirectory rootDir = DirectoryPsiUtil.getDirectory(project, moduleRootPath);
 
         if (rootDir != null) {

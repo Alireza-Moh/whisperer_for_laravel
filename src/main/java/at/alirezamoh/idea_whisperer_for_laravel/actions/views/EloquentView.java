@@ -65,6 +65,7 @@ public class EloquentView extends BaseDialog {
      */
     public EloquentModel getEloquentModel() {
         return new EloquentModel(
+            projectSettingState,
             eloquentNameTextField.getText(),
             getUnformattedModuleFullPath(this.moduleNameComboBox.getItem()),
             getSelectedFormattedModuleFullPath(),

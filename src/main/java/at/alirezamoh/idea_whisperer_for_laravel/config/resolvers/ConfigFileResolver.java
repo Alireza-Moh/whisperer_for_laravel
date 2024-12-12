@@ -81,7 +81,7 @@ public class ConfigFileResolver {
     private void iterateFile() {
         Collection<PsiFile> configFiles = new ArrayList<>();
         if (settingsState.isModuleApplication()) {
-            String rootPath = settingsState.getFormattedModuleRootDirectoryPath();
+            String rootPath = settingsState.getFormattedModulesDirectoryPath();
 
             if (rootPath != null) {
                 configFiles.addAll(DirectoryPsiUtil.getFilesRecursively(project, rootPath + ProjectDefaultPaths.CONFIG_PATH));
@@ -159,9 +159,9 @@ public class ConfigFileResolver {
      * tries to find the searched config key in the modules
      */
     private void searchInModules() {
-        Map<ArrayHashElement, String> configKeys = configKeyCollector.getFromModules().getConfigKeyWithCorrectPsiElement();
+        Map<PsiElement, String> configKeys = configKeyCollector.getFromModules().getConfigKeyWithCorrectPsiElement();
 
-        for (Map.Entry<ArrayHashElement, String> entry : configKeys.entrySet()) {
+        for (Map.Entry<PsiElement, String> entry : configKeys.entrySet()) {
             if (entry.getValue().equals(searchedConfigKey)) {
                 foundedKey = entry.getKey();
             }

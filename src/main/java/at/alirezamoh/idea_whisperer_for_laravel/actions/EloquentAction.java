@@ -4,6 +4,7 @@ import at.alirezamoh.idea_whisperer_for_laravel.actions.models.ControllerModel;
 import at.alirezamoh.idea_whisperer_for_laravel.actions.models.MigrationModel;
 import at.alirezamoh.idea_whisperer_for_laravel.actions.models.EloquentModel;
 import at.alirezamoh.idea_whisperer_for_laravel.actions.views.EloquentView;
+import at.alirezamoh.idea_whisperer_for_laravel.settings.SettingsState;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
@@ -36,6 +37,7 @@ public class EloquentAction extends BaseAction {
 
     private void createController(EloquentView eloquentView, EloquentModel eloquentModel, Project project) {
         ControllerModel controllerModel = new ControllerModel(
+            SettingsState.getInstance(project),
             eloquentView.getControllerName(),
             eloquentModel.getUnformattedModuleFullPath(),
             eloquentModel.getFormattedModuleFullPath()
@@ -50,6 +52,7 @@ public class EloquentAction extends BaseAction {
 
     private void createMigration(EloquentView eloquentView, EloquentModel eloquentModel, Project project) {
         MigrationModel migrationModel = new MigrationModel(
+            SettingsState.getInstance(project),
             eloquentView.getMigrationFileName(),
             eloquentModel.getUnformattedModuleFullPath(),
             eloquentModel.getFormattedModuleFullPath(),

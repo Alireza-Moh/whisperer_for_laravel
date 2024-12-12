@@ -63,11 +63,6 @@ public class SettingConfigurable implements Configurable {
         settingsState.setProjectType(settingsComponent.getProjectType());
         settingsState.setModulesDirectoryPath(settingsComponent.getModulesDirectoryPath());
         settingsState.setModuleSrcDirectoryPath(settingsComponent.getModuleSrcDirectoryPath());
-
-        if (!settingsState.isModuleApplication()) {
-            settingsState.setModulesDirectoryPath("");
-            settingsState.setModuleSrcDirectoryPath("");
-        }
     }
 
     @Override

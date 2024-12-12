@@ -1,6 +1,7 @@
 package at.alirezamoh.idea_whisperer_for_laravel.actions.models;
 
 import at.alirezamoh.idea_whisperer_for_laravel.actions.models.dataTables.Field;
+import at.alirezamoh.idea_whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.idea_whisperer_for_laravel.support.ProjectDefaultPaths;
 
 import java.util.List;
@@ -16,12 +17,14 @@ public class EloquentModel extends BaseModel {
      * @param formattedModuleFullPath   The formatted full path to the module
      */
     public EloquentModel(
+        SettingsState settingsState,
         String name,
         String unformattedModuleFullPath,
         String formattedModuleFullPath,
         List<Field> fields
     ) {
         super(
+            settingsState,
             name,
             unformattedModuleFullPath,
             formattedModuleFullPath,

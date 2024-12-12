@@ -156,7 +156,7 @@ public abstract class BaseDialog extends DialogWrapper {
         projectSettingState = SettingsState.getInstance(this.project);
 
         isAModuleApplication = projectSettingState.isModuleApplication();
-        moduleRootPath = projectSettingState.replaceAndSlashes(this.projectSettingState.getModuleRootDirectoryPath());
+        moduleRootPath = projectSettingState.replaceAndSlashes(this.projectSettingState.getModulesDirectoryPath());
     }
 
     /**

@@ -1,5 +1,6 @@
 package at.alirezamoh.idea_whisperer_for_laravel.actions.models;
 
+import at.alirezamoh.idea_whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.idea_whisperer_for_laravel.support.ProjectDefaultPaths;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.Nullable;
@@ -21,6 +22,7 @@ public class EventListenerModel extends BaseModel {
      * @param formattedModuleFullPath   The formatted module full path
      */
     public EventListenerModel(
+        SettingsState settingsState,
         String name,
         String unformattedModuleFullPath,
         String formattedModuleFullPath,
@@ -28,6 +30,7 @@ public class EventListenerModel extends BaseModel {
     )
     {
         super(
+            settingsState,
             name,
             unformattedModuleFullPath,
             formattedModuleFullPath,

@@ -1,6 +1,7 @@
 package at.alirezamoh.idea_whisperer_for_laravel.actions.models;
 
 import at.alirezamoh.idea_whisperer_for_laravel.actions.models.dataTables.Field;
+import at.alirezamoh.idea_whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.idea_whisperer_for_laravel.support.ProjectDefaultPaths;
 import at.alirezamoh.idea_whisperer_for_laravel.support.strUtil.StrUtil;
 
@@ -27,6 +28,7 @@ public class MigrationModel extends BaseModel {
      * @param formattedModuleFullPath   The formatted module full path
      */
     public MigrationModel(
+        SettingsState settingsState,
         String name,
         String unformattedModuleFullPath,
         String formattedModuleFullPath,
@@ -37,6 +39,7 @@ public class MigrationModel extends BaseModel {
     )
     {
         super(
+            settingsState,
             name,
             unformattedModuleFullPath,
             formattedModuleFullPath,
@@ -54,12 +57,12 @@ public class MigrationModel extends BaseModel {
 
         if (unformattedModuleFullPath.equals("/app") || unformattedModuleFullPath.isEmpty()) {
             this.formattedModuleFullPath = "";
-            initDestination("", ProjectDefaultPaths.MIGRATION_PATH);
+            initDestination("", ProjectDefaultPaths.MIGRATION_PATH, true);
             initNamespace("");
             initFilePath();
         }
         else {
-            initDestination(unformattedModuleFullPath, ProjectDefaultPaths.MIGRATION_PATH);
+            initDestination(unformattedModuleFullPath, ProjectDefaultPaths.MIGRATION_PATH, true);
             initNamespace("");
             initFilePath();
         }

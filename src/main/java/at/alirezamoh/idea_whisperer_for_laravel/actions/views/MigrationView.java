@@ -60,6 +60,7 @@ public class MigrationView extends BaseDialog {
         }
 
         return new MigrationModel(
+            projectSettingState,
             this.migrationClassNameTextField.getText(),
             unformattedModuleFullPath,
             this.getSelectedFormattedModuleFullPath(),

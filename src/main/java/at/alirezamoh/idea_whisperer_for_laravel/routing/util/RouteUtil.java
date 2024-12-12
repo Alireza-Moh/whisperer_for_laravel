@@ -27,7 +27,7 @@ public class RouteUtil {
     }
 
     private static void addRootRouteFiles(Project project, SettingsState settingsState, Collection<PsiFile> files) {
-        String rootPath = settingsState.getFormattedModuleRootDirectoryPath();
+        String rootPath = settingsState.getFormattedModulesDirectoryPath();
         PsiDirectory rootRouteDir = null;
 
         if (rootPath != null) {
@@ -42,7 +42,7 @@ public class RouteUtil {
     }
 
     private static void addModuleRouteFiles(Project project, SettingsState settingsState, Collection<PsiFile> files) {
-        PsiDirectory moduleRootDir = DirectoryPsiUtil.getDirectory(project, StrUtil.addSlashes(settingsState.getModuleRootDirectoryPath()));
+        PsiDirectory moduleRootDir = DirectoryPsiUtil.getDirectory(project, StrUtil.addSlashes(settingsState.getModulesDirectoryPath()));
 
         if (moduleRootDir != null) {
             for (PsiDirectory module : moduleRootDir.getSubdirectories()) {

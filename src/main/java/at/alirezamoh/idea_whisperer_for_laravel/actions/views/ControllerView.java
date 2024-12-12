@@ -1,6 +1,7 @@
 package at.alirezamoh.idea_whisperer_for_laravel.actions.views;
 
 import at.alirezamoh.idea_whisperer_for_laravel.actions.models.ControllerModel;
+import at.alirezamoh.idea_whisperer_for_laravel.support.strUtil.StrUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.util.ui.JBUI;
@@ -29,18 +30,21 @@ public class ControllerView extends BaseDialog {
 
     /**
      * Returns the View model representing a controller
+     *
      * @return The config model
      */
     public ControllerModel getControllerModel() {
         return new ControllerModel(
-           controllerNameTextField.getText(),
-           getUnformattedModuleFullPath(this.moduleNameComboBox.getItem()),
-           getSelectedFormattedModuleFullPath()
+            projectSettingState,
+            controllerNameTextField.getText(),
+            getUnformattedModuleFullPath(this.moduleNameComboBox.getItem()),
+            getSelectedFormattedModuleFullPath()
         );
     }
 
     /**
      * Returns the focused component when the dialog opens
+     *
      * @return The preferred focused component
      */
     @Override
@@ -50,38 +54,40 @@ public class ControllerView extends BaseDialog {
 
     /**
      * Validates the dialog input
+     *
      * @return Validation info if there are errors, null otherwise
      */
     @Override
     protected @Nullable ValidationInfo doValidate() {
-        String text =controllerNameTextField.getText().trim();
+        String text = controllerNameTextField.getText().trim();
 
         if (text.isEmpty()) {
-            return new ValidationInfo("",controllerNameTextField);
+            return new ValidationInfo("", controllerNameTextField);
         }
         return null;
     }
 
     /**
      * Creates the center panel of the dialog
+     *
      * @return The center panel
      */
     @Override
     protected JComponent createCenterPanel() {
-       contentPane = new JPanel();
-       contentPane.setLayout(new GridBagLayout());
+        contentPane = new JPanel();
+        contentPane.setLayout(new GridBagLayout());
 
-       controllerNameTextField = new JTextField();
+        controllerNameTextField = new JTextField();
 
-       initDefaultContentPaneSettings();
+        initDefaultContentPaneSettings();
 
-       gbc.insets = JBUI.insetsLeft(3);
-       contentPane.add(new JLabel("Enter Controller name:"),gbc);
-       gbc.insets = JBUI.insetsLeft(0);
-       gbc.insets = JBUI.insetsBottom(15);
-       gbc.gridy++;
-       contentPane.add(this.controllerNameTextField,gbc);
-       controllerNameTextField.requestFocusInWindow();
+        gbc.insets = JBUI.insetsLeft(3);
+        contentPane.add(new JLabel("Enter Controller name:"), gbc);
+        gbc.insets = JBUI.insetsLeft(0);
+        gbc.insets = JBUI.insetsBottom(15);
+        gbc.gridy++;
+        contentPane.add(this.controllerNameTextField, gbc);
+        controllerNameTextField.requestFocusInWindow();
 
         return contentPane;
     }
