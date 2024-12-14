@@ -17,8 +17,8 @@ public class SettingsComponent {
 
     /*==============Components for General Settings==============*/
     private final JPanel laravelDirectoryPanel = new JPanel(new BorderLayout());
-    private final JPanel moduleSrcDirectoryPanel = new JPanel(new BorderLayout());
     private final JPanel modulesDirectoryPanel = new JPanel(new BorderLayout());
+    private final JPanel moduleSrcDirectoryPanel = new JPanel(new BorderLayout());
     private final JBTextField laravelDirectoryTextField = new JBTextField();
     private final ComboBox<String> projectTypeComboBox = new ComboBox<>(new String[]{"Standard Application", "Module based Application"});
     private final JBTextField modulesDirectoryPathTextField = new JBTextField();
@@ -103,7 +103,7 @@ public class SettingsComponent {
         modulesDirectoryPanel.add(modulesDirectoryHintLabel, BorderLayout.CENTER);
 
         moduleSrcDirectoryPanel.add(moduleSrcDirectoryPathTextField, BorderLayout.NORTH);
-        JBLabel moduleSrcDirectoryHintLabel = new JBLabel("Leave blank if the source directory is is app");
+        JBLabel moduleSrcDirectoryHintLabel = new JBLabel("Leave blank if the source directory is app");
         moduleSrcDirectoryHintLabel.setFont(moduleSrcDirectoryHintLabel.getFont().deriveFont(Font.ITALIC));
         moduleSrcDirectoryHintLabel.setForeground(Color.GRAY);
         moduleSrcDirectoryPanel.add(moduleSrcDirectoryHintLabel, BorderLayout.CENTER);
@@ -143,6 +143,9 @@ public class SettingsComponent {
                 modulesDirectoryPathTextField.setVisible(isSimpleDirectoryModule);
                 moduleSrcDirectoryPathLabel.setVisible(isSimpleDirectoryModule);
                 moduleSrcDirectoryPathTextField.setVisible(isSimpleDirectoryModule);
+
+                modulesDirectoryPanel.setVisible(isSimpleDirectoryModule);
+                moduleSrcDirectoryPanel.setVisible(isSimpleDirectoryModule);
 
                 if (isSimpleDirectoryModule) {
                     modulesDirectoryPathTextField.setText("Modules");

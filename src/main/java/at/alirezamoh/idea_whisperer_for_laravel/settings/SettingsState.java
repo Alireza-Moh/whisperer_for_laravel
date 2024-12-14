@@ -114,7 +114,7 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
         return "Module based Application".equals(projectType);
     }
 
-    public boolean isDefaultLaravelDirectoryEmpty() {
+    public boolean isLaravelDirectoryEmpty() {
         return laravelDirectoryPath.isEmpty();
     }
 
