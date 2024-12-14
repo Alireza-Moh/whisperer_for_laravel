@@ -1,6 +1,9 @@
 package at.alirezamoh.idea_whisperer_for_laravel.actions;
 
+import at.alirezamoh.idea_whisperer_for_laravel.actions.models.MailableModel;
+import at.alirezamoh.idea_whisperer_for_laravel.actions.models.ViewMailableModel;
 import at.alirezamoh.idea_whisperer_for_laravel.actions.views.MailableView;
+import at.alirezamoh.idea_whisperer_for_laravel.settings.SettingsState;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
@@ -12,12 +15,29 @@ public class MailableAction extends BaseAction {
         MailableView mailableView = new MailableView(project);
 
         if (mailableView.showAndGet()) {
+            MailableModel mailableModel = mailableView.getMailableModel();
+
             this.create(
-                mailableView.getMailableModel(),
+                mailableModel,
                 "mailable.ftl",
                 true,
                 project
             );
+
+            if (!mailableModel.getViewName().isEmpty() && project != null) {
+                ViewMailableModel viewMailableModel = new ViewMailableModel(
+                    SettingsState.getInstance(project),
+                    mailableModel.getViewName(),
+                    mailableModel.getUnformattedModuleFullPath().equals("app") ? "" : mailableModel.getUnformattedModuleFullPath(),
+                    mailableModel.getFormattedModuleFullPath()
+                );
+                this.create(
+                    viewMailableModel,
+                    "viewMailable.ftl",
+                    true,
+                    project
+                );
+            }
         }
     }
 }
