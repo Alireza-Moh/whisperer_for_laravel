@@ -215,10 +215,6 @@ abstract public class BaseModel {
         this.name = name;
     }
 
-    public void setFilePath(String filePath) {
-        this.filePath = filePath;
-    }
-
     protected String getModelVariableName(String eloquentModelName) {
         char firstChar = eloquentModelName.charAt(0);
 

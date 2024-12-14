@@ -98,14 +98,6 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
         this.moduleSrcDirectoryPath = moduleSrcDirectoryPath;
     }
 
-    public @Nullable String getFormattedModulesDirectoryPath() {
-        return StrUtil.addSlashes(
-                getModulesDirectoryPath(),
-                false,
-                true
-        );
-    }
-
     /**
      * Checks if the project is a module-based application
      * @return True if the project is a module-based application, false otherwise
