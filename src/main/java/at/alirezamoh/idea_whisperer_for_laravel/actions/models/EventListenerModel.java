@@ -41,7 +41,7 @@ public class EventListenerModel extends BaseModel {
 
         if (eventClassPath != null && !eventClassPath.isEmpty()) {
             this.eventClassName = eventClassPath.substring(eventClassPath.lastIndexOf("\\") + 1);
-            this.eventClassPath = eventClassPath.substring(1);
+            this.eventClassPath = eventClassPath;
             this.hasEventName = ! this.eventClassName.isEmpty();
         }
     }

@@ -35,7 +35,7 @@ public class PolicyView extends BaseDialog {
     public PolicyView(Project project) {
         super(project);
 
-        this.modelProvider = new ModelProvider(project, projectSettingState);
+        this.modelProvider = new ModelProvider(project);
 
         setTitle("Create Policy");
         setSize(500, 200);

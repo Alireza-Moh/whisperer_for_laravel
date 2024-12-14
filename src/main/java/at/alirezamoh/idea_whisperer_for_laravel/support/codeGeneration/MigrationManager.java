@@ -82,8 +82,10 @@ public class MigrationManager {
                             new Relation(
                                 method.getName(),
                                 methodNameAndRelatedModel.getKey(),
-                                "\\Illuminate\\Database\\Eloquent\\Relations\\" + StrUtil.capitalizeFirstLetter(methodNameAndRelatedModel.getKey())
-                                    + "|"+ methodNameAndRelatedModel.getValue().getName()
+                                "\\Illuminate\\Database\\Eloquent\\Relations\\"
+                                    + StrUtil.capitalizeFirstLetter(methodNameAndRelatedModel.getKey())
+                                    + "|"
+                                    + methodNameAndRelatedModel.getValue().getName()
                             )
                         );
                         laravelModel.addField(
@@ -108,7 +110,7 @@ public class MigrationManager {
     }
 
     private void getAllModels(Project project) {
-        ModelProvider modelProvider = new ModelProvider(project, projectSettingsState, true);
+        ModelProvider modelProvider = new ModelProvider(project, true);
         this.originalModels = modelProvider.getOriginalModels();
     }
 

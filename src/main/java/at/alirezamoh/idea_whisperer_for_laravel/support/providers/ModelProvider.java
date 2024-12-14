@@ -1,13 +1,10 @@
 package at.alirezamoh.idea_whisperer_for_laravel.support.providers;
 
-import at.alirezamoh.idea_whisperer_for_laravel.settings.SettingsState;
-import at.alirezamoh.idea_whisperer_for_laravel.support.ProjectDefaultPaths;
-import at.alirezamoh.idea_whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
+import at.alirezamoh.idea_whisperer_for_laravel.support.laravelUtils.ClassUtils;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
-import com.jetbrains.php.lang.psi.PhpFile;
+import com.jetbrains.php.PhpIndex;
+import com.jetbrains.php.lang.psi.elements.PhpClass;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,6 +27,9 @@ public class ModelProvider {
      */
     private Collection<PsiFile> originalModels;
 
+    /**
+     * Should store the file in an array for later use
+     */
     private boolean withFile;
 
     /**
@@ -38,55 +38,35 @@ public class ModelProvider {
     private Project project;
 
     /**
-     * The project settings.
+     * @param project The current project
      */
-    private SettingsState projectSettingState;
-
-    /**
-     * @param project             The current project
-     * @param projectSettingState The plugin settings
-     */
-    public ModelProvider(Project project, SettingsState projectSettingState) {
+    public ModelProvider(Project project) {
         this.project = project;
-        this.projectSettingState = projectSettingState;
         this.withFile = false;
     }
 
 
     /**
-     * @param project             The current project
-     * @param projectSettingState The plugin settings
-     * @param withFile            should save mode files
+     * @param project  The current project
+     * @param withFile should save mode files
      */
-    public ModelProvider(Project project, SettingsState projectSettingState, boolean withFile) {
+    public ModelProvider(Project project, boolean withFile) {
         this.project = project;
-        this.projectSettingState = projectSettingState;
         this.withFile = withFile;
         this.originalModels = new ArrayList<>();
     }
 
     /**
      * Returns a list of fully qualified namespaces of Laravel models.
+     *
      * @return The list of model namespaces.
      */
     public List<String> getModels() {
-        PsiDirectory modelsDir = DirectoryPsiUtil.getDirectory(
-                project,
-                "/app" + ProjectDefaultPaths.ELOQUENT_MODEL_PATH
-        );
-
-        if (modelsDir != null) {
-            for (PsiFile file : modelsDir.getFiles()) {
-                if (file instanceof PhpFile modelFile) {
-                    addModelToList(modelFile);
-                }
-            }
+        PhpClass eloquentBaseModel = ClassUtils.getEloquentBaseModel(project);
+        if (eloquentBaseModel != null) {
+            PhpIndex phpIndex = PhpIndex.getInstance(project);
+            processSubclasses(eloquentBaseModel.getFQN(), phpIndex);
         }
-
-        if (projectSettingState.isModuleApplication()) {
-            searchForModelsInModules();
-        }
-
         return models;
     }
 
@@ -96,47 +76,23 @@ public class ModelProvider {
     }
 
     /**
-     * Searches for models within modules in a module-based project.
+     * Recursively processes subclasses and collects their namespaces.
+     *
+     * @param classFQN The fully qualified name of the base class.
+     * @param phpIndex The PhpIndex instance for accessing class hierarchy information.
      */
-    private void searchForModelsInModules() {
-        String moduleRootPath = projectSettingState.replaceAndSlashes(projectSettingState.getModulesDirectoryPath());
-        PsiDirectory rootDir = DirectoryPsiUtil.getDirectory(project, moduleRootPath);
+    private void processSubclasses(String classFQN, PhpIndex phpIndex) {
+        Collection<PhpClass> subclasses = phpIndex.getDirectSubclasses(classFQN);
 
-        if (rootDir != null) {
-            searchInModuleForModels(rootDir);
-        }
-    }
-
-    /**
-     * Searches for models within module
-     */
-    private void searchInModuleForModels(PsiDirectory rootDir) {
-        for (PsiDirectory module : rootDir.getSubdirectories()) {
-            PsiDirectory moduleModelsDir = module.findSubdirectory(ProjectDefaultPaths.ELOQUENT_MODEL_PATH);
-
-            if (moduleModelsDir != null) {
-                for (PsiFile file : moduleModelsDir.getFiles()) {
-                    if (file instanceof PhpFile modelFile) {
-                        addModelToList(modelFile);
-                    }
+        for (PhpClass subclass : subclasses) {
+            if (subclass.isAbstract()) {
+                processSubclasses(subclass.getFQN(), phpIndex);
+            } else {
+                if (withFile) {
+                    originalModels.add(subclass.getContainingFile());
                 }
+                models.add(subclass.getPresentableFQN());
             }
-        }
-    }
-
-    /**
-     * Adds a model's fully qualified namespace to the list.
-     * @param phpFile The PHP file representing the model.
-     */
-    private void addModelToList(PhpFile phpFile) {
-        VirtualFile virtualFile = phpFile.getVirtualFile();
-
-        String namespace = phpFile.getMainNamespaceName() + "\\" + virtualFile.getNameWithoutExtension();
-
-        models.add(namespace);
-
-        if (withFile) {
-            originalModels.add(phpFile);
         }
     }
 }

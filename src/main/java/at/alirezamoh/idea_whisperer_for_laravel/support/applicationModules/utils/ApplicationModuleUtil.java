@@ -32,27 +32,6 @@ public class ApplicationModuleUtil {
     }
 
     /**
-     * Retrieves a list of service providers from the bootstrap service provider file
-     * This method locates the bootstrap service provider file and uses a visitor to extract
-     * the registered service providers
-     * @param project The project to search in
-     * @return A list of PsiFile objects representing the service providers
-     */
-    public static List<PsiFile> getProviders(Project project) {
-        List<PsiFile> providers = new ArrayList<>();
-        PsiFile bootstrapProviderFile = findBootstrapProviderFile(project);
-
-        if (bootstrapProviderFile != null) {
-            BootstrapFileVisitor providerVisitor = new BootstrapFileVisitor();
-            bootstrapProviderFile.acceptChildren(providerVisitor);
-
-            providers = providerVisitor.getProviders();
-        }
-
-        return providers;
-    }
-
-    /**
      * Retrieves a list of service providers from the bootstrap service provider class
      * This method locates the bootstrap service provider file and uses a visitor to extract
      * the registered service providers

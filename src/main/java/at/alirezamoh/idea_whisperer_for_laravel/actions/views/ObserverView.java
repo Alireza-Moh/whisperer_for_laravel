@@ -63,7 +63,7 @@ public class ObserverView extends BaseDialog {
     public ObserverView(Project project) {
         super(project);
 
-        this.modelProvider = new ModelProvider(project, this.projectSettingState);
+        this.modelProvider = new ModelProvider(project);
 
         setTitle("Create Observer");
         setSize(500, 200);

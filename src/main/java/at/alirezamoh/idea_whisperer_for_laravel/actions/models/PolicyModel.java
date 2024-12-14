@@ -41,7 +41,7 @@ public class PolicyModel extends BaseModel {
         );
 
         if (eloquentModelPath != null && !eloquentModelPath.isEmpty()) {
-            this.eloquentModelPath = eloquentModelPath.substring(1);
+            this.eloquentModelPath = eloquentModelPath;
             this.eloquentModelName = eloquentModelPath.substring(eloquentModelPath.lastIndexOf("\\") + 1);
             this.eloquentModelNameVariable = this.getModelVariableName(this.eloquentModelName);
             this.hasModel = true;
