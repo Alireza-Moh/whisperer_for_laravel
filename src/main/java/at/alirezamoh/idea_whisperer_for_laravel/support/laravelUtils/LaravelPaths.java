@@ -25,6 +25,7 @@ public class LaravelPaths {
         public static final String FormRequest = "\\Illuminate\\Foundation\\Http\\FormRequest";
         public static final String Validator = "\\Illuminate\\Support\\Facades\\Validator";
         public static final String Gate = "\\Illuminate\\Support\\Facades\\Gate";
+        public static final String ServiceProvider = "\\Illuminate\\Support\\ServiceProvider";
     }
 
     public static List<String> RELEVANT_LARAVEL_CLASSES = Arrays.asList(

@@ -115,32 +115,10 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
     }
 
     public boolean isLaravelDirectoryEmpty() {
-        return laravelDirectoryPath.isEmpty();
+        return laravelDirectoryPath == null || laravelDirectoryPath.isEmpty();
     }
 
     public boolean isModuleSrcDirectoryEmpty() {
-        return moduleSrcDirectoryPath.isEmpty();
-    }
-
-    /**
-     * Replaces backslashes with forward slashes and ensures the path starts and ends with a slash
-     * @param text The text to process
-     * @return The processed text
-     */
-    public String replaceAndSlashes(@Nullable String text) {
-        if (text == null) {
-            return text;
-        }
-
-        text = text.replace("\\", "/");
-
-        if (!text.startsWith("/")) {
-            text = "/" + text;
-        }
-        if (!text.endsWith("/")) {
-            text = text + "/";
-        }
-
-        return text;
+        return moduleSrcDirectoryPath == null || moduleSrcDirectoryPath.isEmpty();
     }
 }

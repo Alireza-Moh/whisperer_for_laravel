@@ -6,12 +6,10 @@ import at.alirezamoh.idea_whisperer_for_laravel.support.ProjectDefaultPaths;
 import at.alirezamoh.idea_whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
 import at.alirezamoh.idea_whisperer_for_laravel.support.strUtil.StrUtil;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.jetbrains.php.lang.psi.PhpFile;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
@@ -60,7 +58,7 @@ public class ConfigFileResolver {
     public PsiElement resolveConfigKey() {
         iterateFile();
 
-        if (foundedKey == null && settingsState.isModuleApplication()) {
+        if (foundedKey == null) {
             searchInModules();
         }
 

@@ -267,7 +267,6 @@ abstract public class BaseModel {
         filePath = StrUtil.removeDoubleSlashes(destination + "/" + getName() + extension);
     }
 
-    //TODO. namespace must be fixed when the project has a laravel directory
     protected void initDestination() {
         this.setWithoutModuleSrc();
 

@@ -5,11 +5,13 @@ import at.alirezamoh.idea_whisperer_for_laravel.support.applicationModules.visit
 import at.alirezamoh.idea_whisperer_for_laravel.support.psiUtil.PsiUtil;
 import at.alirezamoh.idea_whisperer_for_laravel.support.strUtil.StrUtil;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiDirectory;
-import com.intellij.psi.PsiElement;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.*;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
+import com.jetbrains.php.lang.psi.elements.ParameterList;
+import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
+import com.jetbrains.php.lang.psi.elements.impl.ConcatenationExpressionImpl;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,44 +66,32 @@ public class BladeModuleServiceProviderVisitor extends BaseServiceProviderVisito
      */
     private void initParameters(MethodReference method) {
         String viewNamespace = PsiUtil.getSecondParameterFromMethod(method);
-        String viewDirName = PsiUtil.getFirstParameterFromMethod(method);
+        ParameterList parameters = method.getParameterList();
 
-        if (viewNamespace == null || viewDirName == null) {
-            return;
-        }
+        if (parameters != null) {
+            PsiElement namespaceParameter = parameters.getParameter(0);
+            if (namespaceParameter instanceof ConcatenationExpressionImpl concatenationExpression) {
+                PsiFile containingFile = concatenationExpression.getContainingFile();
+                VirtualFile virtualFile = containingFile.getVirtualFile();
 
-        if (moduleRootDirectory != null) {
-            viewDirName = StrUtil.getLastWord(viewDirName);
-            for (PsiDirectory module : moduleRootDirectory.getSubdirectories()) {
-                PsiDirectory resourcesDir = module.findSubdirectory("resources");
+                if (virtualFile != null) {
+                    VirtualFile parentDir = virtualFile.getParent();
+                    PsiElement rightOperand = concatenationExpression.getRightOperand();
+                    if (rightOperand instanceof StringLiteralExpression relativePathViewDirPath && parentDir != null) {
 
-                if (resourcesDir != null) {
-                    PsiDirectory viewsDir = resourcesDir.findSubdirectory("views");
-                    if (viewsDir != null) {
-                        PsiDirectory finalBladeDir = findBladeDir(viewsDir, viewDirName);
+                        VirtualFile resolvedVirtualFile = parentDir.findFileByRelativePath(
+                            StrUtil.removeQuotes(relativePathViewDirPath.getText())
+                        );
 
-                        if (finalBladeDir != null) {
-                            bladeFilesInModule.add(new BladeModule(viewNamespace, finalBladeDir));
+                        if (resolvedVirtualFile != null && resolvedVirtualFile.isDirectory()) {
+                            PsiDirectory psiDirectory = PsiManager.getInstance(project).findDirectory(resolvedVirtualFile);
+                            if (psiDirectory != null) {
+                                bladeFilesInModule.add(new BladeModule(viewNamespace, psiDirectory));
+                            }
                         }
                     }
                 }
-
             }
         }
-    }
-
-    private @Nullable PsiDirectory findBladeDir(PsiDirectory currentDir, String bladeDirName) {
-        if (currentDir.getName().equals(bladeDirName)) {
-            return currentDir;
-        }
-
-        for (PsiDirectory subDir : currentDir.getSubdirectories()) {
-            PsiDirectory foundDir = findBladeDir(subDir, bladeDirName);
-            if (foundDir != null) {
-                return foundDir;
-            }
-        }
-
-        return null;
     }
 }

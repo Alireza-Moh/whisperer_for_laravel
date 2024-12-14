@@ -2,12 +2,11 @@ package at.alirezamoh.idea_whisperer_for_laravel.gate.visitors;
 
 import at.alirezamoh.idea_whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.idea_whisperer_for_laravel.support.ProjectDefaultPaths;
-import at.alirezamoh.idea_whisperer_for_laravel.support.applicationModules.utils.ApplicationModuleUtil;
+import at.alirezamoh.idea_whisperer_for_laravel.support.applicationModules.visitors.BaseServiceProviderVisitor;
 import at.alirezamoh.idea_whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
 import at.alirezamoh.idea_whisperer_for_laravel.support.strUtil.StrUtil;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiFile;
@@ -55,17 +54,8 @@ public class GateProcessor {
             appServiceProviderFile.acceptChildren(visitor);
         }
 
-        String modulesDirectoryRootPath = projectSettingsState.getFormattedModulesDirectoryPath();
-        if (projectSettingsState.isModuleApplication() && modulesDirectoryRootPath != null) {
-            PsiDirectory modulesDir = DirectoryPsiUtil.getDirectory(project, modulesDirectoryRootPath);
-
-            if (modulesDir != null) {
-                for (PsiDirectory moduleDir : modulesDir.getSubdirectories()) {
-                    for (PhpClass serviceProvider : ApplicationModuleUtil.getProviders(moduleDir)) {
-                        serviceProvider.acceptChildren(visitor);
-                    }
-                }
-            }
+        for (PhpClass serviceProvider : BaseServiceProviderVisitor.getProviders(project)) {
+            serviceProvider.acceptChildren(visitor);
         }
     }
 }
