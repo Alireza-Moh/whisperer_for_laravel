@@ -1,7 +1,6 @@
 package at.alirezamoh.idea_whisperer_for_laravel.actions.views;
 
 import at.alirezamoh.idea_whisperer_for_laravel.actions.models.ControllerModel;
-import at.alirezamoh.idea_whisperer_for_laravel.support.strUtil.StrUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.util.ui.JBUI;

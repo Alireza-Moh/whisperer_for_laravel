@@ -30,4 +30,9 @@ public class MiddlewareModel extends BaseModel {
             "Http\\Middleware"
         );
     }
+
+    @Override
+    public void setWithoutModuleSrc() {
+        this.withoutModuleSrcPath = true;
+    }
 }

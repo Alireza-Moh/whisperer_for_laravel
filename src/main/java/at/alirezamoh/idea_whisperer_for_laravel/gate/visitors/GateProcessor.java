@@ -41,7 +41,7 @@ public class GateProcessor {
 
     private void traverseAndAccept(PsiElementVisitor visitor) {
         String defaultPath = "";
-        if (!projectSettingsState.isDefaultLaravelDirectoryEmpty()) {
+        if (!projectSettingsState.isLaravelDirectoryEmpty()) {
             defaultPath = StrUtil.addSlashes(
                 projectSettingsState.getLaravelDirectoryPath(),
                 false,
@@ -55,9 +55,9 @@ public class GateProcessor {
             appServiceProviderFile.acceptChildren(visitor);
         }
 
-        String moduleDirectoryRootPath = projectSettingsState.getFormattedModulesDirectoryPath();
-        if (projectSettingsState.isModuleApplication() && moduleDirectoryRootPath != null) {
-            PsiDirectory modulesDir = DirectoryPsiUtil.getDirectory(project, moduleDirectoryRootPath);
+        String modulesDirectoryRootPath = projectSettingsState.getFormattedModulesDirectoryPath();
+        if (projectSettingsState.isModuleApplication() && modulesDirectoryRootPath != null) {
+            PsiDirectory modulesDir = DirectoryPsiUtil.getDirectory(project, modulesDirectoryRootPath);
 
             if (modulesDir != null) {
                 for (PsiDirectory moduleDir : modulesDir.getSubdirectories()) {

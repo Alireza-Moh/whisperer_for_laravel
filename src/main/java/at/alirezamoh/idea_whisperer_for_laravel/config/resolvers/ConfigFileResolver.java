@@ -10,7 +10,6 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.jetbrains.php.lang.psi.PhpFile;
-import com.jetbrains.php.lang.psi.elements.ArrayHashElement;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,11 +20,6 @@ import java.util.Map;
  * Resolves references to keys within Laravel config files
  */
 public class ConfigFileResolver {
-    /**
-     * The config directory
-     */
-    private PsiDirectory configDir;
-
     /**
      * The resolved config key element
      */
@@ -53,7 +47,6 @@ public class ConfigFileResolver {
      */
     public ConfigFileResolver(Project project, PsiElement myElement) {
         this.project = project;
-        configDir = DirectoryPsiUtil.getDirectory(project, ProjectDefaultPaths.CONFIG_PATH);
         searchedConfigKey = StrUtil.removeQuotes(myElement.getText());
         configKeyVisitor = new ConfigKeyVisitor();
         configKeyCollector = new ConfigKeyCollector(project);
@@ -79,26 +72,27 @@ public class ConfigFileResolver {
      * It checks for both direct file name matches and nested key scenarios
      */
     private void iterateFile() {
-        Collection<PsiFile> configFiles = new ArrayList<>();
-        if (settingsState.isModuleApplication()) {
-            String rootPath = settingsState.getFormattedModulesDirectoryPath();
-
-            if (rootPath != null) {
-                configFiles.addAll(DirectoryPsiUtil.getFilesRecursively(project, rootPath + ProjectDefaultPaths.CONFIG_PATH));
-            }
+        String defaultConfigPath = ProjectDefaultPaths.CONFIG_PATH;
+        if (!settingsState.isLaravelDirectoryEmpty()) {
+            defaultConfigPath = StrUtil.addSlashes(
+                settingsState.getLaravelDirectoryPath(),
+                false,
+                true
+            ) + defaultConfigPath;
         }
 
-        configFiles.addAll(DirectoryPsiUtil.getFilesRecursively(project, ProjectDefaultPaths.CONFIG_PATH));
+        Collection<PsiFile> configFiles = DirectoryPsiUtil.getFilesRecursively(project, defaultConfigPath);
 
         for (PsiFile configFile : configFiles) {
             if (!(configFile instanceof PhpFile phpFile)) {
                 continue;
             }
 
-            String configFilePath = phpFile.getVirtualFile().getPath();
-            String relativePath = configFilePath.substring(
-                configDir.getVirtualFile().getPath().length() + 1
-            );
+            String configFilePath = phpFile.getVirtualFile().getPath().replace("\\", "/");
+            String dirPath = project.getBasePath() + defaultConfigPath.replace("\\", "/");
+
+            String relativePath = configFilePath.substring(dirPath.length());
+
             String fileNameWithoutExtension = relativePath.replace(".php", "")
                 .replace("/", ".");
 

@@ -63,11 +63,7 @@ public class ApplicationModuleUtil {
         List<PhpClass> serviceProviderClasses = new ArrayList<>();
         collectPhpClassesFromDirectory(moduleDir, serviceProviderClasses);
 
-        String serviceProviderFQN = "\\Illuminate\\Support\\ServiceProvider";
-        return serviceProviderClasses.stream()
-            .filter(phpClass -> phpClass.getSuperClass() != null && serviceProviderFQN.equals(phpClass.getSuperClass().getFQN()))
-            .filter(phpClass -> !phpClass.isAbstract())
-            .toList();
+        return serviceProviderClasses;
     }
 
     /**
@@ -82,8 +78,13 @@ public class ApplicationModuleUtil {
                 collectPhpClassesFromDirectory((PsiDirectory) file, collectedClasses);
             } else if (file instanceof PhpFile phpFile) {
                 for (PhpNamedElement element : phpFile.getTopLevelDefs().values()) {
-                    if (element instanceof PhpClass) {
-                        collectedClasses.add((PhpClass) element);
+                    if (element instanceof PhpClass serviceProvider && !serviceProvider.isAbstract()) {
+                        String serviceProviderFQN = "\\Illuminate\\Support\\ServiceProvider";
+                        PhpClass superClass = serviceProvider.getSuperClass();
+
+                        if (superClass != null && serviceProviderFQN.equals(superClass.getFQN())) {
+                            collectedClasses.add(serviceProvider);
+                        }
                     }
                 }
             }

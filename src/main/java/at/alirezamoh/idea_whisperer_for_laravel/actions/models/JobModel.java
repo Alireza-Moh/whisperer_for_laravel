@@ -2,7 +2,6 @@ package at.alirezamoh.idea_whisperer_for_laravel.actions.models;
 
 import at.alirezamoh.idea_whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.idea_whisperer_for_laravel.support.ProjectDefaultPaths;
-import com.intellij.openapi.project.Project;
 
 /**
  * Model representing a laravel job class
@@ -30,5 +29,10 @@ public class JobModel extends BaseModel {
             ".php",
             "Jobs"
         );
+    }
+
+    @Override
+    public void setWithoutModuleSrc() {
+        this.withoutModuleSrcPath = false;
     }
 }

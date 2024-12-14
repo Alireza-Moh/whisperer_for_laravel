@@ -52,4 +52,9 @@ public class EloquentModel extends BaseModel {
     public void setTableName(String tableName) {
         this.tableName = tableName;
     }
+
+    @Override
+    public void setWithoutModuleSrc() {
+        this.withoutModuleSrcPath = false;
+    }
 }

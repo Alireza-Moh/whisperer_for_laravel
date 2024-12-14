@@ -1,6 +1,7 @@
 package at.alirezamoh.idea_whisperer_for_laravel.support.applicationModules.visitors;
 
 import at.alirezamoh.idea_whisperer_for_laravel.settings.SettingsState;
+import at.alirezamoh.idea_whisperer_for_laravel.support.ProjectDefaultPaths;
 import at.alirezamoh.idea_whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
 import at.alirezamoh.idea_whisperer_for_laravel.support.strUtil.StrUtil;
 import com.intellij.openapi.project.Project;
@@ -33,16 +34,22 @@ abstract public class BaseServiceProviderVisitor extends PsiRecursiveElementWalk
         this.project = project;
         this.projectSettingState = SettingsState.getInstance(project);
 
-        String moduleDirectoryRootPath = StrUtil.addSlashes(
-            projectSettingState.getModulesDirectoryPath(),
+        String defaultModulesDirRootPath = projectSettingState.getModulesDirectoryPath();
+        if (!projectSettingState.isLaravelDirectoryEmpty()) {
+            defaultModulesDirRootPath = StrUtil.addSlashes(projectSettingState.getLaravelDirectoryPath())
+                + defaultModulesDirRootPath;
+        }
+
+        String modulesDirectoryRootPath = StrUtil.addSlashes(
+            defaultModulesDirRootPath,
             false,
             false
         );;
 
-        if (moduleDirectoryRootPath != null) {
+        if (modulesDirectoryRootPath != null) {
             moduleRootDirectory = DirectoryPsiUtil.getDirectory(
                 project,
-                moduleDirectoryRootPath
+                modulesDirectoryRootPath
             );
         }
     }

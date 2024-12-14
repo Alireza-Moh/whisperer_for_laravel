@@ -32,16 +32,10 @@ public class BladeComponentViewModel extends BaseModel {
         );
 
         this.name = StrUtil.snake(getName(), "-");
-
-        initSettings();
     }
 
-    public void initSettings() {
-        if (unformattedModuleFullPath.isEmpty()) {
-            this.setDestination(ProjectDefaultPaths.BLADE_COMPONENT_VIEW_PATH);
-        }
-        else {
-            this.setDestination(unformattedModuleFullPath + "/" + ProjectDefaultPaths.BLADE_COMPONENT_VIEW_PATH);
-        }
+    @Override
+    public void setWithoutModuleSrc() {
+        this.withoutModuleSrcPath = true;
     }
 }

@@ -20,4 +20,9 @@ public class LaravelModelGeneration extends BaseModel {
     public List<LaravelModel> getModels() {
         return models;
     }
+
+    @Override
+    public void setWithoutModuleSrc() {
+        this.withoutModuleSrcPath = false;
+    }
 }

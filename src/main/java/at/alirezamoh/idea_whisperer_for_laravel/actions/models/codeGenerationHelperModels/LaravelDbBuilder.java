@@ -21,4 +21,9 @@ public class LaravelDbBuilder extends BaseModel {
     public List<Method> getMethods() {
         return methods;
     }
+
+    @Override
+    public void setWithoutModuleSrc() {
+        this.withoutModuleSrcPath = false;
+    }
 }

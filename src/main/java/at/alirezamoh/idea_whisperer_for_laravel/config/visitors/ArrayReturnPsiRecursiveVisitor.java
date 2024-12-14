@@ -118,6 +118,7 @@ public class ArrayReturnPsiRecursiveVisitor extends PsiRecursiveElementWalkingVi
                 .withLookupString(key)
                 .withPresentableText(key)
                 .withTailText(value, true)
+                .bold()
                 .withIcon(IdeaWhispererForLaravelIcon.LARAVEL_ICON);
     }
 

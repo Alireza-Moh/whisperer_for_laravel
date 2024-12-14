@@ -120,6 +120,14 @@ public class StrUtil {
         return input.substring(0, 1).toUpperCase() + input.substring(1);
     }
 
+    public static String toLowerFirstLetter(String input) {
+        char firstChar = input.charAt(0);
+        if (Character.isLowerCase(firstChar)) {
+            return input;
+        }
+        return Character.toLowerCase(firstChar) + input.substring(1);
+    }
+
     public static String removeDoubleSlashes(String input) {
         if (input == null || input.isEmpty()) {
             return input;

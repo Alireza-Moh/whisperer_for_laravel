@@ -52,7 +52,7 @@ public class BladeFileCollector {
 
     public BladeFileCollector startSearching() {
         String defaultViewPath = ProjectDefaultPaths.VIEW_PATH;
-        if (!projectSettingState.isDefaultLaravelDirectoryEmpty()) {
+        if (!projectSettingState.isLaravelDirectoryEmpty()) {
             defaultViewPath = StrUtil.addSlashes(
                 projectSettingState.getLaravelDirectoryPath(),
                 false,
@@ -66,9 +66,9 @@ public class BladeFileCollector {
             searchForBladeFiles(defaultResDir, "", "");
         }
 
-        String moduleDirectoryRootPath = projectSettingState.getFormattedModulesDirectoryPath();
-        if (projectSettingState.isModuleApplication() && moduleDirectoryRootPath != null) {
-            PsiDirectory modulesDir = DirectoryPsiUtil.getDirectory(project, moduleDirectoryRootPath);
+        String modulesDirectoryRootPath = projectSettingState.getFormattedModulesDirectoryPath();
+        if (projectSettingState.isModuleApplication() && modulesDirectoryRootPath != null) {
+            PsiDirectory modulesDir = DirectoryPsiUtil.getDirectory(project, modulesDirectoryRootPath);
 
             if (modulesDir != null) {
                 for (PsiDirectory moduleDir : modulesDir.getSubdirectories()) {

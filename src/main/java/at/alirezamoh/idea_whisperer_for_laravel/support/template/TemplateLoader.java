@@ -2,6 +2,7 @@ package at.alirezamoh.idea_whisperer_for_laravel.support.template;
 
 import at.alirezamoh.idea_whisperer_for_laravel.actions.models.BaseModel;
 import at.alirezamoh.idea_whisperer_for_laravel.support.notification.Notify;
+import at.alirezamoh.idea_whisperer_for_laravel.support.strUtil.StrUtil;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.command.WriteCommandAction;
@@ -124,7 +125,7 @@ public class TemplateLoader {
     public @Nullable PsiFile createTemplateOnly() {
         PsiFile createdFile = null;
         try {
-            String filePath = project.getBasePath() + "/" + object.getFilePath();
+            String filePath = StrUtil.removeDoubleSlashes(project.getBasePath() + object.getFilePath());
             File file = new File(filePath);
             if (file.exists() && !overwriteFile) {
                 Notify.notifyWarning(
@@ -157,6 +158,7 @@ public class TemplateLoader {
                 );
             }
         } catch (IOException | TemplateException ex) {
+            ex.printStackTrace();
             Notify.notifyError(
                 project,
                 "Could not create " + object.getName() + " file"

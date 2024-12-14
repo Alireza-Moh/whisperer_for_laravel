@@ -42,4 +42,9 @@ public class ConsoleModel extends BaseModel {
     public String getSignature() {
         return signature;
     }
+
+    @Override
+    public void setWithoutModuleSrc() {
+        this.withoutModuleSrcPath = false;
+    }
 }

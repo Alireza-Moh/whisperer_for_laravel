@@ -21,7 +21,7 @@ public class BladeComponentAction extends BaseAction {
         if (bladeComponentView.showAndGet()) {
 
             BladeComponentClassModel componentClass = bladeComponentView.getBladeComponentClassModel();
-            BladeComponentViewModel viewForComponent = bladeComponentView.getBladeComponentViewModel();
+            BladeComponentViewModel viewForComponent = bladeComponentView.getBladeComponentViewModel(componentClass);
 
             if (bladeComponentView.withBladeComponentClassAndBladeView()) {
                 createView(viewForComponent, project);

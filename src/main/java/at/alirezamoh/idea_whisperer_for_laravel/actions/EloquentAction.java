@@ -54,7 +54,7 @@ public class EloquentAction extends BaseAction {
         MigrationModel migrationModel = new MigrationModel(
             SettingsState.getInstance(project),
             eloquentView.getMigrationFileName(),
-            eloquentModel.getUnformattedModuleFullPath(),
+            eloquentModel.getUnformattedModuleFullPath().equals("app") ? "" : eloquentModel.getUnformattedModuleFullPath(),
             eloquentModel.getFormattedModuleFullPath(),
             eloquentView.getTableName(),
             true,

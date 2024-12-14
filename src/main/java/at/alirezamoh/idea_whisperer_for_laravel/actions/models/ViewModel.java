@@ -30,4 +30,9 @@ public class ViewModel extends BaseModel {
             ""
         );
     }
+
+    @Override
+    public void setWithoutModuleSrc() {
+        this.withoutModuleSrcPath = true;
+    }
 }

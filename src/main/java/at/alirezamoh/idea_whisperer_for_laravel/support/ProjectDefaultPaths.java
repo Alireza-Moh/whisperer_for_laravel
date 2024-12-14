@@ -28,6 +28,8 @@ final public class ProjectDefaultPaths {
 
     public static final String MAILABLE_PATH = "/Mail/";
 
+    public static final String MAILABLE_VIEW_PATH = "/resources/views/emails/";
+
     public static final String EXCEPTION_PATH = "/Exceptions/";
 
     public static final String EVENT_LISTENER_PATH = "/Listeners/";

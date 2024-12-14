@@ -57,12 +57,12 @@ public class MigrationModel extends BaseModel {
 
         if (unformattedModuleFullPath.equals("/app") || unformattedModuleFullPath.isEmpty()) {
             this.formattedModuleFullPath = "";
-            initDestination("", ProjectDefaultPaths.MIGRATION_PATH, true);
+            initDestination();
             initNamespace("");
             initFilePath();
         }
         else {
-            initDestination(unformattedModuleFullPath, ProjectDefaultPaths.MIGRATION_PATH, true);
+            initDestination();
             initNamespace("");
             initFilePath();
         }
@@ -104,5 +104,10 @@ public class MigrationModel extends BaseModel {
             + StrUtil.generateRandomId()
             + StrUtil.snake(getName())
             + extension;
+    }
+
+    @Override
+    public void setWithoutModuleSrc() {
+        this.withoutModuleSrcPath = true;
     }
 }

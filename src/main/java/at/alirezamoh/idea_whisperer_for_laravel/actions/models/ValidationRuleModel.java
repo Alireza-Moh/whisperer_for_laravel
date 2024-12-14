@@ -30,4 +30,9 @@ public class ValidationRuleModel extends BaseModel {
             "Rules"
         );
     }
+
+    @Override
+    public void setWithoutModuleSrc() {
+        this.withoutModuleSrcPath = false;
+    }
 }

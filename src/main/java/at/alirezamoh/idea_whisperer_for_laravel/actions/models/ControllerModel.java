@@ -30,4 +30,9 @@ public class ControllerModel extends BaseModel {
             "Http\\Controllers"
         );
     }
+
+    @Override
+    public void setWithoutModuleSrc() {
+        this.withoutModuleSrcPath = false;
+    }
 }

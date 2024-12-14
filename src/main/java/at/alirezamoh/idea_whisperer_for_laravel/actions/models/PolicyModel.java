@@ -63,4 +63,9 @@ public class PolicyModel extends BaseModel {
     public boolean isHasModel() {
         return hasModel;
     }
+
+    @Override
+    public void setWithoutModuleSrc() {
+        this.withoutModuleSrcPath = false;
+    }
 }

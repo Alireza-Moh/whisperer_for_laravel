@@ -52,7 +52,7 @@ public class ConfigKeyCollector {
      */
     public ConfigKeyCollector startSearching() {
         String defaultConfigPath = ProjectDefaultPaths.CONFIG_PATH;
-        if (!projectSettingState.isDefaultLaravelDirectoryEmpty()) {
+        if (!projectSettingState.isLaravelDirectoryEmpty()) {
             defaultConfigPath = StrUtil.addSlashes(
                 projectSettingState.getLaravelDirectoryPath(),
                 false,
@@ -158,11 +158,16 @@ public class ConfigKeyCollector {
      */
     private void searchForModulesConfigKeys() {
         ConfigModuleServiceProviderVisitor configModuleServiceProviderVisitor = new ConfigModuleServiceProviderVisitor(this.project);
-        PsiDirectory modulesDir = DirectoryPsiUtil.getDirectory(project, projectSettingState.getModulesDirectoryPath());
+        String defaultModulesPath = projectSettingState.getModulesDirectoryPath();
+        if (!projectSettingState.isLaravelDirectoryEmpty()) {
+            defaultModulesPath = StrUtil.addSlashes(
+                projectSettingState.getLaravelDirectoryPath()
+            ) + defaultModulesPath;
+        }
+        PsiDirectory modulesDir = DirectoryPsiUtil.getDirectory(project, defaultModulesPath);
 
         if (modulesDir != null) {
             for (PsiDirectory moduleDir : modulesDir.getSubdirectories()) {
-                Collection<PhpClass> s = ApplicationModuleUtil.getProviders(moduleDir);
                 for (PhpClass serviceProvider : ApplicationModuleUtil.getProviders(moduleDir)) {
                     serviceProvider.acceptChildren(configModuleServiceProviderVisitor);
 
