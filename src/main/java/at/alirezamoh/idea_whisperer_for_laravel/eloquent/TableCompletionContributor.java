@@ -28,7 +28,7 @@ public class TableCompletionContributor extends CompletionContributor {
                     PsiElement psiElement = completionParameters.getPosition();
                     Project project = psiElement.getProject();
 
-                    if (FrameworkUtils.isLaravelFrameworkNotInstalled(psiElement.getProject())) {
+                    if (FrameworkUtils.isLaravelFrameworkNotInstalled(project)) {
                         return;
                     }
 
