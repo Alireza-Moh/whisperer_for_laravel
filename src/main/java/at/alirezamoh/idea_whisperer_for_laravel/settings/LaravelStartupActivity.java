@@ -16,7 +16,26 @@ public class LaravelStartupActivity implements ProjectActivity {
         if (!MethodUtils.isDumbMode(project)) {
             if (FrameworkUtils.isLaravelProject(project)) {
                 SettingsState settingsState = SettingsState.getInstance(project);
-                settingsState.getState();
+
+                if (settingsState.isLaravelDirectoryEmpty()) {
+                    settingsState.setLaravelDirectoryPath("");
+                }
+
+                if (settingsState.getProjectType() == null) {
+                    settingsState.setProjectType("Standard Application");
+                }
+
+                if (settingsState.getModulesDirectoryPath() == null) {
+                    settingsState.setModulesDirectoryPath("Modules");
+                }
+
+                if (settingsState.isModuleSrcDirectoryEmpty()) {
+                    settingsState.setModuleSrcDirectoryPath("app");
+                }
+
+                if (settingsState.getInertiaPageComponentRootPath() == null) {
+                    settingsState.setInertiaPageComponentRootPath("resources/js/Pages;");
+                }
             }
         }
 
