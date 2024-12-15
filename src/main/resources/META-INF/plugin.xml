@@ -58,6 +58,8 @@
 
         <codeInsight.template.postfixTemplateProvider language="PHP" implementationClass="at.alirezamoh.idea_whisperer_for_laravel.postfixes.dd.DDPostfixProvider" />
 
+        <codeInsight.lineMarkerProvider language="PHP" implementationClass="at.alirezamoh.idea_whisperer_for_laravel.routing.RouteLineMarker" />
+
         <errorHandler implementation="com.intellij.diagnostic.JetBrainsMarketplaceErrorReportSubmitter"/>
     </extensions>
 
