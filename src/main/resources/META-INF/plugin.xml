@@ -51,6 +51,7 @@
         <psi.referenceContributor language="PHP" implementation="at.alirezamoh.idea_whisperer_for_laravel.blade.BladeReferenceContributor"/>
         <psi.referenceContributor language="PHP" implementation="at.alirezamoh.idea_whisperer_for_laravel.routing.RouteReferenceContributor"/>
         <psi.referenceContributor language="PHP" implementation="at.alirezamoh.idea_whisperer_for_laravel.gate.GateReferenceContributor"/>
+        <psi.referenceContributor language="PHP" implementation="at.alirezamoh.idea_whisperer_for_laravel.inertia.InertiaReferenceContributor"/>
 
         <completion.contributor language="PHP" implementationClass="at.alirezamoh.idea_whisperer_for_laravel.formRequest.RuleValidationCompletionContributor"/>
         <completion.contributor language="PHP" implementationClass="at.alirezamoh.idea_whisperer_for_laravel.eloquent.TableCompletionContributor"/>

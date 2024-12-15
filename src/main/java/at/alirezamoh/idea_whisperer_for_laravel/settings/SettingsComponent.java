@@ -1,16 +1,18 @@
 package at.alirezamoh.idea_whisperer_for_laravel.settings;
 
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
-import com.intellij.ui.components.JBLabel;
-import com.intellij.ui.components.JBTabbedPane;
-import com.intellij.ui.components.JBTextField;
+import com.intellij.ui.JBColor;
+import com.intellij.ui.components.*;
 import com.intellij.util.ui.FormBuilder;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SettingsComponent {
     private final JBTabbedPane tabbedPane = new JBTabbedPane();
@@ -27,7 +29,11 @@ public class SettingsComponent {
     private final JBLabel moduleSrcDirectoryPathLabel = new JBLabel("Module source:");
 
 
-    public SettingsComponent(Project project) {
+    /*==============Components for laravel packages==============*/
+    private final JBTextField inertiaPageComponentRootPathTextField = new JBTextField();
+
+
+    public SettingsComponent() {
         initializeTabs();
 
         updateModuleSettingsVisibility();
@@ -77,11 +83,20 @@ public class SettingsComponent {
         this.moduleSrcDirectoryPathTextField.setText(newPath);
     }
 
+    public String getInertiaPageComponentRootPath() {
+        return inertiaPageComponentRootPathTextField.getText();
+    }
+
+    public void setInertiaPageComponentRootPath(String inertiaPageComponentRootPath) {
+        this.inertiaPageComponentRootPathTextField.setText(inertiaPageComponentRootPath);
+    }
+
     /**
      * Initializes the tabs in the `JBTabbedPane`
      */
     private void initializeTabs() {
         tabbedPane.addTab("General Settings", createGeneralSettingsPanel());
+        tabbedPane.addTab("Laravel packages", createLaravelPackagesPanel());
     }
 
     /**
@@ -93,19 +108,19 @@ public class SettingsComponent {
         laravelDirectoryPanel.add(laravelDirectoryTextField, BorderLayout.NORTH);
         JBLabel laravelDirectoryHintLabel = new JBLabel("Leave blank if the Laravel project is in the root directory.");
         laravelDirectoryHintLabel.setFont(laravelDirectoryHintLabel.getFont().deriveFont(Font.ITALIC));
-        laravelDirectoryHintLabel.setForeground(Color.GRAY);
+        laravelDirectoryHintLabel.setForeground(JBColor.GRAY);
         laravelDirectoryPanel.add(laravelDirectoryHintLabel, BorderLayout.CENTER);
 
         modulesDirectoryPanel.add(modulesDirectoryPathTextField, BorderLayout.NORTH);
         JBLabel modulesDirectoryHintLabel = new JBLabel("The main folder path for all modules");
         modulesDirectoryHintLabel.setFont(modulesDirectoryHintLabel.getFont().deriveFont(Font.ITALIC));
-        modulesDirectoryHintLabel.setForeground(Color.GRAY);
+        modulesDirectoryHintLabel.setForeground(JBColor.GRAY);
         modulesDirectoryPanel.add(modulesDirectoryHintLabel, BorderLayout.CENTER);
 
         moduleSrcDirectoryPanel.add(moduleSrcDirectoryPathTextField, BorderLayout.NORTH);
         JBLabel moduleSrcDirectoryHintLabel = new JBLabel("Leave blank if the source directory is app");
         moduleSrcDirectoryHintLabel.setFont(moduleSrcDirectoryHintLabel.getFont().deriveFont(Font.ITALIC));
-        moduleSrcDirectoryHintLabel.setForeground(Color.GRAY);
+        moduleSrcDirectoryHintLabel.setForeground(JBColor.GRAY);
         moduleSrcDirectoryPanel.add(moduleSrcDirectoryHintLabel, BorderLayout.CENTER);
 
         FormBuilder builder = FormBuilder.createFormBuilder()
@@ -115,6 +130,34 @@ public class SettingsComponent {
             .addLabeledComponent(moduleSrcDirectoryPathLabel, moduleSrcDirectoryPanel, 10, false);
 
         return builder.getPanel();
+    }
+
+    private JPanel createLaravelPackagesPanel() {
+        inertiaPageComponentRootPathTextField.setEditable(false); // Read-only to encourage use of the popup
+        inertiaPageComponentRootPathTextField.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                openPathsManagerDialog();
+            }
+        });
+        FormBuilder builder = FormBuilder.createFormBuilder()
+            .addLabeledComponent(
+                new JBLabel("Inertia Page component paths:"),
+                inertiaPageComponentRootPathTextField,
+                10,
+                false
+            );
+
+        JPanel parentPanel = new JPanel(new BorderLayout());
+        parentPanel.add(builder.getPanel(), BorderLayout.PAGE_START);
+
+        return parentPanel;
+    }
+
+    private void openPathsManagerDialog() {
+        InertiaPathsDialog dialog = new InertiaPathsDialog(inertiaPageComponentRootPathTextField);
+
+        dialog.show();
     }
 
     private JPanel createComboBoxPanel(ComboBox<String> comboBox) {

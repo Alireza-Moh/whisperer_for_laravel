@@ -35,12 +35,17 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
     /**
      * The root directory path for module-based projects
      */
-    private String modulesDirectoryPath;
+    private String modulesDirectoryPath = "Modules";
 
     /**
      * The src directory path for module-based projects
      */
-    private String moduleSrcDirectoryPath;
+    private String moduleSrcDirectoryPath = "src";
+
+    /**
+     * The path for the inertia pages components
+     */
+    private String inertiaPageComponentRootPath = "resources/js/Pages;";
 
     public static SettingsState getInstance(@NotNull Project foundedProject) {
         project = foundedProject;
@@ -96,6 +101,14 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
 
     public void setModuleSrcDirectoryPath(String moduleSrcDirectoryPath) {
         this.moduleSrcDirectoryPath = moduleSrcDirectoryPath;
+    }
+
+    public String getInertiaPageComponentRootPath() {
+        return inertiaPageComponentRootPath;
+    }
+
+    public void setInertiaPageComponentRootPath(String inertiaPageComponentRootPath) {
+        this.inertiaPageComponentRootPath = inertiaPageComponentRootPath;
     }
 
     /**
