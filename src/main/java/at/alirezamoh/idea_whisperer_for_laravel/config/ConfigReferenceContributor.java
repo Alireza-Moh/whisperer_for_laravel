@@ -31,18 +31,18 @@ public class ConfigReferenceContributor extends PsiReferenceContributor {
     /**
      * The names of the methods in the `Config` facade that can reference config keys
      */
-    public static Map<String, List<Integer>> CONFIG_METHODS = new HashMap<>() {{
-        put("get", List.of(0));
-        put("has", List.of(0));
-        put("config", List.of(0));
-        put("array", List.of(0));
-        put("boolean", List.of(0));
-        put("float", List.of(0));
-        put("integer", List.of(0));
-        put("string", List.of(0));
-        put("getMany", List.of(0));
-        put("set", List.of(0));
-        put("prepend", List.of(0));
+    public static Map<String, Integer> CONFIG_METHODS = new HashMap<>() {{
+        put("get", 0);
+        put("has", 0);
+        put("config", 0);
+        put("array", 0);
+        put("boolean", 0);
+        put("float", 0);
+        put("integer", 0);
+        put("string", 0);
+        put("getMany", 0);
+        put("set", 0);
+        put("prepend", 0);
     }};
 
     /**
@@ -60,7 +60,6 @@ public class ConfigReferenceContributor extends PsiReferenceContributor {
                             return PsiReference.EMPTY_ARRAY;
                         }
 
-                        boolean a = isInsideConfigHelperMethod(psiElement);
                         if (isInsideConfigHelperMethod(psiElement))
                         {
                             String text = psiElement.getText();
@@ -107,13 +106,16 @@ public class ConfigReferenceContributor extends PsiReferenceContributor {
      * @return True or false
      */
     private boolean isConfigParam(PsiElement reference, PsiElement position) {
-        int paramIndex = MethodUtils.findParamIndex(position, false);
         String referenceName = (reference instanceof MethodReference)
                 ? ((MethodReference) reference).getName()
                 : ((FunctionReference) reference).getName();
 
-        List<Integer> paramPositions = CONFIG_METHODS.get(referenceName);
+        Integer expectedParamIndex = CONFIG_METHODS.get(referenceName);
 
-        return paramPositions != null && paramPositions.contains(paramIndex);
+        if (expectedParamIndex == null) {
+            return false;
+        }
+
+        return MethodUtils.findParamIndex(position, false) == expectedParamIndex;
     }
 }

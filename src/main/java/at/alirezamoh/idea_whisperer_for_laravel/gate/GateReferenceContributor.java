@@ -73,9 +73,6 @@ public class GateReferenceContributor extends PsiReferenceContributor {
             return false;
         }
 
-        String s = method.getName();
-        int p = GATE_METHODS.get(method.getName());
-        int m = MethodUtils.findParamIndex(position, false);
         return GATE_METHODS.get(method.getName()) == MethodUtils.findParamIndex(position, false);
     }
 }
