@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "at.alirezamoh.idea-whisperer-for-laravel"
-version = "1.0.1"
+version = "1.1.0"
 
 repositories {
     mavenCentral()
