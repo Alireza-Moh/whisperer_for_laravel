@@ -39,21 +39,6 @@ public class GateProcessor {
     }
 
     private void traverseAndAccept(PsiElementVisitor visitor) {
-        String defaultPath = "";
-        if (!projectSettingsState.isLaravelDirectoryEmpty()) {
-            defaultPath = StrUtil.addSlashes(
-                projectSettingsState.getLaravelDirectoryPath(),
-                false,
-                true
-            ) + ProjectDefaultPaths.APP_SERVICE_PROVIDER_PATH;
-        }
-
-        PsiFile appServiceProviderFile = DirectoryPsiUtil.getFileByName(project, defaultPath);
-
-        if (appServiceProviderFile != null) {
-            appServiceProviderFile.acceptChildren(visitor);
-        }
-
         for (PhpClass serviceProvider : BaseServiceProviderVisitor.getProviders(project)) {
             serviceProvider.acceptChildren(visitor);
         }

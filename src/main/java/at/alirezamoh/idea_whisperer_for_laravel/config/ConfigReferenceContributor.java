@@ -12,14 +12,10 @@ import com.intellij.psi.*;
 import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.lang.psi.elements.FunctionReference;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
-import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
-import com.jetbrains.php.lang.psi.elements.impl.PhpClassImpl;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Contributes references to Laravel config keys in the PSI tree
@@ -28,7 +24,9 @@ public class ConfigReferenceContributor extends PsiReferenceContributor {
     /**
      * The namespace of the `Config` facade
      */
-    private final String CONFIG = "\\Illuminate\\Support\\Facades\\Config";
+    private final List<String> CONFIG = new ArrayList<>() {{
+        add("\\Illuminate\\Support\\Facades\\Config");
+    }};
 
     /**
      * The names of the methods in the `Config` facade that can reference config keys
@@ -62,6 +60,7 @@ public class ConfigReferenceContributor extends PsiReferenceContributor {
                             return PsiReference.EMPTY_ARRAY;
                         }
 
+                        boolean a = isInsideConfigHelperMethod(psiElement);
                         if (isInsideConfigHelperMethod(psiElement))
                         {
                             String text = psiElement.getText();
@@ -89,8 +88,16 @@ public class ConfigReferenceContributor extends PsiReferenceContributor {
         FunctionReference function = MethodUtils.resolveFunctionReference(psiElement, 10);
         Project project = psiElement.getProject();
 
-        return (method != null && isConfigParam(method, psiElement) && isConfigMethod(method, project))
-                || (function != null && isConfigParam(function, psiElement));
+        return (
+            method != null
+                && isConfigParam(method, psiElement)
+                && ClassUtils.isCorrectRelatedClass(method, project, CONFIG)
+            )
+            || (
+                function != null
+                    && isConfigParam(function, psiElement)
+                    && Objects.equals(function.getName(), "config")
+            );
     }
 
     /**
@@ -108,19 +115,5 @@ public class ConfigReferenceContributor extends PsiReferenceContributor {
         List<Integer> paramPositions = CONFIG_METHODS.get(referenceName);
 
         return paramPositions != null && paramPositions.contains(paramIndex);
-    }
-
-    /**
-     * Checks if the given method reference is a view or route method
-     * @param methodReference The method reference
-     * @param project The project context
-     * @return True or false
-     */
-    private boolean isConfigMethod(MethodReference methodReference, Project project) {
-        List<PhpClassImpl> resolvedClasses = MethodUtils.resolveMethodClasses(methodReference, project);
-
-        PhpClass configClass = ClassUtils.getClassByFQN(project, CONFIG);
-
-        return configClass != null && resolvedClasses.stream().anyMatch(clazz -> ClassUtils.isChildOf(clazz, configClass));
     }
 }
