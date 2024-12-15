@@ -1,6 +1,5 @@
 package at.alirezamoh.idea_whisperer_for_laravel.settings;
 
-import at.alirezamoh.idea_whisperer_for_laravel.support.strUtil.StrUtil;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
@@ -30,22 +29,22 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
     /**
      * The type of the project (Standard or Module-based)
      */
-    private String projectType = "Standard Application";
+    private String projectType;
 
     /**
      * The root directory path for module-based projects
      */
-    private String modulesDirectoryPath = "Modules";
+    private String modulesDirectoryPath;
 
     /**
      * The src directory path for module-based projects
      */
-    private String moduleSrcDirectoryPath = "src";
+    private String moduleSrcDirectoryPath;
 
     /**
      * The path for the inertia pages components
      */
-    private String inertiaPageComponentRootPath = "resources/js/Pages;";
+    private String inertiaPageComponentRootPath;
 
     public static SettingsState getInstance(@NotNull Project foundedProject) {
         project = foundedProject;
