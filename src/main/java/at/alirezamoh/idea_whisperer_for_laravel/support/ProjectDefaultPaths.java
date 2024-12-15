@@ -28,6 +28,8 @@ final public class ProjectDefaultPaths {
 
     public static final String MAILABLE_PATH = "/Mail/";
 
+    public static final String MAILABLE_VIEW_PATH = "/resources/views/emails/";
+
     public static final String EXCEPTION_PATH = "/Exceptions/";
 
     public static final String EVENT_LISTENER_PATH = "/Listeners/";
@@ -48,9 +50,7 @@ final public class ProjectDefaultPaths {
 
     public static final String LARAVEL_DB_QUERY_BUILDER_PATH = "/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php";
 
-    public static final String LARAVEL_ELOQUENT_BUILDER_PATH = "/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php";
-
     public static final String LARAVEL_DB_QUERY_RELATIONSHIPS_PATH = "/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/QueriesRelationships.php";
 
-    public static final String IDEA_WHISPERER_FOR_LARAVEL_MODELS_PATH = "/vendor/_idea_whisperer_for_laravel/idea_whisperer_for_laravel_models.php";
+    public static final String LARAVEL_ILLUMINATE_PATH = "/vendor/laravel/framework/src/Illuminate/";
 }

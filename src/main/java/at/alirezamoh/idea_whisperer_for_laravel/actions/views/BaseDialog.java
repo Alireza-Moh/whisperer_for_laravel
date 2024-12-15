@@ -3,10 +3,15 @@ package at.alirezamoh.idea_whisperer_for_laravel.actions.views;
 import at.alirezamoh.idea_whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.idea_whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
 import at.alirezamoh.idea_whisperer_for_laravel.support.notification.Notify;
+import at.alirezamoh.idea_whisperer_for_laravel.support.strUtil.StrUtil;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
+import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DialogWrapper;
+import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiManager;
 import com.intellij.util.ui.JBUI;
 
 import javax.swing.*;
@@ -156,7 +161,8 @@ public abstract class BaseDialog extends DialogWrapper {
         projectSettingState = SettingsState.getInstance(this.project);
 
         isAModuleApplication = projectSettingState.isModuleApplication();
-        moduleRootPath = projectSettingState.replaceAndSlashes(this.projectSettingState.getModuleRootDirectoryPath());
+
+        moduleRootPath = StrUtil.addSlashes(projectSettingState.getModulesDirectoryPath());
     }
 
     /**
@@ -169,7 +175,7 @@ public abstract class BaseDialog extends DialogWrapper {
 
         PsiDirectory rootDir = DirectoryPsiUtil.getDirectory(project, moduleRootPath);
         if (rootDir != null) {
-            modules.put("/app", "App root path");
+            addRootApp();
             for (PsiDirectory module : rootDir.getSubdirectories()) {
                 formattedModulePath(module.getName());
             }
@@ -186,12 +192,26 @@ public abstract class BaseDialog extends DialogWrapper {
     }
 
     /**
+     * Adds the root app of the laravel project if it exists
+     */
+    private void addRootApp() {
+        String path = "app";
+        if (projectSettingState.isLaravelDirectoryEmpty()) {
+            path = StrUtil.addSlashes(projectSettingState.getLaravelDirectoryPath()) + "app";
+        }
+        PsiDirectory rootApp = DirectoryPsiUtil.getDirectory(project, path);
+        if (rootApp != null) {
+            modules.put("/app", "App root path");
+        }
+    }
+
+    /**
      * Formats the module path for display in the select input
      *
      * @param modulePath The module path to format
      */
     private void formattedModulePath(String modulePath) {
-        String unformattedModuleFullPath = moduleRootPath + modulePath;
+        String unformattedModuleFullPath = StrUtil.removeDoubleSlashes(moduleRootPath + modulePath);
         String backSlashedModuleFullPath = unformattedModuleFullPath.replace("/", "\\");
 
         StringBuilder result = new StringBuilder();
@@ -201,13 +221,8 @@ public abstract class BaseDialog extends DialogWrapper {
             .toList();
 
         for (String word : paths) {
-            result
-                .append(
-                    Character.toUpperCase(word.charAt(0))
-                )
-                .append(
-                    word.substring(1)
-                )
+            result.append(Character.toUpperCase(word.charAt(0)))
+                .append(word.substring(1))
                 .append("\\");
         }
 

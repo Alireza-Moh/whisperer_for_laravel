@@ -20,6 +20,13 @@ import org.jetbrains.annotations.Nullable;
     storages = {@Storage("idea_whisperer_for_laravel.xml")}
 )
 public class SettingsState implements PersistentStateComponent<SettingsState> {
+    private static Project project;
+
+    /**
+     * The root directory where the whole laravel project is ===> default value = the root of the opened project
+     */
+    private String laravelDirectoryPath;
+
     /**
      * The type of the project (Standard or Module-based)
      */
@@ -28,10 +35,25 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
     /**
      * The root directory path for module-based projects
      */
-    private String moduleRootDirectoryPath;
+    private String modulesDirectoryPath = "Modules";
 
-    public static SettingsState getInstance(@NotNull Project project) {
-        return project.getService(SettingsState.class);
+    /**
+     * The src directory path for module-based projects
+     */
+    private String moduleSrcDirectoryPath = "src";
+
+    /**
+     * The path for the inertia pages components
+     */
+    private String inertiaPageComponentRootPath = "resources/js/Pages;";
+
+    public static SettingsState getInstance(@NotNull Project foundedProject) {
+        project = foundedProject;
+        return foundedProject.getService(SettingsState.class);
+    }
+
+    public Project getProject() {
+        return project;
     }
 
     @Override
@@ -49,6 +71,14 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
         PersistentStateComponent.super.initializeComponent();
     }
 
+    public String getLaravelDirectoryPath() {
+        return laravelDirectoryPath;
+    }
+
+    public void setLaravelDirectoryPath(String laravelDirectoryPath) {
+        this.laravelDirectoryPath = laravelDirectoryPath;
+    }
+
     public String getProjectType() {
         return projectType;
     }
@@ -57,20 +87,28 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
         this.projectType = projectType;
     }
 
-    public String getModuleRootDirectoryPath() {
-        return moduleRootDirectoryPath;
+    public String getModulesDirectoryPath() {
+        return modulesDirectoryPath;
     }
 
-    public @Nullable String getFormattedModuleRootDirectoryPath() {
-        return StrUtil.addSlashes(
-                getModuleRootDirectoryPath(),
-                false,
-                true
-        );
+    public void setModulesDirectoryPath(String modulesDirectoryPath) {
+        this.modulesDirectoryPath = modulesDirectoryPath;
     }
 
-    public void setModuleRootDirectoryPath(String moduleRootDirectoryPath) {
-        this.moduleRootDirectoryPath = moduleRootDirectoryPath;
+    public String getModuleSrcDirectoryPath() {
+        return moduleSrcDirectoryPath;
+    }
+
+    public void setModuleSrcDirectoryPath(String moduleSrcDirectoryPath) {
+        this.moduleSrcDirectoryPath = moduleSrcDirectoryPath;
+    }
+
+    public String getInertiaPageComponentRootPath() {
+        return inertiaPageComponentRootPath;
+    }
+
+    public void setInertiaPageComponentRootPath(String inertiaPageComponentRootPath) {
+        this.inertiaPageComponentRootPath = inertiaPageComponentRootPath;
     }
 
     /**
@@ -81,25 +119,11 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
         return "Module based Application".equals(projectType);
     }
 
-    /**
-     * Replaces backslashes with forward slashes and ensures the path starts and ends with a slash
-     * @param text The text to process
-     * @return The processed text
-     */
-    public String replaceAndSlashes(@Nullable String text) {
-        if (text == null) {
-            return text;
-        }
+    public boolean isLaravelDirectoryEmpty() {
+        return laravelDirectoryPath == null || laravelDirectoryPath.isEmpty();
+    }
 
-        text = text.replace("\\", "/");
-
-        if (!text.startsWith("/")) {
-            text = "/" + text;
-        }
-        if (!text.endsWith("/")) {
-            text = text + "/";
-        }
-
-        return text;
+    public boolean isModuleSrcDirectoryEmpty() {
+        return moduleSrcDirectoryPath == null || moduleSrcDirectoryPath.isEmpty();
     }
 }

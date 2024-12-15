@@ -1,5 +1,6 @@
 package at.alirezamoh.idea_whisperer_for_laravel.actions.models;
 
+import at.alirezamoh.idea_whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.idea_whisperer_for_laravel.support.ProjectDefaultPaths;
 
 /**
@@ -17,6 +18,7 @@ public class ConsoleModel extends BaseModel {
      * @param formattedModuleFullPath   The formatted module full path
      */
     public ConsoleModel(
+        SettingsState settingsState,
         String name,
         String unformattedModuleFullPath,
         String formattedModuleFullPath,
@@ -24,6 +26,7 @@ public class ConsoleModel extends BaseModel {
     )
     {
         super(
+            settingsState,
             name,
             unformattedModuleFullPath,
             formattedModuleFullPath,
@@ -38,5 +41,10 @@ public class ConsoleModel extends BaseModel {
 
     public String getSignature() {
         return signature;
+    }
+
+    @Override
+    public void setWithoutModuleSrc() {
+        this.withoutModuleSrcPath = false;
     }
 }

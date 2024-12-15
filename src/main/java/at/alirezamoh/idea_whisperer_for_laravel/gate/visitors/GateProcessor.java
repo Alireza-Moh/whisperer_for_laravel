@@ -2,13 +2,15 @@ package at.alirezamoh.idea_whisperer_for_laravel.gate.visitors;
 
 import at.alirezamoh.idea_whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.idea_whisperer_for_laravel.support.ProjectDefaultPaths;
-import at.alirezamoh.idea_whisperer_for_laravel.support.applicationModules.utils.ApplicationModuleUtil;
+import at.alirezamoh.idea_whisperer_for_laravel.support.applicationModules.visitors.BaseServiceProviderVisitor;
 import at.alirezamoh.idea_whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
+import at.alirezamoh.idea_whisperer_for_laravel.support.strUtil.StrUtil;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiFile;
+import com.jetbrains.php.lang.psi.elements.PhpClass;
 
 import java.util.List;
 
@@ -37,39 +39,23 @@ public class GateProcessor {
     }
 
     private void traverseAndAccept(PsiElementVisitor visitor) {
-        PsiFile appServiceProviderFile = null;
+        String defaultPath = "";
+        if (!projectSettingsState.isLaravelDirectoryEmpty()) {
+            defaultPath = StrUtil.addSlashes(
+                projectSettingsState.getLaravelDirectoryPath(),
+                false,
+                true
+            ) + ProjectDefaultPaths.APP_SERVICE_PROVIDER_PATH;
+        }
 
-        if (projectSettingsState.isModuleApplication()) {
-            String rootAppPath = projectSettingsState.getFormattedModuleRootDirectoryPath();
-            if (rootAppPath != null) {
-                appServiceProviderFile = DirectoryPsiUtil.getFileByName(
-                    project,
-                    rootAppPath
-                    + ProjectDefaultPaths.APP_SERVICE_PROVIDER_PATH
-                );
-            }
-        }
-        else {
-            appServiceProviderFile = DirectoryPsiUtil.getFileByName(
-                project,
-                "/app/" + ProjectDefaultPaths.APP_SERVICE_PROVIDER_PATH
-            );
-        }
+        PsiFile appServiceProviderFile = DirectoryPsiUtil.getFileByName(project, defaultPath);
 
         if (appServiceProviderFile != null) {
             appServiceProviderFile.acceptChildren(visitor);
         }
 
-        searchInModules(visitor);
-    }
-
-    private void searchInModules(PsiElementVisitor visitor) {
-        String moduleDirectoryRootPath = projectSettingsState.getFormattedModuleRootDirectoryPath();
-
-        if (projectSettingsState.isModuleApplication() && moduleDirectoryRootPath != null) {
-            for (PsiFile provider : ApplicationModuleUtil.getProviders(project)) {
-                provider.acceptChildren(visitor);
-            }
+        for (PhpClass serviceProvider : BaseServiceProviderVisitor.getProviders(project)) {
+            serviceProvider.acceptChildren(visitor);
         }
     }
 }

@@ -63,7 +63,7 @@ public class ObserverView extends BaseDialog {
     public ObserverView(Project project) {
         super(project);
 
-        this.modelProvider = new ModelProvider(project, this.projectSettingState);
+        this.modelProvider = new ModelProvider(project);
 
         setTitle("Create Observer");
         setSize(500, 200);
@@ -77,6 +77,7 @@ public class ObserverView extends BaseDialog {
      */
     public ObserverModel getObserverModel() {
         return new ObserverModel(
+            projectSettingState,
             this.observerNameTextField.getText(),
             this.eloquentModelNameTextField.getText(),
             this.getUnformattedModuleFullPath(this.moduleNameComboBox.getItem()),

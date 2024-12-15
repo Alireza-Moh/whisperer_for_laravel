@@ -1,7 +1,7 @@
 package at.alirezamoh.idea_whisperer_for_laravel.actions.models;
 
+import at.alirezamoh.idea_whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.idea_whisperer_for_laravel.support.ProjectDefaultPaths;
-import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -50,6 +50,7 @@ public class ObserverModel extends BaseModel {
      * @param formattedModuleFullPath   The formatted module full path
      */
     public ObserverModel(
+        SettingsState settingsState,
         String name,
         @Nullable String eloquentModelPath,
         String unformattedModuleFullPath,
@@ -71,6 +72,7 @@ public class ObserverModel extends BaseModel {
     )
     {
         super(
+            settingsState,
             name,
             unformattedModuleFullPath,
             formattedModuleFullPath,
@@ -172,5 +174,10 @@ public class ObserverModel extends BaseModel {
 
     public boolean isHasModel() {
         return hasModel;
+    }
+
+    @Override
+    public void setWithoutModuleSrc() {
+        this.withoutModuleSrcPath = false;
     }
 }

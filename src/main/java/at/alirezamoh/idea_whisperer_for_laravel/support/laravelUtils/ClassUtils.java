@@ -63,4 +63,20 @@ public class ClassUtils {
 
         return false;
     }
+
+    public static boolean isCorrectRelatedClass(MethodReference methodReference, Project project, List<String> classFQNs) {
+        List<PhpClassImpl> resolvedClasses = MethodUtils.resolveMethodClasses(methodReference, project);
+
+        for (PhpClassImpl clazz : resolvedClasses) {
+            for (String classFQN : classFQNs) {
+                PhpClass foundedClass = getClassByFQN(project, classFQN);
+
+                if (foundedClass != null && isChildOf(clazz, foundedClass)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
 }

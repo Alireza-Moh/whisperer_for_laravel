@@ -1,7 +1,7 @@
 package at.alirezamoh.idea_whisperer_for_laravel.actions.models;
 
+import at.alirezamoh.idea_whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.idea_whisperer_for_laravel.support.ProjectDefaultPaths;
-import com.intellij.openapi.project.Project;
 
 /**
  * Model representing a laravel job class
@@ -13,12 +13,14 @@ public class JobModel extends BaseModel {
      * @param formattedModuleFullPath   The formatted module full path
      */
     public JobModel(
+        SettingsState settingsState,
         String name,
         String unformattedModuleFullPath,
         String formattedModuleFullPath
     )
     {
         super(
+            settingsState,
             name,
             unformattedModuleFullPath,
             formattedModuleFullPath,
@@ -27,5 +29,10 @@ public class JobModel extends BaseModel {
             ".php",
             "Jobs"
         );
+    }
+
+    @Override
+    public void setWithoutModuleSrc() {
+        this.withoutModuleSrcPath = false;
     }
 }

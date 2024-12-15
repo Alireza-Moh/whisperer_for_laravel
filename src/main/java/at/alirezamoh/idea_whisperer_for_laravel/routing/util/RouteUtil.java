@@ -16,33 +16,26 @@ public class RouteUtil {
         Collection<PsiFile> files = new ArrayList<>();
         SettingsState settingsState = SettingsState.getInstance(project);
 
+        addDefaultRouteFiles(project, settingsState, files);
+
         if (settingsState.isModuleApplication()) {
-            addRootRouteFiles(project, settingsState, files);
             addModuleRouteFiles(project, settingsState, files);
-        } else {
-            addDefaultRouteFiles(project, files);
         }
 
         return files;
     }
 
-    private static void addRootRouteFiles(Project project, SettingsState settingsState, Collection<PsiFile> files) {
-        String rootPath = settingsState.getFormattedModuleRootDirectoryPath();
-        PsiDirectory rootRouteDir = null;
-
-        if (rootPath != null) {
-            rootRouteDir = DirectoryPsiUtil.getDirectory(project, rootPath + ProjectDefaultPaths.ROUTE_PATH);
-        }
-
-        if (rootRouteDir != null) {
-            DirectoryPsiUtil.collectFilesRecursively(rootRouteDir, files);
-        }
-
-        addDefaultRouteFiles(project, files);
-    }
-
     private static void addModuleRouteFiles(Project project, SettingsState settingsState, Collection<PsiFile> files) {
-        PsiDirectory moduleRootDir = DirectoryPsiUtil.getDirectory(project, StrUtil.addSlashes(settingsState.getModuleRootDirectoryPath()));
+        String defaultModulesDirPath = StrUtil.addSlashes(settingsState.getModulesDirectoryPath());
+        if (!settingsState.isLaravelDirectoryEmpty()) {
+            defaultModulesDirPath = StrUtil.addSlashes(
+                settingsState.getLaravelDirectoryPath(),
+                false,
+                true
+            ) + defaultModulesDirPath;
+        }
+
+        PsiDirectory moduleRootDir = DirectoryPsiUtil.getDirectory(project, defaultModulesDirPath);
 
         if (moduleRootDir != null) {
             for (PsiDirectory module : moduleRootDir.getSubdirectories()) {
@@ -54,8 +47,18 @@ public class RouteUtil {
         }
     }
 
-    private static void addDefaultRouteFiles(Project project, Collection<PsiFile> files) {
-        PsiDirectory rootRouteDir = DirectoryPsiUtil.getDirectory(project, ProjectDefaultPaths.ROUTE_PATH);
+    private static void addDefaultRouteFiles(Project project, SettingsState settingsState, Collection<PsiFile> files) {
+        String defaultRouteDirPath = ProjectDefaultPaths.ROUTE_PATH;
+        if (!settingsState.isLaravelDirectoryEmpty()) {
+            defaultRouteDirPath = StrUtil.addSlashes(
+                settingsState.getLaravelDirectoryPath(),
+                false,
+                true
+            ) + ProjectDefaultPaths.ROUTE_PATH;
+        }
+
+        PsiDirectory rootRouteDir = DirectoryPsiUtil.getDirectory(project, defaultRouteDirPath);
+
         if (rootRouteDir != null) {
             DirectoryPsiUtil.collectFilesRecursively(rootRouteDir, files);
         }

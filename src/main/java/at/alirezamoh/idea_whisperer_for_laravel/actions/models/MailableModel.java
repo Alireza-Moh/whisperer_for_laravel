@@ -1,7 +1,7 @@
 package at.alirezamoh.idea_whisperer_for_laravel.actions.models;
 
+import at.alirezamoh.idea_whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.idea_whisperer_for_laravel.support.ProjectDefaultPaths;
-import com.intellij.openapi.project.Project;
 
 /**
  * Model representing a laravel console command
@@ -21,6 +21,7 @@ public class MailableModel extends BaseModel {
      * @param formattedModuleFullPath   The formatted module full path
      */
     public MailableModel(
+        SettingsState settingsState,
         String name,
         String unformattedModuleFullPath,
         String formattedModuleFullPath,
@@ -31,6 +32,7 @@ public class MailableModel extends BaseModel {
     )
     {
         super(
+            settingsState,
             name,
             unformattedModuleFullPath,
             formattedModuleFullPath,
@@ -60,5 +62,10 @@ public class MailableModel extends BaseModel {
 
     public boolean isUseNewSyntax() {
         return useNewSyntax;
+    }
+
+    @Override
+    public void setWithoutModuleSrc() {
+        this.withoutModuleSrcPath = false;
     }
 }

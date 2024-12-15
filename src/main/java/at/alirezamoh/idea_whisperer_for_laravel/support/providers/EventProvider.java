@@ -3,11 +3,14 @@ package at.alirezamoh.idea_whisperer_for_laravel.support.providers;
 import at.alirezamoh.idea_whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.idea_whisperer_for_laravel.support.ProjectDefaultPaths;
 import at.alirezamoh.idea_whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
+import at.alirezamoh.idea_whisperer_for_laravel.support.strUtil.StrUtil;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.jetbrains.php.lang.psi.PhpFile;
+import com.jetbrains.php.lang.psi.elements.PhpClass;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +25,7 @@ public class EventProvider {
     /**
      * List to store the fully qualified namespaces of the events.
      */
-    private List<String> events = new ArrayList<>();
+    private List<String> events;
 
     /**
      * The current project.
@@ -49,29 +52,26 @@ public class EventProvider {
      * @return The list of event namespaces.
      */
     public List<String> getEvents() {
-        PsiDirectory eventsDir = DirectoryPsiUtil.getDirectory(this.project, "/app/Events/");
-
+        PsiDirectory eventsDir = getDirectoryWithPath("/app/Events/");
         if (eventsDir != null) {
-            for (PsiFile file : eventsDir.getFiles()) {
-                if (file instanceof PhpFile eventFile) {
-                    this.addModelToList(eventFile);
-                }
-            }
+            processEventFiles(eventsDir);
         }
+
+        searchInFrameworkForEvents();
 
         if (this.projectSettingState.isModuleApplication()) {
-            this.searchForEventsInModules();
+            searchForEventsInModules();
         }
 
-        return this.events;
+        return events;
     }
 
     /**
      * Searches for events within modules in a module-based project
      */
     private void searchForEventsInModules() {
-        String moduleRootPath = projectSettingState.replaceAndSlashes(projectSettingState.getModuleRootDirectoryPath());
-        PsiDirectory rootDir = DirectoryPsiUtil.getDirectory(project, moduleRootPath);
+        PsiDirectory rootDir = getDirectoryWithPath(projectSettingState.getModulesDirectoryPath());
+
         if (rootDir != null) {
             searchInModuleForEvents(rootDir);
         }
@@ -83,27 +83,100 @@ public class EventProvider {
      */
     private void searchInModuleForEvents(PsiDirectory rootDir) {
         for (PsiDirectory module : rootDir.getSubdirectories()) {
-            PsiDirectory moduleEventsDir = module.findSubdirectory("/Events/");
+            String path = "/Events/";
+            if (!projectSettingState.isModuleSrcDirectoryEmpty()) {
+                path = StrUtil.addSlashes(
+                    projectSettingState.getModuleSrcDirectoryPath(),
+                    false,
+                    true
+                ) + path;
+            }
+
+            PsiDirectory moduleEventsDir = module.findSubdirectory(path);
 
             if (moduleEventsDir != null) {
-                for (PsiFile file : moduleEventsDir.getFiles()) {
-                    if (file instanceof PhpFile eventFile) {
-                        addModelToList(eventFile);
-                    }
-                }
+                processEventFiles(moduleEventsDir);
+            }
+        }
+    }
+
+    /**
+     * Search for events in laravel framework
+     */
+    private void searchInFrameworkForEvents() {
+        PsiDirectory dir = getDirectoryWithPath(ProjectDefaultPaths.LARAVEL_ILLUMINATE_PATH);
+
+        if (dir != null) {
+            processEventDirectories(dir);
+        }
+    }
+
+    /**
+     * Recursively processes directories looking for "Events" subdirectories and adds models to the list
+     *
+     * @param parentDir The parent directory to start searching from
+     */
+    private void processEventDirectories(PsiDirectory parentDir) {
+        PsiDirectory eventsDir = parentDir.findSubdirectory("Events");
+        if (eventsDir != null) {
+            processEventFiles(eventsDir);
+        }
+
+        for (PsiDirectory subDir : parentDir.getSubdirectories()) {
+            processEventDirectories(subDir);
+        }
+    }
+
+    /**
+     * Retrieves a directory from the project based on the specified relative path
+     * @param relativePath The relative path of the directory
+     * @return The PsiDirectory or null if the directory cannot be found
+     */
+    private PsiDirectory getDirectoryWithPath(String relativePath) {
+        String fullPath = buildFullPath(relativePath);
+        return DirectoryPsiUtil.getDirectory(this.project, fullPath);
+    }
+
+    /**
+     * Builds the full directory path by appending the base path from settings
+     * @param relativePath The relative path to append
+     * @return The full directory path
+     */
+    private String buildFullPath(String relativePath) {
+        String basePath = projectSettingState.isLaravelDirectoryEmpty()
+            ? ""
+            : StrUtil.addSlashes(
+                projectSettingState.getLaravelDirectoryPath(),
+                false,
+                true
+            );
+
+        return basePath + relativePath;
+    }
+
+    /**
+     * Processes files in the "Events" directory.
+     * @param eventsDir The directory containing event files.
+     */
+    private void processEventFiles(PsiDirectory eventsDir) {
+        for (PsiFile file : eventsDir.getFiles()) {
+            if (file instanceof PhpFile) {
+                addModelToList(file);
             }
         }
     }
 
     /**
      * Adds an event's fully qualified namespace to the list
-     * @param phpFile The PHP file representing the event
+     * @param file The PHP file representing the event
      */
-    private void addModelToList(PhpFile phpFile) {
-        VirtualFile virtualFile = phpFile.getVirtualFile();
-
-        String namespace = phpFile.getMainNamespaceName() + "\\" + virtualFile.getNameWithoutExtension();
-
-        this.events.add(namespace);
+    private void addModelToList(PsiFile file) {
+        if (file instanceof PhpFile) {
+            for (PsiElement element : PsiTreeUtil.findChildrenOfType(file, PhpClass.class)) {
+                if (element instanceof PhpClass phpClass) {
+                    events.add(phpClass.getPresentableFQN());
+                }
+            }
+        }
     }
 }

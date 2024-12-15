@@ -5,14 +5,16 @@ import at.alirezamoh.idea_whisperer_for_laravel.config.visitors.ArrayReturnPsiRe
 import at.alirezamoh.idea_whisperer_for_laravel.config.visitors.ConfigModuleServiceProviderVisitor;
 import at.alirezamoh.idea_whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.idea_whisperer_for_laravel.support.ProjectDefaultPaths;
-import at.alirezamoh.idea_whisperer_for_laravel.support.applicationModules.utils.ApplicationModuleUtil;
+import at.alirezamoh.idea_whisperer_for_laravel.support.applicationModules.visitors.BaseServiceProviderVisitor;
 import at.alirezamoh.idea_whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
+import at.alirezamoh.idea_whisperer_for_laravel.support.strUtil.StrUtil;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.jetbrains.php.lang.psi.PhpFile;
-import com.jetbrains.php.lang.psi.elements.ArrayHashElement;
+import com.jetbrains.php.lang.psi.elements.PhpClass;
 
 import java.util.*;
 
@@ -28,7 +30,7 @@ public class ConfigKeyCollector {
     /**
      * Map of ArrayHashElement objects and their corresponding config key strings
      */
-    private Map<ArrayHashElement, String> configKeyWithCorrectPsiElement = new HashMap<>();
+    private Map<PsiElement, String> configKeyWithCorrectPsiElement = new HashMap<>();
 
     /**
      * The current project
@@ -49,38 +51,27 @@ public class ConfigKeyCollector {
      * Searches for config keys within a given directory
      */
     public ConfigKeyCollector startSearching() {
-        PsiDirectory configDir = null;
-        if (projectSettingState.isModuleApplication()) {
-            String rootPath = projectSettingState.getFormattedModuleRootDirectoryPath();
-
-            if (rootPath != null) {
-                configDir = DirectoryPsiUtil.getDirectory(project, rootPath + ProjectDefaultPaths.CONFIG_PATH);
-            }
+        String defaultConfigPath = ProjectDefaultPaths.CONFIG_PATH;
+        if (!projectSettingState.isLaravelDirectoryEmpty()) {
+            defaultConfigPath = StrUtil.addSlashes(
+                projectSettingState.getLaravelDirectoryPath(),
+                false,
+                true
+            ) + ProjectDefaultPaths.CONFIG_PATH;
         }
 
-        if (configDir != null) {
-            processDirectory(configDir, "");
-        }
-
-        PsiDirectory rootConfig = DirectoryPsiUtil.getDirectory(project, ProjectDefaultPaths.CONFIG_PATH);
+        PsiDirectory rootConfig = DirectoryPsiUtil.getDirectory(project, defaultConfigPath);
         if (rootConfig != null) {
-            processDirectory(rootConfig, "");
+           processDirectory(rootConfig, "");
         }
 
-
-        String moduleDirectoryRootPath = projectSettingState.getFormattedModuleRootDirectoryPath();
-        if (projectSettingState.isModuleApplication() && moduleDirectoryRootPath != null) {
-            searchForModulesConfigKeys();
-        }
+        searchForModulesConfigKeys();
         
         return this;
     }
 
     public ConfigKeyCollector getFromModules() {
-        String moduleDirectoryRootPath = projectSettingState.getFormattedModuleRootDirectoryPath();
-        if (projectSettingState.isModuleApplication() && moduleDirectoryRootPath != null) {
-            searchForModulesConfigKeys();
-        }
+        searchForModulesConfigKeys();
 
         return this;
     }
@@ -97,7 +88,7 @@ public class ConfigKeyCollector {
      * Returns a map of ArrayHashElement objects and their corresponding config key strings
      * @return The map of ArrayHashElement objects and config key strings
      */
-    public Map<ArrayHashElement, String> getConfigKeyWithCorrectPsiElement() {
+    public Map<PsiElement, String> getConfigKeyWithCorrectPsiElement() {
         return configKeyWithCorrectPsiElement;
     }
 
@@ -110,7 +101,7 @@ public class ConfigKeyCollector {
     private void processDirectory(PsiDirectory directory, String currentDirName) {
         for (PsiFile file : directory.getFiles()) {
             if (file instanceof PhpFile) {
-                iterateOverFileChildren(currentDirName, file, "", false);
+                iterateOverFileChildren(currentDirName, file, "", false, false);
             }
         }
 
@@ -129,22 +120,41 @@ public class ConfigKeyCollector {
      * @param dirName     The name of the directory containing the file
      * @param configFile  The PHP file to process
      */
-    private void iterateOverFileChildren(String dirName, PsiFile configFile, String configFileKeyIdentifier, boolean withKeyPisElement) {
+    private void iterateOverFileChildren(
+        String dirName,
+        PsiFile configFile,
+        String configFileKeyIdentifier,
+        boolean withKeyPisElement,
+        boolean forModule
+    ) {
         String filename = configFile.getName();
         filename = filename.substring(0, filename.length() - 4);
 
-        ArrayReturnPsiRecursiveVisitor visitor = new ArrayReturnPsiRecursiveVisitor(dirName, filename, "", configFileKeyIdentifier);
+        ArrayReturnPsiRecursiveVisitor visitor = new ArrayReturnPsiRecursiveVisitor(
+            dirName,
+            filename,
+            "",
+            configFileKeyIdentifier,
+            forModule
+        );
         configFile.acceptChildren(visitor);
 
-        String fileFullPath = (dirName.isBlank())
-            ? filename
-            : dirName + "." + filename;
+        String fileFullPath;
+        if (forModule) {
+            fileFullPath = configFileKeyIdentifier;
+        }
+        else  {
+            fileFullPath = (dirName.isBlank())
+                ? filename
+                : dirName + "." + filename;
+        }
 
         variants.add(visitor.buildLookupElement(fileFullPath, ""));
         variants.addAll(visitor.getSuggestions());
 
         if (withKeyPisElement) {
             configKeyWithCorrectPsiElement.putAll(visitor.getSuggestionsWithCorrectPsiElement());
+            configKeyWithCorrectPsiElement.put(configFile, fileFullPath);
         }
     }
 
@@ -154,32 +164,24 @@ public class ConfigKeyCollector {
     private void searchForModulesConfigKeys() {
         ConfigModuleServiceProviderVisitor configModuleServiceProviderVisitor = new ConfigModuleServiceProviderVisitor(this.project);
 
-        for (PsiFile serviceProviderFile : ApplicationModuleUtil.getProviders(project)) {
-            serviceProviderFile.acceptChildren(configModuleServiceProviderVisitor);
+        for (PhpClass serviceProvider : BaseServiceProviderVisitor.getProviders(project)) {
+            serviceProvider.acceptChildren(configModuleServiceProviderVisitor);
 
             List<ConfigModule> configModules = configModuleServiceProviderVisitor.getConfigFilesInModule();
 
             if (!configModules.isEmpty()) {
                 for (ConfigModule configModule : configModules) {
-                    processConfigDirModule(configModule.configDir(), "", configModule);
+                    if (configModule.configFile() instanceof PhpFile) {
+                        iterateOverFileChildren(
+                            "",
+                            configModule.configFile(),
+                            configModule.configKeyIdentifier(),
+                            true,
+                            true
+                        );
+                    }
                 }
             }
-        }
-    }
-
-    private void processConfigDirModule(PsiDirectory directory, String currentDirName, ConfigModule configModule) {
-        for (PsiFile configFile : directory.getFiles()) {
-            if (configFile instanceof PhpFile && configFile.getName().equals(configModule.fileName())) {
-                iterateOverFileChildren(currentDirName, configFile, configModule.configKeyIdentifier(), true);
-            }
-        }
-
-        for (PsiDirectory subDir : directory.getSubdirectories()) {
-            String dirFullPath = (currentDirName.isBlank())
-                ? subDir.getName()
-                : currentDirName + "." + subDir.getName();
-
-            processConfigDirModule(subDir, dirFullPath, configModule);
         }
     }
 }

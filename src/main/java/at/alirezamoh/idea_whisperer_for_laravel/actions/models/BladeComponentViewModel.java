@@ -1,5 +1,6 @@
 package at.alirezamoh.idea_whisperer_for_laravel.actions.models;
 
+import at.alirezamoh.idea_whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.idea_whisperer_for_laravel.support.ProjectDefaultPaths;
 import at.alirezamoh.idea_whisperer_for_laravel.support.strUtil.StrUtil;
 
@@ -13,12 +14,14 @@ public class BladeComponentViewModel extends BaseModel {
      * @param formattedModuleFullPath   The formatted module full path
      */
     public BladeComponentViewModel(
+        SettingsState settingsState,
         String name,
         String unformattedModuleFullPath,
         String formattedModuleFullPath
     )
     {
         super(
+            settingsState,
             name,
             unformattedModuleFullPath,
             formattedModuleFullPath,
@@ -29,16 +32,10 @@ public class BladeComponentViewModel extends BaseModel {
         );
 
         this.name = StrUtil.snake(getName(), "-");
-
-        initSettings();
     }
 
-    public void initSettings() {
-        if (unformattedModuleFullPath.isEmpty()) {
-            this.setDestination(ProjectDefaultPaths.BLADE_COMPONENT_VIEW_PATH);
-        }
-        else {
-            this.setDestination(unformattedModuleFullPath + "/" + ProjectDefaultPaths.BLADE_COMPONENT_VIEW_PATH);
-        }
+    @Override
+    public void setWithoutModuleSrc() {
+        this.withoutModuleSrcPath = true;
     }
 }

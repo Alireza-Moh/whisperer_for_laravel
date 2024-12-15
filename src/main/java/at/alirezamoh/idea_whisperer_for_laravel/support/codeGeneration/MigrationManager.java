@@ -82,8 +82,10 @@ public class MigrationManager {
                             new Relation(
                                 method.getName(),
                                 methodNameAndRelatedModel.getKey(),
-                                "\\Illuminate\\Database\\Eloquent\\Relations\\" + StrUtil.capitalizeFirstLetter(methodNameAndRelatedModel.getKey())
-                                    + "|"+ methodNameAndRelatedModel.getValue().getName()
+                                "\\Illuminate\\Database\\Eloquent\\Relations\\"
+                                    + StrUtil.capitalizeFirstLetter(methodNameAndRelatedModel.getKey())
+                                    + "|"
+                                    + methodNameAndRelatedModel.getValue().getName()
                             )
                         );
                         laravelModel.addField(
@@ -108,13 +110,21 @@ public class MigrationManager {
     }
 
     private void getAllModels(Project project) {
-        ModelProvider modelProvider = new ModelProvider(project, projectSettingsState, true);
+        ModelProvider modelProvider = new ModelProvider(project, true);
         this.originalModels = modelProvider.getOriginalModels();
     }
 
     private void searchForMigrations() {
-        Collection<PsiFile> migrations = DirectoryPsiUtil.getFilesRecursively(project, ProjectDefaultPaths.MIGRATION_PATH);
+        String defaultMigrationPath = ProjectDefaultPaths.MIGRATION_PATH;
+        if (!projectSettingsState.isLaravelDirectoryEmpty()) {
+            defaultMigrationPath = StrUtil.addSlashes(
+                projectSettingsState.getLaravelDirectoryPath(),
+                false,
+                true
+            ) + ProjectDefaultPaths.MIGRATION_PATH;
+        }
 
+        Collection<PsiFile> migrations = DirectoryPsiUtil.getFilesRecursively(project, defaultMigrationPath);
         if (projectSettingsState.isModuleApplication()) {
             searchForMigrationsInModules(migrations);
         }
@@ -225,13 +235,26 @@ public class MigrationManager {
     }
 
     private void searchForMigrationsInModules(Collection<PsiFile> migrations) {
-        String moduleRootPath = projectSettingsState.replaceAndSlashes(projectSettingsState.getModuleRootDirectoryPath());
-        PsiDirectory rootDir = DirectoryPsiUtil.getDirectory(project, moduleRootPath);
+        String modulesRootDirectoryPath = StrUtil.addSlashes(projectSettingsState.getModulesDirectoryPath());
 
+        if (!projectSettingsState.isLaravelDirectoryEmpty()) {
+            modulesRootDirectoryPath =
+                modulesRootDirectoryPath
+                + StrUtil.addSlashes(
+                    projectSettingsState.getLaravelDirectoryPath(),
+                    true,
+                    false
+                );
+        }
+
+        PsiDirectory rootDir = DirectoryPsiUtil.getDirectory(project, modulesRootDirectoryPath);
         if (rootDir != null) {
             for (PsiDirectory module : rootDir.getSubdirectories()) {
                 migrations.addAll(
-                    DirectoryPsiUtil.getFilesRecursively(project, moduleRootPath + module.getName() + ProjectDefaultPaths.MIGRATION_PATH)
+                    DirectoryPsiUtil.getFilesRecursively(
+                        project,
+                        modulesRootDirectoryPath + module.getName() + ProjectDefaultPaths.MIGRATION_PATH
+                    )
                 );
             }
         }

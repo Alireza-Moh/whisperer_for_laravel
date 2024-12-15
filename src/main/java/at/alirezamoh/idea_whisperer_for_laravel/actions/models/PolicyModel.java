@@ -1,5 +1,6 @@
 package at.alirezamoh.idea_whisperer_for_laravel.actions.models;
 
+import at.alirezamoh.idea_whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.idea_whisperer_for_laravel.support.ProjectDefaultPaths;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,6 +22,7 @@ public class PolicyModel extends BaseModel {
      * @param formattedModuleFullPath   The formatted module full path
      */
     public PolicyModel(
+        SettingsState settingsState,
         String name,
         @Nullable String eloquentModelPath,
         String unformattedModuleFullPath,
@@ -28,6 +30,7 @@ public class PolicyModel extends BaseModel {
     )
     {
         super(
+            settingsState,
             name,
             unformattedModuleFullPath,
             formattedModuleFullPath,
@@ -38,7 +41,7 @@ public class PolicyModel extends BaseModel {
         );
 
         if (eloquentModelPath != null && !eloquentModelPath.isEmpty()) {
-            this.eloquentModelPath = eloquentModelPath.substring(1);
+            this.eloquentModelPath = eloquentModelPath;
             this.eloquentModelName = eloquentModelPath.substring(eloquentModelPath.lastIndexOf("\\") + 1);
             this.eloquentModelNameVariable = this.getModelVariableName(this.eloquentModelName);
             this.hasModel = true;
@@ -59,5 +62,10 @@ public class PolicyModel extends BaseModel {
 
     public boolean isHasModel() {
         return hasModel;
+    }
+
+    @Override
+    public void setWithoutModuleSrc() {
+        this.withoutModuleSrcPath = false;
     }
 }

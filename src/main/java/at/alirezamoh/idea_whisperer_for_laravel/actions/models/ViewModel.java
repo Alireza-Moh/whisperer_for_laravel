@@ -1,5 +1,6 @@
 package at.alirezamoh.idea_whisperer_for_laravel.actions.models;
 
+import at.alirezamoh.idea_whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.idea_whisperer_for_laravel.support.ProjectDefaultPaths;
 
 /**
@@ -12,12 +13,14 @@ public class ViewModel extends BaseModel {
      * @param formattedModuleFullPath   The formatted module full path
      */
     public ViewModel(
+        SettingsState settingsState,
         String name,
         String unformattedModuleFullPath,
         String formattedModuleFullPath
     )
     {
         super(
+            settingsState,
             name,
             unformattedModuleFullPath,
             formattedModuleFullPath,
@@ -26,5 +29,10 @@ public class ViewModel extends BaseModel {
             ".blade.php",
             ""
         );
+    }
+
+    @Override
+    public void setWithoutModuleSrc() {
+        this.withoutModuleSrcPath = true;
     }
 }

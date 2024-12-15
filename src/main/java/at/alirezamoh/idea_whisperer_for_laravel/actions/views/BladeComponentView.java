@@ -2,6 +2,7 @@ package at.alirezamoh.idea_whisperer_for_laravel.actions.views;
 
 import at.alirezamoh.idea_whisperer_for_laravel.actions.models.BladeComponentClassModel;
 import at.alirezamoh.idea_whisperer_for_laravel.actions.models.BladeComponentViewModel;
+import at.alirezamoh.idea_whisperer_for_laravel.support.strUtil.StrUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.ValidationInfo;
@@ -40,6 +41,7 @@ public class BladeComponentView extends BaseDialog {
      */
     public BladeComponentClassModel getBladeComponentClassModel() {
         return new BladeComponentClassModel(
+            projectSettingState,
             componentNameTextField.getText(),
             getUnformattedModuleFullPath(moduleNameComboBox.getItem()),
             getSelectedFormattedModuleFullPath()
@@ -50,14 +52,21 @@ public class BladeComponentView extends BaseDialog {
      * Returns the Blade component view model
      * @return The Blade component view model
      */
-    public BladeComponentViewModel getBladeComponentViewModel() {
+    public BladeComponentViewModel getBladeComponentViewModel(BladeComponentClassModel bladeComponentClassModel) {
         String unformattedModuleFullPath = getUnformattedModuleFullPath(moduleNameComboBox.getItem());
         if (!projectSettingState.isModuleApplication()) {
             unformattedModuleFullPath = "";
         }
 
+        String name = StrUtil.removeDoubleSlashes(
+            bladeComponentClassModel.getFolderPath()
+                + StrUtil.addSlashes(
+                    StrUtil.toLowerFirstLetter(bladeComponentClassModel.getName())
+            )
+        );
         return new BladeComponentViewModel(
-            componentNameTextField.getText(),
+            projectSettingState,
+            name,
             unformattedModuleFullPath,
             getSelectedFormattedModuleFullPath()
         );

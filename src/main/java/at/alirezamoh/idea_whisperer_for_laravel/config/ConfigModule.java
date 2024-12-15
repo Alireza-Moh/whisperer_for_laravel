@@ -1,5 +1,5 @@
 package at.alirezamoh.idea_whisperer_for_laravel.config;
 
-import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiFile;
 
-public record ConfigModule(String fileName, String configKeyIdentifier, PsiDirectory configDir) {}
+public record ConfigModule(PsiFile configFile, String configKeyIdentifier) {}

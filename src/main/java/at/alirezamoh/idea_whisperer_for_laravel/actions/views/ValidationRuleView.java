@@ -33,6 +33,7 @@ public class ValidationRuleView extends BaseDialog {
      */
     public ValidationRuleModel getValidationRuleModel() {
         return new ValidationRuleModel(
+            projectSettingState,
             jobNameTextField.getText(),
             getUnformattedModuleFullPath(moduleNameComboBox.getItem()),
             getSelectedFormattedModuleFullPath()

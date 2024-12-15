@@ -5,9 +5,14 @@ import at.alirezamoh.idea_whisperer_for_laravel.support.applicationModules.visit
 import at.alirezamoh.idea_whisperer_for_laravel.support.psiUtil.PsiUtil;
 import at.alirezamoh.idea_whisperer_for_laravel.support.strUtil.StrUtil;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiDirectory;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiManager;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
+import com.jetbrains.php.lang.psi.elements.ParameterList;
+import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
+import com.jetbrains.php.lang.psi.elements.impl.ConcatenationExpressionImpl;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -65,14 +70,30 @@ public class ConfigModuleServiceProviderVisitor extends BaseServiceProviderVisit
             return;
         }
 
-        if (moduleRootDirectory != null) {
-            for (PsiDirectory module : moduleRootDirectory.getSubdirectories()) {
-                PsiDirectory configDir = module.findSubdirectory("config");
+        ParameterList parameters = method.getParameterList();
+        if (parameters != null) {
+            PsiElement namespaceParameter = parameters.getParameter(0);
+            if (namespaceParameter instanceof ConcatenationExpressionImpl concatenationExpression) {
+                PsiFile containingFile = concatenationExpression.getContainingFile();
+                VirtualFile virtualFile = containingFile.getVirtualFile();
 
-                if (configDir != null) {
-                    configFilesInModule.add(
-                        new ConfigModule(StrUtil.getLastWord(configFileName), configKeyIdentifier, configDir)
-                    );
+                if (virtualFile != null) {
+                    VirtualFile parentDir = virtualFile.getParent();
+                    PsiElement rightOperand = concatenationExpression.getRightOperand();
+                    if (rightOperand instanceof StringLiteralExpression relativePathConfigFilePath && parentDir != null) {
+                        VirtualFile resolvedVirtualFile = parentDir.findFileByRelativePath(
+                            StrUtil.removeQuotes(relativePathConfigFilePath.getText())
+                        );
+
+                        if (resolvedVirtualFile != null) {
+                            PsiFile configFile = PsiManager.getInstance(project).findFile(resolvedVirtualFile);
+                            if (configFile != null) {
+                                configFilesInModule.add(
+                                    new ConfigModule(configFile, configKeyIdentifier)
+                                );
+                            }
+                        }
+                    }
                 }
             }
         }

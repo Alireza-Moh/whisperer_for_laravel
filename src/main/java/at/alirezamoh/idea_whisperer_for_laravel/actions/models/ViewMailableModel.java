@@ -4,15 +4,15 @@ import at.alirezamoh.idea_whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.idea_whisperer_for_laravel.support.ProjectDefaultPaths;
 
 /**
- * Model representing a middleware class
+ * Model representing a blade view file
  */
-public class MiddlewareModel extends BaseModel {
+public class ViewMailableModel extends BaseModel {
     /**
-     * @param name                      The name of the middleware
+     * @param name                      The name of the view mailable file
      * @param unformattedModuleFullPath The unformatted module full path
      * @param formattedModuleFullPath   The formatted module full path
      */
-    public MiddlewareModel(
+    public ViewMailableModel(
         SettingsState settingsState,
         String name,
         String unformattedModuleFullPath,
@@ -24,10 +24,10 @@ public class MiddlewareModel extends BaseModel {
             name,
             unformattedModuleFullPath,
             formattedModuleFullPath,
-            ProjectDefaultPaths.MIDDLEWARE_PATH,
-            "Middleware",
-            ".php",
-            "Http\\Middleware"
+            ProjectDefaultPaths.MAILABLE_VIEW_PATH,
+            "",
+            ".blade.php",
+            ""
         );
     }
 

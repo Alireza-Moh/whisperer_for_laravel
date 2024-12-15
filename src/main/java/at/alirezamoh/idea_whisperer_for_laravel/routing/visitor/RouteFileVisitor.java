@@ -11,6 +11,7 @@ import com.jetbrains.php.lang.psi.elements.impl.MethodReferenceImpl;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+
 /**
  * Visits a laravel route file to collect route names and their corresponding URIs.
  * This visitor analyzes the PSI tree of a PHP file and extracts route names
@@ -21,7 +22,11 @@ public class RouteFileVisitor extends PsiRecursiveElementWalkingVisitor {
     /**
      * The namespaces of the `Route` facade and class
      */
-    private final String[] ROUTE_NAMESPACES = {"\\Illuminate\\Routing\\Route", "\\Illuminate\\Support\\Facades\\Route"};
+    private final String[] ROUTE_NAMESPACES = {
+        "\\Illuminate\\Routing\\Route",
+        "\\Illuminate\\Support\\Facades\\Route",
+        "\\Route"
+    };
 
     /**
      * The name of the method used to define route names
@@ -98,6 +103,7 @@ public class RouteFileVisitor extends PsiRecursiveElementWalkingVisitor {
             this.suggestions.add(
                 LookupElementBuilder
                     .create(modifiedName)
+                    .bold()
                     .withTypeText(this.getRouteUri(methodReference), true)
                     .withIcon(IdeaWhispererForLaravelIcon.LARAVEL_ICON)
             );
@@ -120,7 +126,7 @@ public class RouteFileVisitor extends PsiRecursiveElementWalkingVisitor {
             && methodReference1.getName() != null
             && !methodReference1.getName().equals(ROUTE_METHOD_NAME)
         ) {
-            PhpExpression routeReference = ((MethodReferenceImpl) parentMethod).getClassReference();
+            PhpExpression routeReference = methodReference1.getClassReference();
             if (
                 routeReference instanceof ClassReferenceImpl classReference
                 && Arrays.asList(ROUTE_NAMESPACES).contains(classReference.getFQN())

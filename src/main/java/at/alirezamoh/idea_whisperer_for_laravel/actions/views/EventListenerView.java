@@ -43,6 +43,7 @@ public class EventListenerView extends BaseDialog {
      */
     public EventListenerModel getEventListenerModel() {
         return new EventListenerModel(
+            projectSettingState,
             this.eventListenerTextField.getText(),
             this.getUnformattedModuleFullPath(moduleNameComboBox.getItem()),
             this.getSelectedFormattedModuleFullPath(),

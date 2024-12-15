@@ -33,6 +33,7 @@ public class JobView extends BaseDialog {
      */
     public JobModel getJobModel() {
         return new JobModel(
+            projectSettingState,
             jobNameTextField.getText(),
             getUnformattedModuleFullPath(moduleNameComboBox.getItem()),
             getSelectedFormattedModuleFullPath()

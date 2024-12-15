@@ -3,19 +3,18 @@ package at.alirezamoh.idea_whisperer_for_laravel.blade.visitors;
 import at.alirezamoh.idea_whisperer_for_laravel.blade.BladeModule;
 import at.alirezamoh.idea_whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.idea_whisperer_for_laravel.support.ProjectDefaultPaths;
-import at.alirezamoh.idea_whisperer_for_laravel.support.applicationModules.utils.ApplicationModuleUtil;
+import at.alirezamoh.idea_whisperer_for_laravel.support.applicationModules.visitors.BaseServiceProviderVisitor;
 import at.alirezamoh.idea_whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
 import at.alirezamoh.idea_whisperer_for_laravel.support.psiUtil.PsiUtil;
+import at.alirezamoh.idea_whisperer_for_laravel.support.strUtil.StrUtil;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.jetbrains.php.blade.BladeFileType;
+import com.jetbrains.php.lang.psi.elements.PhpClass;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class BladeFileCollector {
     /**
@@ -49,29 +48,22 @@ public class BladeFileCollector {
     }
 
     public BladeFileCollector startSearching() {
-        PsiDirectory defaultViewDir = null;
-        if (projectSettingState.isModuleApplication()) {
-            String rootPath = projectSettingState.getFormattedModuleRootDirectoryPath();
-
-            if (rootPath != null) {
-                defaultViewDir = DirectoryPsiUtil.getDirectory(project, rootPath + ProjectDefaultPaths.VIEW_PATH);
-            }
+        String defaultViewPath = ProjectDefaultPaths.VIEW_PATH;
+        if (!projectSettingState.isLaravelDirectoryEmpty()) {
+            defaultViewPath = StrUtil.addSlashes(
+                projectSettingState.getLaravelDirectoryPath(),
+                false,
+                true
+            ) + ProjectDefaultPaths.VIEW_PATH;
         }
 
-        PsiDirectory defaultResDir = DirectoryPsiUtil.getDirectory(project, ProjectDefaultPaths.VIEW_PATH);
+        PsiDirectory defaultResDir = DirectoryPsiUtil.getDirectory(project, defaultViewPath);
 
         if (defaultResDir != null) {
             searchForBladeFiles(defaultResDir, "", "");
         }
 
-        if (defaultViewDir != null) {
-            searchForBladeFiles(defaultViewDir, "", "");
-        }
-
-        String moduleDirectoryRootPath = projectSettingState.getFormattedModuleRootDirectoryPath();
-        if (projectSettingState.isModuleApplication() && moduleDirectoryRootPath != null) {
-            searchForBladeFilesInModules();
-        }
+        searchForBladeFilesInModules();
 
         return this;
     }
@@ -95,10 +87,6 @@ public class BladeFileCollector {
      * @param viewNamespace The view namespace to prepend to the file name
      */
     public void searchForBladeFiles(PsiDirectory directory, String currentPath, String viewNamespace) {
-        if (directory.getName().equals("components")) {
-            return;
-        }
-
         for (PsiFile file : directory.getFiles()) {
             if (file.getFileType() instanceof BladeFileType) {
                 String fileName = file.getName().replace(".blade.php", "");
@@ -118,7 +106,10 @@ public class BladeFileCollector {
         }
 
         for (PsiDirectory subdirectory : directory.getSubdirectories()) {
-            String newPath = currentPath.isEmpty() ? subdirectory.getName() : currentPath + "." + subdirectory.getName();
+            String newPath = currentPath.isEmpty()
+                ? subdirectory.getName()
+                : currentPath + "." + subdirectory.getName();
+
             searchForBladeFiles(subdirectory, newPath, viewNamespace);
         }
     }
@@ -129,9 +120,8 @@ public class BladeFileCollector {
     private void searchForBladeFilesInModules() {
         BladeModuleServiceProviderVisitor bladeModuleServiceProviderVisitor = new BladeModuleServiceProviderVisitor(project);
 
-        for (PsiFile serviceProviderFile : ApplicationModuleUtil.getProviders(project)) {
-            serviceProviderFile.acceptChildren(bladeModuleServiceProviderVisitor);
-
+        for (PhpClass serviceProvider : BaseServiceProviderVisitor.getProviders(project)) {
+            serviceProvider.acceptChildren(bladeModuleServiceProviderVisitor);
             List<BladeModule> bladeModules = bladeModuleServiceProviderVisitor.getBladeFilesInModule();
 
             if (!bladeModules.isEmpty()) {

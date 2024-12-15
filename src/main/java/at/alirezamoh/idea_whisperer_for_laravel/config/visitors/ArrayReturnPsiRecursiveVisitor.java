@@ -49,17 +49,21 @@ public class ArrayReturnPsiRecursiveVisitor extends PsiRecursiveElementWalkingVi
      */
     private String configNamespace;
 
+    private boolean forModule;
+
     /**
      * @param dirName         The name of the directory containing the config file
      * @param configFileName  The name of the config file
      * @param parentKeys      The parent keys leading to the current config key
      * @param configNamespace The namespace for the config keys
+     * @param forModule       Should append file name to the string
      */
-    public ArrayReturnPsiRecursiveVisitor(String dirName, String configFileName, String parentKeys, String configNamespace) {
+    public ArrayReturnPsiRecursiveVisitor(String dirName, String configFileName, String parentKeys, String configNamespace, boolean forModule) {
         this.dirName = dirName;
         this.configFileName = configFileName;
         this.parentKeys = parentKeys;
         this.configNamespace = configNamespace;
+        this.forModule = forModule;
     }
 
     /**
@@ -114,6 +118,7 @@ public class ArrayReturnPsiRecursiveVisitor extends PsiRecursiveElementWalkingVi
                 .withLookupString(key)
                 .withPresentableText(key)
                 .withTailText(value, true)
+                .bold()
                 .withIcon(IdeaWhispererForLaravelIcon.LARAVEL_ICON);
     }
 
@@ -186,11 +191,16 @@ public class ArrayReturnPsiRecursiveVisitor extends PsiRecursiveElementWalkingVi
     private String generateFullKey(String dirName, String filename, String parentKeys, String key) {
         String prefixedKey = parentKeys.isEmpty() ? "" : parentKeys + ".";
 
-        if (dirName.isEmpty()) {
-            return StrUtil.removeQuotes(filename + "." + prefixedKey + key);
+        if (forModule) {
+            return StrUtil.removeQuotes(prefixedKey + key);
         }
         else {
-            return StrUtil.removeQuotes(dirName + "." + filename + "." + prefixedKey + key);
+            if (dirName.isEmpty()) {
+                return StrUtil.removeQuotes(filename + "." + prefixedKey + key);
+            }
+            else {
+                return StrUtil.removeQuotes(dirName + "." + filename + "." + prefixedKey + key);
+            }
         }
     }
 
