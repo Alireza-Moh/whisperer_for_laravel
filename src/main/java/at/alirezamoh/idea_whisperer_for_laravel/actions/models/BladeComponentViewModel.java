@@ -32,6 +32,8 @@ public class BladeComponentViewModel extends BaseModel {
         );
 
         this.name = StrUtil.snake(getName(), "-");
+
+        initFilePath();
     }
 
     @Override
