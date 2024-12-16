@@ -33,7 +33,7 @@ public class InertiaReference extends PsiReferenceBase<PsiElement> {
     @Override
     public @Nullable PsiElement resolve() {
         String text = StrUtil.removeQuotes(myElement.getText());
-        List<InertiaPage> pages = locateReferences(true);
+        List<InertiaPage> pages = collectPages(true);
 
         for (InertiaPage page : pages) {
             if (page.getPath().equals(text)) {
@@ -46,7 +46,7 @@ public class InertiaReference extends PsiReferenceBase<PsiElement> {
 
     @Override
     public Object @NotNull [] getVariants() {
-        List<InertiaPage> pages = locateReferences(false);
+        List<InertiaPage> pages = collectPages(false);
 
         List<LookupElementBuilder> variants = new ArrayList<>();
         for (InertiaPage page : pages) {
@@ -64,14 +64,25 @@ public class InertiaReference extends PsiReferenceBase<PsiElement> {
      * @param withFile Whether to include the PsiFile reference in the InertiaPage objects.
      * @return A list of discovered Inertia pages
      */
-    public List<InertiaPage> locateReferences(boolean withFile) {
+    public List<InertiaPage> collectPages(boolean withFile) {
         List<InertiaPage> references = new ArrayList<>();
+        SettingsState settings = SettingsState.getInstance(project);
 
-        String[] paths = SettingsState.getInstance(project).getInertiaPageComponentRootPath().split(";");
+        String defaultPath = "";
+        if (!settings.isLaravelDirectoryEmpty()) {
+            defaultPath = StrUtil.removeDoubleSlashes(
+                StrUtil.addSlashes(settings.getLaravelDirectoryPath()) + defaultPath
+            );
+        }
+
+        String[] paths = settings.getInertiaPageComponentRootPath().split(";");
         for (String path : paths) {
             PsiDirectory potentialDir = DirectoryPsiUtil.getDirectory(
                 project,
-                StrUtil.removeDoubleSlashes(StrUtil.addSlashes(path.replace("\\", "/")))
+                StrUtil.removeDoubleSlashes(
+                    defaultPath +
+                        StrUtil.addSlashes(path.replace("\\", "/"))
+                )
             );
 
             if (potentialDir != null) {
