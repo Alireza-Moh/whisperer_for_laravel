@@ -58,62 +58,67 @@ public class InertiaReference extends PsiReferenceBase<PsiElement> {
         return variants.toArray();
     }
 
+    /**
+     * Collect all Inertia pages based on the paths configured in SettingsState
+     *
+     * @param withFile Whether to include the PsiFile reference in the InertiaPage objects.
+     * @return A list of discovered Inertia pages
+     */
     public List<InertiaPage> locateReferences(boolean withFile) {
         List<InertiaPage> references = new ArrayList<>();
 
         String[] paths = SettingsState.getInstance(project).getInertiaPageComponentRootPath().split(";");
-
-        List<PsiDirectory> dirs = new ArrayList<>();
         for (String path : paths) {
             PsiDirectory potentialDir = DirectoryPsiUtil.getDirectory(
                 project,
-                StrUtil.removeDoubleSlashes(
-                    StrUtil.addSlashes(
-                        path.replace("\\", "/")
-                    )
-                )
+                StrUtil.removeDoubleSlashes(StrUtil.addSlashes(path.replace("\\", "/")))
             );
 
             if (potentialDir != null) {
-                dirs.add(potentialDir);
-            }
-        }
-
-        if (dirs.isEmpty()) {
-            return references;
-        }
-
-        for (PsiDirectory dir : dirs) {
-            for (PsiDirectory subDir : dir.getSubdirectories()) {
-                references.addAll(getPages(subDir, withFile));
+                references.addAll(getPagesInternal(potentialDir, withFile, ""));
             }
         }
 
         return references;
     }
 
-    public List<InertiaPage> getPages(PsiDirectory dir, boolean withFile) {
+    /**
+     * Recursively collect pages from the given directory
+     *
+     * @param dir        The directory to scan
+     * @param withFile   Whether to include a PsiFile reference in each InertiaPage
+     * @param parentPath The accumulated path from root directories
+     * @return           A list of Inertia pages found in this directory and its subdirectories
+     */
+    private List<InertiaPage> getPagesInternal(PsiDirectory dir, boolean withFile, String parentPath) {
 
-        List<InertiaPage> pages = new ArrayList<>(processFilesInDirectory(dir, dir.getFiles(), withFile, ""));
+        List<InertiaPage> pages = new ArrayList<>(buildPagePath(dir.getFiles(), withFile, parentPath));
 
         for (PsiDirectory subDir : dir.getSubdirectories()) {
-            pages.addAll(processFilesInDirectory(subDir, subDir.getFiles(), withFile, dir.getName()));
+            String newParentPath = parentPath.isEmpty() ? subDir.getName() : parentPath + "/" + subDir.getName();
+            pages.addAll(getPagesInternal(subDir, withFile, newParentPath));
         }
 
         return pages;
     }
 
-    private List<InertiaPage> processFilesInDirectory(PsiDirectory dir, PsiFile[] files, boolean withFile, String parentPath) {
+    /**
+     * Builds the path for all files in a single directory to detect Vue or JSX files representing Inertia pages.
+     *
+     * @param files      The array of files in this directory
+     * @param withFile   Whether to include a PsiFile reference in each InertiaPage
+     * @param parentPath The accumulated parent path segments
+     * @return           A list of Inertia pages
+     */
+    private List<InertiaPage> buildPagePath(PsiFile[] files, boolean withFile, String parentPath) {
         List<InertiaPage> pages = new ArrayList<>();
 
         for (PsiFile psiFile : files) {
-
             String fileName = psiFile.getName();
 
             if (fileName.endsWith(".vue") || fileName.endsWith(".jsx")) {
-
-                String pageName = parentPath.isEmpty() ? dir.getName() : parentPath + "/" + dir.getName();
-                pageName = pageName + "/" + fileName.replaceFirst("\\.(vue|jsx)$", "");
+                String pageName = parentPath.isEmpty() ? "" : parentPath + "/";
+                pageName += fileName.replaceFirst("\\.(vue|jsx)$", "");
 
                 if (withFile) {
                     pages.add(new InertiaPage(pageName, psiFile));
