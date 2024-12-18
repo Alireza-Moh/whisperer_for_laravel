@@ -5,7 +5,6 @@ import at.alirezamoh.idea_whisperer_for_laravel.support.strUtil.StrUtil;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.elements.impl.ArrayHashElementImpl;
 import org.jetbrains.annotations.NotNull;
@@ -114,31 +113,18 @@ public class PsiUtil {
         return false;
     }
 
-    public static boolean isAssocArray(PsiElement element) {
-        PsiElement parent = element.getParent();
-
-        if (parent != null) {
-            PsiElement prevSibling = parent.getPrevSibling();
-
-            if (prevSibling instanceof LeafPsiElement) {
-                return prevSibling.textMatches("=>");
-            }
-            else {
-                prevSibling = parent.getNextSibling() != null ? parent.getNextSibling().getNextSibling() : null;
-                return prevSibling instanceof LeafPsiElement && prevSibling.textMatches("=>");
-            }
-        }
-
-        return false;
-    }
-
-    public static boolean isInRegularArray(PsiElement element, int maxDepth) {
+    public static boolean isAssocArray(PsiElement element, int maxDepth) {
         PsiElement currentElement = element;
         int depth = 0;
 
-        while (currentElement != null && depth < maxDepth) {
-            if (currentElement instanceof ArrayCreationExpression) {
-                return true;
+        while (currentElement != null && depth <= maxDepth) {
+            if (currentElement instanceof ArrayCreationExpression arrayCreationExpression) {
+                Iterable<ArrayHashElement> iterator = arrayCreationExpression.getHashElements();
+
+                if (iterator == null || iterator.iterator().hasNext()) {
+                    return true;
+                }
+                return false;
             }
             currentElement = currentElement.getParent();
             depth++;
@@ -147,4 +133,49 @@ public class PsiUtil {
         return false;
     }
 
+    public static boolean isRegularArray(PsiElement element, int maxDepth) {
+        PsiElement currentElement = element;
+        int depth = 0;
+
+        while (currentElement != null && depth <= maxDepth) {
+            if (currentElement instanceof ArrayCreationExpression arrayCreationExpression) {
+                Iterable<ArrayHashElement> iterator = arrayCreationExpression.getHashElements();
+
+                if (iterator == null) {
+                    return true;
+                } else if (!iterator.iterator().hasNext()) {
+                    return true;
+                }
+
+                return false;
+            }
+            currentElement = currentElement.getParent();
+            depth++;
+        }
+
+        return false;
+    }
+
+    public static @Nullable ArrayCreationExpression getRegularArray(PsiElement element, int maxDepth) {
+        PsiElement currentElement = element;
+        int depth = 0;
+
+        while (currentElement != null && depth <= maxDepth) {
+            if (currentElement instanceof ArrayCreationExpression arrayCreationExpression) {
+                Iterable<ArrayHashElement> iterator = arrayCreationExpression.getHashElements();
+
+                if (iterator == null) {
+                    return arrayCreationExpression;
+                } else if (!iterator.iterator().hasNext()) {
+                    return arrayCreationExpression;
+                }
+
+                return null;
+            }
+            currentElement = currentElement.getParent();
+            depth++;
+        }
+
+        return null;
+    }
 }

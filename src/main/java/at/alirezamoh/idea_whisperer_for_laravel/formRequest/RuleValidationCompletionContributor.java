@@ -11,13 +11,12 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.lang.lexer.PhpTokenTypes;
+import com.jetbrains.php.lang.psi.elements.ArrayCreationExpression;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
-import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import com.jetbrains.php.lang.psi.elements.impl.MethodImpl;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -49,10 +48,10 @@ public class RuleValidationCompletionContributor extends CompletionContributor {
     /**
      * List of the available methods for completion
      */
-    public static Map<String, List<Integer>> RULES_METHODS = new HashMap<>() {{
-        put("validate", List.of(0));
-        put("make", List.of(1));
-        put("validateWithBag", List.of(1));
+    public static Map<String, Integer> RULES_METHODS = new HashMap<>() {{
+        put("validate", 0);
+        put("make", 1);
+        put("validateWithBag", 1);
     }};
 
 
@@ -67,14 +66,14 @@ public class RuleValidationCompletionContributor extends CompletionContributor {
 
                 @Override
                 protected void addCompletions(@NotNull CompletionParameters completionParameters, @NotNull ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
-                    PsiElement psiElement = completionParameters.getPosition().getParent();
+                    PsiElement psiElement = completionParameters.getPosition().getOriginalElement().getParent();
                     Project project = psiElement.getProject();
 
                     if (FrameworkUtils.isLaravelFrameworkNotInstalled(project)) {
                         return;
                     }
 
-                    if (psiElement instanceof StringLiteralExpression && isInsideCorrectMethod(psiElement, project)) {
+                    if (isInsideCorrectMethod(psiElement, project)) {
                         CompletionResultSet resultOnPipe = getCompletionResultSetOnPipe(psiElement, completionResultSet, completionParameters);
                         if (resultOnPipe != null) {
                             completionResultSet = resultOnPipe;
@@ -111,14 +110,14 @@ public class RuleValidationCompletionContributor extends CompletionContributor {
                 || Objects.equals(methodReference.getName(), "validateWithBag")
             )
             && isRuleParam(methodReference, psiElement)
-            && isInsideArrayOrArrayValue(psiElement);
+            && isInsideArrayValue(psiElement);
     }
 
     private boolean isInsideValidatorMethod(PsiElement psiElement, MethodReference methodReference, Project project) {
         return ClassUtils.isLaravelRelatedClass(methodReference, project)
             && Objects.equals(methodReference.getName(), "make")
             && isRuleParam(methodReference, psiElement)
-            && isInsideArrayOrArrayValue(psiElement);
+            && isInsideArrayValue(psiElement);
     }
 
     /**
@@ -127,23 +126,32 @@ public class RuleValidationCompletionContributor extends CompletionContributor {
     private boolean isInsideRulesMethod(PsiElement psiElement) {
         MethodImpl methodCall = PsiTreeUtil.getParentOfType(psiElement, MethodImpl.class);
 
-        return methodCall != null && methodCall.getName().equals("rules") && isInsideArrayOrArrayValue(psiElement);
+        return methodCall != null
+            && methodCall.getName().equals("rules")
+            && isInsideArrayValue(psiElement);
     }
 
-    private boolean isInsideArrayOrArrayValue(PsiElement psiElement) {
-        boolean isInsideArrayOrArrayValue = PsiUtil.isInRegularArray(psiElement, 10);
-
-        if (PsiUtil.isAssocArray(psiElement)) {
-            isInsideArrayOrArrayValue = PsiUtil.isInArrayValue(psiElement, 10);
+    private boolean isInsideArrayValue(PsiElement psiElement) {
+        if (PsiUtil.isRegularArray(psiElement, 10)) {
+            ArrayCreationExpression array = PsiUtil.getRegularArray(psiElement, 10);
+            if (array != null) {
+                return PsiUtil.isAssocArray(array.getParent(), 10) && PsiUtil.isInArrayValue(array, 10);
+            }
+            return false;
         }
-        return isInsideArrayOrArrayValue;
+        else {
+            return PsiUtil.isAssocArray(psiElement, 10) && PsiUtil.isInArrayValue(psiElement, 10);
+        }
     }
 
     public boolean isRuleParam(MethodReference method, PsiElement position) {
-        int paramIndex = MethodUtils.findParamIndex(position, false);
-        List<Integer> paramPositions = RULES_METHODS.get(method.getName());
+        Integer paramPositions = RULES_METHODS.get(method.getName());
 
-        return paramPositions != null && paramPositions.contains(paramIndex);
+        if (paramPositions == null) {
+            return false;
+        }
+
+        return MethodUtils.findParamIndex(position, false) == paramPositions;
     }
 
     /**
