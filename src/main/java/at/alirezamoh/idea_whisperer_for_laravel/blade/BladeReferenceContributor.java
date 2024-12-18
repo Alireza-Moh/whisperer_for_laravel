@@ -9,14 +9,12 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.*;
 import com.intellij.util.ProcessingContext;
-import com.jetbrains.php.lang.psi.elements.FunctionReference;
-import com.jetbrains.php.lang.psi.elements.MethodReference;
-import com.jetbrains.php.lang.psi.elements.PhpClass;
-import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
+import com.jetbrains.php.lang.psi.elements.*;
+import com.jetbrains.php.lang.psi.elements.impl.ArrayCreationExpressionImpl;
 import com.jetbrains.php.lang.psi.elements.impl.PhpClassImpl;
+import com.jetbrains.php.lang.psi.elements.impl.PhpPsiElementImpl;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,13 +26,19 @@ public class BladeReferenceContributor extends PsiReferenceContributor {
     /**
      * The names of the methods in the 'View' facade that can reference Blade files
      */
-    public static Map<String, List<Integer>> VIEW_METHODS = new HashMap<>() {{
-        put("make", List.of(0));
-        put("first", List.of(0));
-        put("exists", List.of(0));
-        put("composer", List.of(0));
-        put("creator", List.of(0));
-        put("view", List.of(0));
+    public static Map<String, Integer> VIEW_METHODS = new HashMap<>() {{
+        put("make", 0);
+        put("first", 0);
+        put("exists", 0);
+        put("composer", 0);
+        put("creator", 0);
+    }};
+
+    /**
+     * The names of the methods in the 'Route' facade that can reference Blade files
+     */
+    public static Map<String, Integer> ROUTE_METHODS = new HashMap<>() {{
+        put("view", 0);
     }};
 
     /**
@@ -54,26 +58,30 @@ public class BladeReferenceContributor extends PsiReferenceContributor {
     @Override
     public void registerReferenceProviders(@NotNull PsiReferenceRegistrar psiReferenceRegistrar) {
         psiReferenceRegistrar.registerReferenceProvider(
-                PlatformPatterns.psiElement(StringLiteralExpression.class),
-                new PsiReferenceProvider() {
+            PlatformPatterns.or(
+                PlatformPatterns.psiElement(StringLiteralExpression.class).withSuperParent(1, ParameterList.class),
+                PlatformPatterns.psiElement(StringLiteralExpression.class).withSuperParent(1, ArrayCreationExpressionImpl.class),
+                PlatformPatterns.psiElement(StringLiteralExpression.class).withSuperParent(1, PhpPsiElementImpl.class)
+            ),
+            new PsiReferenceProvider() {
 
-                    @Override
-                    public PsiReference @NotNull [] getReferencesByElement(@NotNull PsiElement psiElement, @NotNull ProcessingContext processingContext) {
-                        if (FrameworkUtils.isLaravelFrameworkNotInstalled(psiElement.getProject())) {
-                            return PsiReference.EMPTY_ARRAY;
-                        }
-
-                        if (isInsideViewMethods(psiElement)) {
-                            String text = psiElement.getText();
-
-                            return new PsiReference[]{new BladeReference(
-                                psiElement,
-                                new TextRange(PsiUtil.getStartOffset(text), PsiUtil.getEndOffset(text))
-                            )};
-                        }
+                @Override
+                public PsiReference @NotNull [] getReferencesByElement(@NotNull PsiElement psiElement, @NotNull ProcessingContext processingContext) {
+                    if (FrameworkUtils.isLaravelFrameworkNotInstalled(psiElement.getProject())) {
                         return PsiReference.EMPTY_ARRAY;
                     }
+
+                    if (isInsideViewMethods(psiElement)) {
+                        String text = psiElement.getText();
+
+                        return new PsiReference[]{new BladeReference(
+                            psiElement,
+                            new TextRange(PsiUtil.getStartOffset(text), PsiUtil.getEndOffset(text))
+                        )};
+                    }
+                    return PsiReference.EMPTY_ARRAY;
                 }
+            }
         );
     }
 
@@ -87,25 +95,35 @@ public class BladeReferenceContributor extends PsiReferenceContributor {
         FunctionReference function = MethodUtils.resolveFunctionReference(psiElement, 10);
         Project project = psiElement.getProject();
 
-        return (method != null && isViewParam(method, psiElement) && isViewOrRouteMethod(method, project))
-                || (function != null && isViewParam(function, psiElement));
+        return (method != null && isViewMethodParam(method, psiElement) && isViewOrRouteFacadeMethod(method, project))
+                || (function != null && isViewFunctionParam(function, psiElement));
     }
 
     /**
      * General method to check if the given reference and position match the view parameter criteria
-     * @param reference The method or function reference
+     * @param methodReference The method or function reference
      * @param position The PSI element position
      * @return True or false
      */
-    private boolean isViewParam(PsiElement reference, PsiElement position) {
-        int paramIndex = MethodUtils.findParamIndex(position, false);
-        String referenceName = (reference instanceof MethodReference)
-                ? ((MethodReference) reference).getName()
-                : ((FunctionReference) reference).getName();
+    private boolean isViewMethodParam(MethodReference methodReference, PsiElement position) {
+        Integer expectedParamIndex = VIEW_METHODS.get(methodReference.getName());
 
-        List<Integer> paramPositions = VIEW_METHODS.get(referenceName);
+        if (expectedParamIndex == null) {
+            return false;
+        }
 
-        return paramPositions != null && paramPositions.contains(paramIndex);
+        return expectedParamIndex == MethodUtils.findParamIndex(position, false);
+    }
+
+    /**
+     * General method to check if the given function and position match the view function parameter criteria
+     * @param functionReference The function reference
+     * @param position The PSI element position
+     * @return True or false
+     */
+    private boolean isViewFunctionParam(FunctionReference functionReference, PsiElement position) {
+        return ROUTE_METHODS.containsKey(functionReference.getName())
+            && 0 == MethodUtils.findParamIndex(position, false);
     }
 
     /**
@@ -114,13 +132,23 @@ public class BladeReferenceContributor extends PsiReferenceContributor {
      * @param project The project context
      * @return True or false
      */
-    private boolean isViewOrRouteMethod(MethodReference methodReference, Project project) {
+    private boolean isViewOrRouteFacadeMethod(MethodReference methodReference, Project project) {
+        String methodName = methodReference.getName();
         List<PhpClassImpl> resolvedClasses = MethodUtils.resolveMethodClasses(methodReference, project);
 
         PhpClass routeClass = ClassUtils.getClassByFQN(project, ROUTE);
         PhpClass viewClass = ClassUtils.getClassByFQN(project, VIEW);
 
-        return (routeClass != null && resolvedClasses.stream().anyMatch(clazz -> ClassUtils.isChildOf(clazz, routeClass)))
-                || (viewClass != null && resolvedClasses.stream().anyMatch(clazz -> ClassUtils.isChildOf(clazz, viewClass)));
+        return (
+            ROUTE_METHODS.containsKey(methodName)
+                && routeClass != null
+                && resolvedClasses.stream().anyMatch(clazz -> ClassUtils.isChildOf(clazz, routeClass))
+            )
+            ||
+            (
+                VIEW_METHODS.containsKey(methodName)
+                    && viewClass != null
+                    && resolvedClasses.stream().anyMatch(clazz -> ClassUtils.isChildOf(clazz, viewClass))
+            );
     }
 }

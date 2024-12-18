@@ -16,7 +16,7 @@ public class FrameworkUtils {
     private FrameworkUtils() {}
 
     public static boolean isLaravelFrameworkNotInstalled(Project project) {
-        PsiDirectory psiDirectory = DirectoryPsiUtil.getDirectory(project, "/vendor/laravel/framework/src/Illuminate/");
+        PsiDirectory psiDirectory = DirectoryPsiUtil.getDirectory(project, "/vendor/laravel/framework/");
 
         return psiDirectory == null;
     }

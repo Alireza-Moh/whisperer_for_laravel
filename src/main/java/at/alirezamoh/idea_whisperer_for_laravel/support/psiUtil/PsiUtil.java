@@ -8,6 +8,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.elements.impl.ArrayHashElementImpl;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -20,7 +21,7 @@ public class PsiUtil {
      * @param key The config key
      * @return The LookupElementBuilder
      */
-    public static LookupElementBuilder buildSimpleLookupElement(String key) {
+    public static @NotNull LookupElementBuilder buildSimpleLookupElement(String key) {
         return LookupElementBuilder
             .create(key)
             .withLookupString(key)
