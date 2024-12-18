@@ -68,6 +68,9 @@
         <psi.referenceContributor language="PHP" implementation="at.alirezamoh.idea_whisperer_for_laravel.eloquent.table.TableReferenceContributor"/>
 
         <completion.contributor language="PHP" implementationClass="at.alirezamoh.idea_whisperer_for_laravel.formRequest.RuleValidationCompletionContributor"/>
+        <completion.contributor language="XML" implementationClass="at.alirezamoh.idea_whisperer_for_laravel.blade.component.BladeXComponentCompletionContributor"/>
+
+        <gotoDeclarationHandler implementation="at.alirezamoh.idea_whisperer_for_laravel.blade.component.BladeXComponentGotoDeclarationHandler"/>
 
         <codeInsight.template.postfixTemplateProvider language="PHP" implementationClass="at.alirezamoh.idea_whisperer_for_laravel.postfixes.dd.DDPostfixProvider" />
 
