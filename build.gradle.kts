@@ -3,7 +3,7 @@ plugins {
     id("org.jetbrains.intellij.platform") version "2.1.0"
 }
 
-group = "at.alirezamoh.idea-whisperer-for-laravel"
+group = "at.alirezamoh.whisperer-for-laravel"
 version = "1.1.0"
 
 repositories {
