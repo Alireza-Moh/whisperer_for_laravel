@@ -5,4 +5,4 @@ pluginManagement {
     }
 }
 
-rootProject.name = "idea-whisperer-for-laravel"
+rootProject.name = "whisperer-for-laravel"
