@@ -32,13 +32,14 @@ public class BladeReferenceContributor extends PsiReferenceContributor {
         put("exists", 0);
         put("composer", 0);
         put("creator", 0);
+        put("view", 1);
     }};
 
     /**
      * The names of the methods in the 'Route' facade that can reference Blade files
      */
     public static Map<String, Integer> ROUTE_METHODS = new HashMap<>() {{
-        put("view", 0);
+        put("view", 1);
     }};
 
     /**
@@ -91,39 +92,15 @@ public class BladeReferenceContributor extends PsiReferenceContributor {
      * @return True or false
      */
     private boolean isInsideViewMethods(@NotNull PsiElement psiElement) {
-        MethodReference method = MethodUtils.resolveMethodReference(psiElement, 10);
-        FunctionReference function = MethodUtils.resolveFunctionReference(psiElement, 10);
         Project project = psiElement.getProject();
 
-        return (method != null && isViewMethodParam(method, psiElement) && isViewOrRouteFacadeMethod(method, project))
-                || (function != null && isViewFunctionParam(function, psiElement));
-    }
-
-    /**
-     * General method to check if the given reference and position match the view parameter criteria
-     * @param methodReference The method or function reference
-     * @param position The PSI element position
-     * @return True or false
-     */
-    private boolean isViewMethodParam(MethodReference methodReference, PsiElement position) {
-        Integer expectedParamIndex = VIEW_METHODS.get(methodReference.getName());
-
-        if (expectedParamIndex == null) {
-            return false;
+        MethodReference method = MethodUtils.resolveMethodReference(psiElement, 10);
+        if (method != null) {
+            return isViewMethodParam(method, psiElement) && isViewOrRouteFacadeMethod(method, project);
         }
 
-        return expectedParamIndex == MethodUtils.findParamIndex(position, false);
-    }
-
-    /**
-     * General method to check if the given function and position match the view function parameter criteria
-     * @param functionReference The function reference
-     * @param position The PSI element position
-     * @return True or false
-     */
-    private boolean isViewFunctionParam(FunctionReference functionReference, PsiElement position) {
-        return ROUTE_METHODS.containsKey(functionReference.getName())
-            && 0 == MethodUtils.findParamIndex(position, false);
+        FunctionReference function = MethodUtils.resolveFunctionReference(psiElement, 10);
+        return function != null && isViewFunctionParam(function, psiElement);
     }
 
     /**
@@ -139,16 +116,59 @@ public class BladeReferenceContributor extends PsiReferenceContributor {
         PhpClass routeClass = ClassUtils.getClassByFQN(project, ROUTE);
         PhpClass viewClass = ClassUtils.getClassByFQN(project, VIEW);
 
-        return (
-            ROUTE_METHODS.containsKey(methodName)
-                && routeClass != null
-                && resolvedClasses.stream().anyMatch(clazz -> ClassUtils.isChildOf(clazz, routeClass))
-            )
-            ||
-            (
-                VIEW_METHODS.containsKey(methodName)
-                    && viewClass != null
-                    && resolvedClasses.stream().anyMatch(clazz -> ClassUtils.isChildOf(clazz, viewClass))
-            );
+        return isExpectedFacadeMethod(methodName, resolvedClasses, routeClass, ROUTE_METHODS)
+            || isExpectedFacadeMethod(methodName, resolvedClasses, viewClass, VIEW_METHODS);
+    }
+
+    /**
+     * Checks if a method matches the expected facade class and method map.
+     *
+     * @param methodName The method name.
+     * @param resolvedClasses The list of resolved classes for the method.
+     * @param expectedClass The expected facade class.
+     * @param methodMap The map containing method names and expected parameter indices.
+     * @return true or false
+     */
+    private boolean isExpectedFacadeMethod(String methodName, List<PhpClassImpl> resolvedClasses, PhpClass expectedClass, Map<String, Integer> methodMap) {
+        boolean index = methodMap.containsKey(methodName);
+        boolean s =resolvedClasses.stream().anyMatch(clazz -> ClassUtils.isChildOf(clazz, expectedClass));
+        return methodMap.containsKey(methodName)
+            && expectedClass != null
+            && resolvedClasses.stream().anyMatch(clazz -> ClassUtils.isChildOf(clazz, expectedClass));
+    }
+
+    /**
+     * Checks if a method reference matches a parameter in the 'View' methods.
+     *
+     * @param methodReference The method reference.
+     * @param position The PSI element position.
+     * @return true or false
+     */
+    private boolean isViewMethodParam(MethodReference methodReference, PsiElement position) {
+        return isExpectedParam(position, methodReference.getName(), VIEW_METHODS);
+    }
+
+    /**
+     * Checks if a function reference matches a parameter in the 'Route' methods.
+     *
+     * @param functionReference The function reference.
+     * @param position The PSI element position.
+     * @return true or false
+     */
+    private boolean isViewFunctionParam(FunctionReference functionReference, PsiElement position) {
+        return isExpectedParam(position, functionReference.getName(), ROUTE_METHODS);
+    }
+
+    /**
+     * Generalized logic to check if a parameter matches the expected method and map.
+     *
+     * @param position The PSI element position.
+     * @param methodName The method name.
+     * @param methodMap The map containing method names and expected parameter indices.
+     * @return true or false
+     */
+    private boolean isExpectedParam(PsiElement position, String methodName, Map<String, Integer> methodMap) {
+        Integer expectedParamIndex = methodMap.get(methodName);
+        return expectedParamIndex != null && expectedParamIndex == MethodUtils.findParamIndex(position, false);
     }
 }

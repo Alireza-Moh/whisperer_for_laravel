@@ -35,7 +35,7 @@ public class MethodUtils extends PhpElementVisitor {
         return resolveMethodReference(element.getParent(), depthLimit - 1);
     }
 
-    public static FunctionReference resolveFunctionReference(PsiElement element, int depthLimit) {
+    public static @Nullable FunctionReference resolveFunctionReference(PsiElement element, int depthLimit) {
         if (element == null || depthLimit <= 0) {
             return null;
         }
