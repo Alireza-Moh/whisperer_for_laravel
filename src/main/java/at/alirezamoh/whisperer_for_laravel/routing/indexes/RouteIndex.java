@@ -20,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 public class RouteIndex extends FileBasedIndexExtension<String, List<RouteData>> {
-    public static final ID<String, List<RouteData>> INDEX_ID = ID.create("idea_whisperer_for_laravel.routing");
+    public static final ID<String, List<RouteData>> INDEX_ID = ID.create("whisperer_for_laravel.routing");
 
     /**
      * The name of the method used to define route names

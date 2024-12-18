@@ -5,6 +5,7 @@ import at.alirezamoh.whisperer_for_laravel.actions.models.dataTables.Field;
 import at.alirezamoh.whisperer_for_laravel.actions.models.dataTables.Method;
 import at.alirezamoh.whisperer_for_laravel.actions.models.dataTables.Relation;
 import at.alirezamoh.whisperer_for_laravel.actions.models.dataTables.Table;
+import at.alirezamoh.whisperer_for_laravel.eloquent.table.indexes.TableIndex;
 import at.alirezamoh.whisperer_for_laravel.support.codeGeneration.vistors.MigrationVisitor;
 import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.ClassUtils;
 import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.LaravelPaths;
@@ -12,10 +13,11 @@ import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.MethodUtils;
 import at.alirezamoh.whisperer_for_laravel.support.providers.ModelProvider;
 import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
-import com.jetbrains.php.PhpIndex;
+import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.*;
+import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.util.indexing.FileBasedIndex;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.impl.*;
 import org.jetbrains.annotations.NotNull;
@@ -98,47 +100,45 @@ public class MigrationManager {
         return models;
     }
 
-    public List<Table> getTables() {
-        searchForMigrations();
-        removeDuplicatedTable();
-
-        return tables;
-    }
-
     private void getAllModels(Project project) {
         ModelProvider modelProvider = new ModelProvider(project, true);
         this.originalModels = modelProvider.getOriginalModels();
     }
 
     private void searchForMigrations() {
-        PhpClass baseMigration = ClassUtils.getClassByFQN(project, BASE_MIGRATION_CLASS);
-        List<PhpClass> migrationClasses = new ArrayList<>();
+        List<String> flattenedPaths = new ArrayList<>();
 
-        if (baseMigration != null) {
-            PhpIndex phpIndex = PhpIndex.getInstance(project);
-            collectPhpClassesFromDirectory(baseMigration.getFQN(), phpIndex, migrationClasses);
+        FileBasedIndex fileBasedIndex = FileBasedIndex.getInstance();
 
-            for (PhpClass migrationClass : migrationClasses) {
-                MigrationVisitor migrationVisitor = new MigrationVisitor();
-                migrationClass.acceptChildren(migrationVisitor);
-                tables.addAll(migrationVisitor.getTables());
-            }
+        Collection<String> allKeys = fileBasedIndex.getAllKeys(TableIndex.INDEX_ID, project);
+
+        for (String key : allKeys) {
+            fileBasedIndex.processValues(
+                TableIndex.INDEX_ID,
+                key,
+                null,
+                (file, value) -> {
+                    if (value != null) {
+                        flattenedPaths.addAll(value);
+                    }
+                    return true;
+                },
+                GlobalSearchScope.allScope(project)
+            );
         }
-    }
 
-    /**
-     * Recursively collect all PHP classes within a directory
-     *
-     * @param collectedClasses   A list to collect found php classes
-     */
-    private static void collectPhpClassesFromDirectory(String classFQN, PhpIndex phpIndex, @NotNull List<PhpClass> collectedClasses) {
-        Collection<PhpClass> subclasses = phpIndex.getDirectSubclasses(classFQN);
 
-        for (PhpClass subclass : subclasses) {
-            if (subclass.isAbstract()) {
-                collectPhpClassesFromDirectory(subclass.getFQN(), phpIndex, collectedClasses);
-            } else {
-                collectedClasses.add(subclass);
+        for (String migrationFilePath : flattenedPaths) {
+            VirtualFile targetFile = LocalFileSystem.getInstance().findFileByPath(migrationFilePath);
+
+            if (targetFile != null) {
+                PsiFile psiFile = PsiManager.getInstance(project).findFile(targetFile);
+
+                if (psiFile != null) {
+                    MigrationVisitor migrationVisitor = new MigrationVisitor();
+                    psiFile.acceptChildren(migrationVisitor);
+                    tables.addAll(migrationVisitor.getTables());
+                }
             }
         }
     }

@@ -1,17 +1,21 @@
 package at.alirezamoh.whisperer_for_laravel.eloquent.table;
 
-import at.alirezamoh.whisperer_for_laravel.actions.models.dataTables.Table;
-import at.alirezamoh.whisperer_for_laravel.support.codeGeneration.MigrationManager;
+import at.alirezamoh.whisperer_for_laravel.eloquent.table.indexes.TableIndex;
 import at.alirezamoh.whisperer_for_laravel.support.psiUtil.PsiUtil;
 import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
+import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
+import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.util.indexing.FileBasedIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class TableReference extends PsiReferenceBase<PsiElement> implements PsiPolyVariantReference {
@@ -37,32 +41,52 @@ public class TableReference extends PsiReferenceBase<PsiElement> implements PsiP
 
     @Override
     public ResolveResult @NotNull [] multiResolve(boolean b) {
-        MigrationManager migrationManager = new MigrationManager(project);
+        String text = StrUtil.removeQuotes(myElement.getText());
 
-        List<ResolveResult> resolveResults = new ArrayList<>();
 
-        for (Table table : migrationManager.getTables()) {
-            if (table.name().equals(StrUtil.removeQuotes(myElement.getText()))) {
-                resolveResults.add(
-                    new PsiElementResolveResult(
-                        table.navigationElement()
-                    )
-                );
+        List <List<String>> paths = FileBasedIndex.getInstance().getValues(
+            TableIndex.INDEX_ID,
+            text,
+            GlobalSearchScope.allScope(project)
+        );
+
+        if (paths.isEmpty()) {
+            return ResolveResult.EMPTY_ARRAY;
+        }
+
+        List<String> flattenedPaths = new ArrayList<>();
+        for (List<String> pathList : paths) {
+            if (pathList != null) {
+                flattenedPaths.addAll(pathList);
             }
         }
 
-        return resolveResults.toArray(new ResolveResult[0]);
+        List<ResolveResult> results = new ArrayList<>();
+        for (String path : flattenedPaths) {
+            if (path != null) {
+                VirtualFile targetFile = LocalFileSystem.getInstance().findFileByPath(path);
+
+                if (targetFile != null) {
+                    PsiFile psiFile = PsiManager.getInstance(project).findFile(targetFile);
+
+                    if (psiFile != null) {
+                        results.add(new PsiElementResolveResult(psiFile));
+                    }
+                }
+            }
+        }
+
+        return results.toArray(new ResolveResult[0]);
     }
 
     @Override
     public Object @NotNull [] getVariants() {
-        MigrationManager migrationManager = new MigrationManager(project);
-
         List<LookupElementBuilder> variants = new ArrayList<>();
+        Collection<String> tables = FileBasedIndex.getInstance().getAllKeys(TableIndex.INDEX_ID, project);
 
-        for (Table table : migrationManager.getTables()) {
+        for (String table : tables) {
             variants.add(
-                PsiUtil.buildSimpleLookupElement(table.name())
+                PsiUtil.buildSimpleLookupElement(table)
             );
         }
 
