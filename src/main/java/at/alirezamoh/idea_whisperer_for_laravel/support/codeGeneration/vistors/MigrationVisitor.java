@@ -70,11 +70,15 @@ public class MigrationVisitor extends PsiRecursiveElementWalkingVisitor {
         if (parameterTableName instanceof StringLiteralExpression) {
             String tableName = StrUtil.removeQuotes(parameterTableName.getText());
 
+            if (tableName.isEmpty()) {
+                return;
+            }
+
             boolean tableExists = tables.stream().anyMatch(table -> table.name().equals(tableName));
             currentTableName = tableName;
 
             if (!tableExists) {
-                tables.add(new Table(currentTableName, new ArrayList<>()));
+                tables.add(new Table(currentTableName, methodReference, new ArrayList<>()));
             }
 
             getFieldsForTable(methodReference);

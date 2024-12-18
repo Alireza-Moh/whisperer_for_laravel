@@ -65,9 +65,9 @@
         <psi.referenceContributor language="PHP" implementation="at.alirezamoh.idea_whisperer_for_laravel.routing.RouteReferenceContributor"/>
         <psi.referenceContributor language="PHP" implementation="at.alirezamoh.idea_whisperer_for_laravel.gate.GateReferenceContributor"/>
         <psi.referenceContributor language="PHP" implementation="at.alirezamoh.idea_whisperer_for_laravel.inertia.InertiaReferenceContributor"/>
+        <psi.referenceContributor language="PHP" implementation="at.alirezamoh.idea_whisperer_for_laravel.eloquent.table.TableReferenceContributor"/>
 
         <completion.contributor language="PHP" implementationClass="at.alirezamoh.idea_whisperer_for_laravel.formRequest.RuleValidationCompletionContributor"/>
-        <completion.contributor language="PHP" implementationClass="at.alirezamoh.idea_whisperer_for_laravel.eloquent.TableCompletionContributor"/>
 
         <codeInsight.template.postfixTemplateProvider language="PHP" implementationClass="at.alirezamoh.idea_whisperer_for_laravel.postfixes.dd.DDPostfixProvider" />
 

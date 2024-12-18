@@ -5,20 +5,17 @@ import at.alirezamoh.idea_whisperer_for_laravel.actions.models.dataTables.Field;
 import at.alirezamoh.idea_whisperer_for_laravel.actions.models.dataTables.Method;
 import at.alirezamoh.idea_whisperer_for_laravel.actions.models.dataTables.Relation;
 import at.alirezamoh.idea_whisperer_for_laravel.actions.models.dataTables.Table;
-import at.alirezamoh.idea_whisperer_for_laravel.settings.SettingsState;
-import at.alirezamoh.idea_whisperer_for_laravel.support.ProjectDefaultPaths;
 import at.alirezamoh.idea_whisperer_for_laravel.support.codeGeneration.vistors.MigrationVisitor;
-import at.alirezamoh.idea_whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
 import at.alirezamoh.idea_whisperer_for_laravel.support.laravelUtils.ClassUtils;
 import at.alirezamoh.idea_whisperer_for_laravel.support.laravelUtils.LaravelPaths;
 import at.alirezamoh.idea_whisperer_for_laravel.support.laravelUtils.MethodUtils;
 import at.alirezamoh.idea_whisperer_for_laravel.support.providers.ModelProvider;
 import at.alirezamoh.idea_whisperer_for_laravel.support.strUtil.StrUtil;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
+import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.impl.*;
 import org.jetbrains.annotations.NotNull;
@@ -27,7 +24,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 public class MigrationManager {
-    static final String ELOQUENT_BUILDER_NAMESPACE = "\\Illuminate\\Database\\Eloquent\\Builder";
+    public static final String ELOQUENT_BUILDER_NAMESPACE = "\\Illuminate\\Database\\Eloquent\\Builder";
+
+    private static final String BASE_MIGRATION_CLASS = "\\Illuminate\\Database\\Migrations\\Migration";
 
     public static Map<String, Integer> RELATION_METHODS = new HashMap<>() {{
         put("belongsTo", 0);
@@ -46,8 +45,6 @@ public class MigrationManager {
 
     private Project project;
 
-    private SettingsState projectSettingsState;
-
     private List<LaravelModel> models = new ArrayList<>();
 
     private Collection<PsiFile> originalModels = new ArrayList<>();
@@ -56,7 +53,6 @@ public class MigrationManager {
 
     public MigrationManager(Project project) {
         this.project = project;
-        this.projectSettingsState = SettingsState.getInstance(project);
 
         getAllModels(project);
     }
@@ -115,24 +111,35 @@ public class MigrationManager {
     }
 
     private void searchForMigrations() {
-        String defaultMigrationPath = ProjectDefaultPaths.MIGRATION_PATH;
-        if (!projectSettingsState.isLaravelDirectoryEmpty()) {
-            defaultMigrationPath = StrUtil.addSlashes(
-                projectSettingsState.getLaravelDirectoryPath(),
-                false,
-                true
-            ) + ProjectDefaultPaths.MIGRATION_PATH;
-        }
+        PhpClass baseMigration = ClassUtils.getClassByFQN(project, BASE_MIGRATION_CLASS);
+        List<PhpClass> migrationClasses = new ArrayList<>();
 
-        Collection<PsiFile> migrations = DirectoryPsiUtil.getFilesRecursively(project, defaultMigrationPath);
-        if (projectSettingsState.isModuleApplication()) {
-            searchForMigrationsInModules(migrations);
-        }
+        if (baseMigration != null) {
+            PhpIndex phpIndex = PhpIndex.getInstance(project);
+            collectPhpClassesFromDirectory(baseMigration.getFQN(), phpIndex, migrationClasses);
 
-        for (PsiFile migration : migrations) {
-            MigrationVisitor migrationVisitor = new MigrationVisitor();
-            migration.acceptChildren(migrationVisitor);
-            tables.addAll(migrationVisitor.getTables());
+            for (PhpClass migrationClass : migrationClasses) {
+                MigrationVisitor migrationVisitor = new MigrationVisitor();
+                migrationClass.acceptChildren(migrationVisitor);
+                tables.addAll(migrationVisitor.getTables());
+            }
+        }
+    }
+
+    /**
+     * Recursively collect all PHP classes within a directory
+     *
+     * @param collectedClasses   A list to collect found php classes
+     */
+    private static void collectPhpClassesFromDirectory(String classFQN, PhpIndex phpIndex, @NotNull List<PhpClass> collectedClasses) {
+        Collection<PhpClass> subclasses = phpIndex.getDirectSubclasses(classFQN);
+
+        for (PhpClass subclass : subclasses) {
+            if (subclass.isAbstract()) {
+                collectPhpClassesFromDirectory(subclass.getFQN(), phpIndex, collectedClasses);
+            } else {
+                collectedClasses.add(subclass);
+            }
         }
     }
 
@@ -149,7 +156,7 @@ public class MigrationManager {
 
                 existingTable.fields().addAll(currentTable.fields());
             } else {
-                mergedTables.add(new Table(currentTable.name(), currentTable.fields()));
+                mergedTables.add(new Table(currentTable.name(), currentTable.navigationElement(), currentTable.fields()));
             }
         }
 
@@ -230,32 +237,6 @@ public class MigrationManager {
                 method.setReturnType(ELOQUENT_BUILDER_NAMESPACE + "|" + laravelModel.getModelName());
                 method.addParameter("value", "mixed", "");
                 laravelModel.addMethod(method);
-            }
-        }
-    }
-
-    private void searchForMigrationsInModules(Collection<PsiFile> migrations) {
-        String modulesRootDirectoryPath = StrUtil.addSlashes(projectSettingsState.getModulesDirectoryPath());
-
-        if (!projectSettingsState.isLaravelDirectoryEmpty()) {
-            modulesRootDirectoryPath =
-                modulesRootDirectoryPath
-                + StrUtil.addSlashes(
-                    projectSettingsState.getLaravelDirectoryPath(),
-                    true,
-                    false
-                );
-        }
-
-        PsiDirectory rootDir = DirectoryPsiUtil.getDirectory(project, modulesRootDirectoryPath);
-        if (rootDir != null) {
-            for (PsiDirectory module : rootDir.getSubdirectories()) {
-                migrations.addAll(
-                    DirectoryPsiUtil.getFilesRecursively(
-                        project,
-                        modulesRootDirectoryPath + module.getName() + ProjectDefaultPaths.MIGRATION_PATH
-                    )
-                );
             }
         }
     }
