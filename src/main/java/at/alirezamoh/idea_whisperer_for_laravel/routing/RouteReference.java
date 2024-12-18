@@ -1,15 +1,26 @@
 package at.alirezamoh.idea_whisperer_for_laravel.routing;
 
-import at.alirezamoh.idea_whisperer_for_laravel.routing.util.RouteUtil;
-import at.alirezamoh.idea_whisperer_for_laravel.routing.visitor.RouteNameFinder;
-import at.alirezamoh.idea_whisperer_for_laravel.routing.visitor.RouteNamesCollector;
+import at.alirezamoh.idea_whisperer_for_laravel.routing.indexes.RouteData;
+import at.alirezamoh.idea_whisperer_for_laravel.routing.indexes.RouteIndex;
+import at.alirezamoh.idea_whisperer_for_laravel.support.IdeaWhispererForLaravelIcon;
+import at.alirezamoh.idea_whisperer_for_laravel.support.strUtil.StrUtil;
+import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
+import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiReferenceBase;
+import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.util.indexing.FileBasedIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Provides references to Laravel routes within a project
@@ -24,11 +35,6 @@ public class RouteReference extends PsiReferenceBase<PsiElement> {
     private Project project;
 
     /**
-     * Collects route names
-     */
-    private RouteNamesCollector routeNamesCollector;
-
-    /**
      * @param element        The PSI element representing the route name reference
      * @param rangeInElement The text range of the reference within the element
      */
@@ -36,7 +42,6 @@ public class RouteReference extends PsiReferenceBase<PsiElement> {
         super(element, rangeInElement);
 
         this.project = element.getProject();
-        this.routeNamesCollector = new RouteNamesCollector(this.project);
     }
 
     /**
@@ -47,18 +52,38 @@ public class RouteReference extends PsiReferenceBase<PsiElement> {
      */
     @Override
     public @Nullable PsiElement resolve() {
-        RouteNameFinder routeNameFinder = new RouteNameFinder(myElement);
+        String routeName = StrUtil.removeQuotes(myElement.getText());
+        AtomicReference<PsiElement> foundedElement = new AtomicReference<>();
 
-        for (PsiFile routeFile : RouteUtil.getAllRouteFiles(project)) {
-            routeFile.accept(routeNameFinder);
-            PsiElement foundedRoute = routeNameFinder.getFoundedRoute();
+        FileBasedIndex.getInstance().processAllKeys(RouteIndex.INDEX_ID, fileName -> {
+            List<List<RouteData>> routes = FileBasedIndex.getInstance()
+                .getValues(RouteIndex.INDEX_ID, fileName, GlobalSearchScope.projectScope(project));
 
-            if (foundedRoute != null) {
-                return foundedRoute;
+            for (List<RouteData> allRoutes : routes) {
+                for (RouteData route : allRoutes) {
+                    if (route.name().equals(routeName)) {
+                        VirtualFile virtualFile = LocalFileSystem.getInstance().findFileByPath(route.filePath());
+
+                        if (virtualFile == null) {
+                            return false;
+                        }
+
+                        PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualFile);
+                        if (psiFile != null) {
+                            PsiElement element = psiFile.findElementAt(route.offset());
+                            if (element != null) {
+                                foundedElement.set(element);
+
+                                break;
+                            }
+                        }
+                    }
+                }
             }
-        }
+            return true;
+        }, project);
 
-        return null;
+        return foundedElement.get();
     }
 
     /**
@@ -67,6 +92,26 @@ public class RouteReference extends PsiReferenceBase<PsiElement> {
      */
     @Override
     public Object @NotNull [] getVariants() {
-        return routeNamesCollector.startSearching().toArray();
+        List<LookupElementBuilder> variants = new ArrayList<>();
+
+        FileBasedIndex.getInstance().processAllKeys(RouteIndex.INDEX_ID, key -> {
+            List<List<RouteData>> routes = FileBasedIndex.getInstance()
+                .getValues(RouteIndex.INDEX_ID, key, GlobalSearchScope.projectScope(project));
+
+            for (List<RouteData> allRoutes : routes) {
+                for (RouteData route : allRoutes) {
+                    variants.add(
+                        LookupElementBuilder
+                            .create(route.name())
+                            .bold()
+                            .withTypeText(route.uri(), true)
+                            .withIcon(IdeaWhispererForLaravelIcon.LARAVEL_ICON)
+                    );
+                }
+            }
+            return true;
+        }, project);
+
+        return variants.toArray();
     }
 }

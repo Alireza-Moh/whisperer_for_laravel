@@ -55,6 +55,8 @@
 
         <postStartupActivity implementation="at.alirezamoh.idea_whisperer_for_laravel.settings.LaravelStartupActivity"/>
 
+        <fileBasedIndex implementation="at.alirezamoh.idea_whisperer_for_laravel.routing.indexes.RouteIndex"/>
+
         <projectConfigurable parentId="language" instance="at.alirezamoh.idea_whisperer_for_laravel.settings.SettingConfigurable" id="idea_whisperer_for_laravel_settings" displayName="Idea Whisperer For Laravel" nonDefaultProject="true"/>
         <projectService serviceImplementation="at.alirezamoh.idea_whisperer_for_laravel.settings.SettingsState"/>
 
@@ -73,8 +75,6 @@
         <gotoDeclarationHandler implementation="at.alirezamoh.idea_whisperer_for_laravel.blade.component.BladeXComponentGotoDeclarationHandler"/>
 
         <codeInsight.template.postfixTemplateProvider language="PHP" implementationClass="at.alirezamoh.idea_whisperer_for_laravel.postfixes.dd.DDPostfixProvider" />
-
-        <codeInsight.lineMarkerProvider language="PHP" implementationClass="at.alirezamoh.idea_whisperer_for_laravel.routing.RouteLineMarker" />
 
         <errorHandler implementation="com.intellij.diagnostic.JetBrainsMarketplaceErrorReportSubmitter"/>
     </extensions>
