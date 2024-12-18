@@ -1,15 +1,15 @@
 # ![Whisperer For Laravel](src/main/resources/META-INF/pluginIcon.svg)
 
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
-![JetBrains Plugin Version](https://img.shields.io/jetbrains/plugin/v/at.alirezamoh.idea_whisperer_for_laravel)
+![JetBrains Plugin Version](https://img.shields.io/jetbrains/plugin/v/at.alirezamoh.whisperer_for_laravel)
 
 # Whisperer For Laravel
 
 Whisperer For Laravel is a PhpStorm plugin designed to boost your productivity by streamlining the development process for Laravel applications. With a set of powerful features, this plugin helps you work faster when developing Laravel applications in PhpStorm.
 
-[GitHub Issues page](https://alireza-moh.github.io/idea-whisperer-for-laravel-docs/)
+[Documentation](https://alireza-moh.github.io/whisperer-for-laravel-docs/)
 
-[Issues](https://github.com/Alireza-Moh/idea_whisperer_for_laravel/issues)
+[Issues](https://github.com/Alireza-Moh/whisperer_for_laravel/issues)
 
 [Plugin](https://plugins.jetbrains.com/plugin/26042-whisperer-for-laravel)
 
