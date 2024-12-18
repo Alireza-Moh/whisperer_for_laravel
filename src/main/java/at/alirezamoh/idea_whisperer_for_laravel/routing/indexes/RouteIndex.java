@@ -1,5 +1,6 @@
 package at.alirezamoh.idea_whisperer_for_laravel.routing.indexes;
 
+import at.alirezamoh.idea_whisperer_for_laravel.support.laravelUtils.FrameworkUtils;
 import at.alirezamoh.idea_whisperer_for_laravel.support.strUtil.StrUtil;
 import com.intellij.lang.javascript.index.gist.ListExternalizer;
 import com.intellij.psi.PsiElement;
@@ -58,6 +59,10 @@ public class RouteIndex extends FileBasedIndexExtension<String, List<RouteData>>
     @Override
     public @NotNull  DataIndexer<String, List<RouteData>, FileContent> getIndexer() {
         return inputData -> {
+            if (!FrameworkUtils.isLaravelProject(inputData.getProject())) {
+                return Collections.emptyMap();
+            }
+
             PsiFile file = inputData.getPsiFile();
 
             if (!(file instanceof PhpFile)) {
