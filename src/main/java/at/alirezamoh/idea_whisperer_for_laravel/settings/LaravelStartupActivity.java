@@ -1,6 +1,5 @@
 package at.alirezamoh.idea_whisperer_for_laravel.settings;
 
-import at.alirezamoh.idea_whisperer_for_laravel.support.laravelUtils.FrameworkUtils;
 import at.alirezamoh.idea_whisperer_for_laravel.support.laravelUtils.MethodUtils;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.ProjectActivity;
@@ -14,28 +13,26 @@ public class LaravelStartupActivity implements ProjectActivity {
     @Override
     public @Nullable Object execute(@NotNull Project project, @NotNull Continuation<? super Unit> continuation) {
         if (!MethodUtils.isDumbMode(project)) {
-            if (FrameworkUtils.isLaravelProject(project)) {
-                SettingsState settingsState = SettingsState.getInstance(project);
+            SettingsState settingsState = SettingsState.getInstance(project);
 
-                if (settingsState.isLaravelDirectoryEmpty()) {
-                    settingsState.setLaravelDirectoryPath("");
-                }
+            if (settingsState.isLaravelDirectoryEmpty()) {
+                settingsState.setLaravelDirectoryPath("");
+            }
 
-                if (settingsState.getProjectType() == null) {
-                    settingsState.setProjectType("Standard Application");
-                }
+            if (settingsState.getProjectType() == null) {
+                settingsState.setProjectType("Standard Application");
+            }
 
-                if (settingsState.getModulesDirectoryPath() == null) {
-                    settingsState.setModulesDirectoryPath("Modules");
-                }
+            if (settingsState.getModulesDirectoryPath() == null) {
+                settingsState.setModulesDirectoryPath("Modules");
+            }
 
-                if (settingsState.isModuleSrcDirectoryEmpty()) {
-                    settingsState.setModuleSrcDirectoryPath("app");
-                }
+            if (settingsState.isModuleSrcDirectoryEmpty()) {
+                settingsState.setModuleSrcDirectoryPath("app");
+            }
 
-                if (settingsState.getInertiaPageComponentRootPath() == null) {
-                    settingsState.setInertiaPageComponentRootPath("resources/js/Pages;");
-                }
+            if (settingsState.getInertiaPageComponentRootPath() == null) {
+                settingsState.setInertiaPageComponentRootPath("resources/js/Pages;");
             }
         }
 
