@@ -70,10 +70,11 @@
         <psi.referenceContributor language="PHP" implementation="at.alirezamoh.whisperer_for_laravel.inertia.InertiaReferenceContributor"/>
         <psi.referenceContributor language="PHP" implementation="at.alirezamoh.whisperer_for_laravel.eloquent.table.TableReferenceContributor"/>
 
-        <completion.contributor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.formRequest.RuleValidationCompletionContributor"/>
+        <completion.contributor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.request.validation.RuleValidationCompletionContributor"/>
         <completion.contributor language="XML" implementationClass="at.alirezamoh.whisperer_for_laravel.blade.component.BladeXComponentCompletionContributor"/>
 
         <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.blade.component.BladeXComponentGotoDeclarationHandler"/>
+        <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.request.validation.RuleValidationGotoDeclarationHandler"/>
 
         <codeInsight.template.postfixTemplateProvider language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.postfixes.dd.DDPostfixProvider" />
 

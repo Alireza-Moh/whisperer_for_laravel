@@ -121,10 +121,8 @@ public class PsiUtil {
             if (currentElement instanceof ArrayCreationExpression arrayCreationExpression) {
                 Iterable<ArrayHashElement> iterator = arrayCreationExpression.getHashElements();
 
-                if (iterator == null || iterator.iterator().hasNext()) {
-                    return true;
-                }
-                return false;
+                boolean s = iterator.iterator().hasNext();
+                return iterator.iterator().hasNext();
             }
             currentElement = currentElement.getParent();
             depth++;
