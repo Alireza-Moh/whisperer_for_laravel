@@ -5,7 +5,7 @@ import at.alirezamoh.whisperer_for_laravel.actions.models.dataTables.Field;
 import at.alirezamoh.whisperer_for_laravel.actions.models.dataTables.Method;
 import at.alirezamoh.whisperer_for_laravel.actions.models.dataTables.Relation;
 import at.alirezamoh.whisperer_for_laravel.actions.models.dataTables.Table;
-import at.alirezamoh.whisperer_for_laravel.eloquent.table.indexes.TableIndex;
+import at.alirezamoh.whisperer_for_laravel.indexing.TableIndex;
 import at.alirezamoh.whisperer_for_laravel.support.codeGeneration.vistors.MigrationVisitor;
 import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.ClassUtils;
 import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.LaravelPaths;
@@ -13,7 +13,6 @@ import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.MethodUtils;
 import at.alirezamoh.whisperer_for_laravel.support.providers.ModelProvider;
 import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
@@ -25,10 +24,14 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
+
+/**
+ * Manages Laravel migration files and generates corresponding model information
+ * This class processes migrations to extract table structure, fields, and relationships
+ * and generates Laravel models enriched with helper methods and relations
+ */
 public class MigrationManager {
     public static final String ELOQUENT_BUILDER_NAMESPACE = "\\Illuminate\\Database\\Eloquent\\Builder";
-
-    private static final String BASE_MIGRATION_CLASS = "\\Illuminate\\Database\\Migrations\\Migration";
 
     public static Map<String, Integer> RELATION_METHODS = new HashMap<>() {{
         put("belongsTo", 0);
@@ -59,6 +62,11 @@ public class MigrationManager {
         getAllModels(project);
     }
 
+    /**
+     * Processes all migrations, resolves models, and generates Laravel models
+     *
+     * @return a list of generated Laravel models with fields and relationships
+     */
     public List<LaravelModel> visit() {
         searchForMigrations();
         removeDuplicatedTable();
@@ -100,49 +108,50 @@ public class MigrationManager {
         return models;
     }
 
+    /**
+     * Retrieves all original laravel models available in the project
+     *
+     * @param project the current project
+     */
     private void getAllModels(Project project) {
         ModelProvider modelProvider = new ModelProvider(project, true);
         this.originalModels = modelProvider.getOriginalModels();
     }
 
+    /**
+     * Searches for migration files and extracts tables
+     */
     private void searchForMigrations() {
-        List<String> flattenedPaths = new ArrayList<>();
+        Collection<VirtualFile> files = new ArrayList<>();
 
         FileBasedIndex fileBasedIndex = FileBasedIndex.getInstance();
 
-        Collection<String> allKeys = fileBasedIndex.getAllKeys(TableIndex.INDEX_ID, project);
+        Collection<String> tables = fileBasedIndex.getAllKeys(TableIndex.INDEX_ID, project);
 
-        for (String key : allKeys) {
-            fileBasedIndex.processValues(
-                TableIndex.INDEX_ID,
-                key,
-                null,
-                (file, value) -> {
-                    if (value != null) {
-                        flattenedPaths.addAll(value);
-                    }
-                    return true;
-                },
-                GlobalSearchScope.allScope(project)
+        for (String table : tables) {
+            files.addAll(
+                fileBasedIndex.getContainingFiles(
+                    TableIndex.INDEX_ID,
+                    table,
+                    GlobalSearchScope.allScope(project)
+                )
             );
         }
 
+        for (VirtualFile file : files) {
+            PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
 
-        for (String migrationFilePath : flattenedPaths) {
-            VirtualFile targetFile = LocalFileSystem.getInstance().findFileByPath(migrationFilePath);
-
-            if (targetFile != null) {
-                PsiFile psiFile = PsiManager.getInstance(project).findFile(targetFile);
-
-                if (psiFile != null) {
-                    MigrationVisitor migrationVisitor = new MigrationVisitor();
-                    psiFile.acceptChildren(migrationVisitor);
-                    tables.addAll(migrationVisitor.getTables());
-                }
+            if (psiFile != null) {
+                MigrationVisitor migrationVisitor = new MigrationVisitor();
+                psiFile.acceptChildren(migrationVisitor);
+                this.tables.addAll(migrationVisitor.getTables());
             }
         }
     }
 
+    /**
+     * Removes duplicate tables by merging them and cleans up fields
+     */
     private void removeDuplicatedTable() {
         List<Table> mergedTables = new ArrayList<>();
 
@@ -167,6 +176,9 @@ public class MigrationManager {
         renameFields();
     }
 
+    /**
+     * Removes duplicate fields from tables to ensure each field is unique
+     */
     private void removeDuplicatedFields() {
         for (Table currentTable : tables) {
             List<Field> fields = currentTable.fields();
@@ -187,6 +199,9 @@ public class MigrationManager {
         }
     }
 
+    /**
+     * Removes fields marked as dropped from the table
+     */
     private void dropFields() {
         for (Table currentTable : tables) {
             List<Field> droppedFields = new ArrayList<>();
@@ -205,6 +220,9 @@ public class MigrationManager {
         }
     }
 
+    /**
+     * Renames fields marked for renaming in the table
+     */
     private void renameFields() {
         for (Table currentTable : tables) {
             List<Field> droppedFields = new ArrayList<>();
@@ -226,6 +244,11 @@ public class MigrationManager {
         }
     }
 
+    /**
+     * Creates helper methods (like where conditions) for the Laravel model based on its fields
+     *
+     * @param laravelModel the model
+     */
     private void createLaravelModelHelperMethods(LaravelModel laravelModel) {
         for (Field field : laravelModel.getFields()) {
             if (!field.getName().isEmpty()) {
@@ -241,6 +264,12 @@ public class MigrationManager {
         }
     }
 
+    /**
+     * Finds a PhpClass model corresponding to a table name
+     *
+     * @param tableName the table
+     * @return the matching PhpClass or null if not found
+     */
     private @Nullable PhpClass getModelByTableName(String tableName) {
         final PhpClass[] finalModel = {null};
         for (PsiFile model : originalModels) {
@@ -271,6 +300,12 @@ public class MigrationManager {
         return finalModel[0];
     }
 
+    /**
+     * Decapitalizes the first character of a string
+     *
+     * @param str the input string.
+     * @return the decapitalized string.
+     */
     private String decapitalize(String str) {
         if (str == null || str.isEmpty()) {
             return str;
@@ -278,7 +313,13 @@ public class MigrationManager {
         return str.substring(0, 1).toLowerCase() + str.substring(1);
     }
 
-    public static @Nullable Map.Entry<String, PhpClass> findRelationships(com.jetbrains.php.lang.psi.elements.Method foundedMethod) {
+    /**
+     * Finds the related model relationships.
+     *
+     * @param foundedMethod the relationship method defined in the eloquent model
+     * @return an entry containing the method name and related PhpClass, or null if no relationship is found
+     */
+    public @Nullable Map.Entry<String, PhpClass> findRelationships(com.jetbrains.php.lang.psi.elements.Method foundedMethod) {
         return Arrays.stream(foundedMethod.getChildren())
             .filter(element -> element instanceof GroupStatementImpl)
             .flatMap(groupStatement -> Arrays.stream(groupStatement.getChildren()))
@@ -298,7 +339,14 @@ public class MigrationManager {
             .orElse(null);
     }
 
-    public static List<com.jetbrains.php.lang.psi.elements.Method> resolveAllRelations(PhpClass model, Project project) {
+    /**
+     * Resolves all relationships defined in the given model class
+     *
+     * @param model   the model to analyze for relationships
+     * @param project the project
+     * @return a list of relationships in the given model class
+     */
+    public List<com.jetbrains.php.lang.psi.elements.Method> resolveAllRelations(PhpClass model, Project project) {
         List<com.jetbrains.php.lang.psi.elements.Method> relations = new ArrayList<>();
 
         for (com.jetbrains.php.lang.psi.elements.Method method : model.getOwnMethods()) {
@@ -310,7 +358,14 @@ public class MigrationManager {
         return relations;
     }
 
-    public static boolean isRelationshipMethod(com.jetbrains.php.lang.psi.elements.Method method, Project project) {
+    /**
+     * Determines whether the given method is a Laravel relationship method
+     *
+     * @param method  the method to check
+     * @param project the project
+     * @return true or false
+     */
+    public boolean isRelationshipMethod(com.jetbrains.php.lang.psi.elements.Method method, Project project) {
         return Arrays.stream(method.getChildren())
             .filter(element -> element instanceof GroupStatementImpl)
             .flatMap(element -> Arrays.stream(element.getChildren()))
@@ -328,7 +383,13 @@ public class MigrationManager {
             });
     }
 
-    public static @Nullable PhpClass findRelatedModelFromMethod(com.jetbrains.php.lang.psi.elements.Method foundedMethod) {
+    /**
+     * Resolves the related model referenced in a relationship method
+     *
+     * @param foundedMethod the relationship method to analyze
+     * @return the PhpClass of the related model, or null if no related model is found
+     */
+    public @Nullable PhpClass findRelatedModelFromMethod(com.jetbrains.php.lang.psi.elements.Method foundedMethod) {
         return Arrays.stream(foundedMethod.getChildren())
             .filter(element -> element instanceof GroupStatementImpl)
             .flatMap(groupStatement -> Arrays.stream(groupStatement.getChildren()))
