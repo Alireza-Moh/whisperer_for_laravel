@@ -54,6 +54,31 @@ public class StrUtil {
         return text;
     }
 
+    public static String addBackSlashes(String text, boolean removeSlashFromStart, boolean removeSlashFromEnd) {
+        if (text == null) {
+            return text;
+        }
+
+        text = text.replaceAll("/", "\\");
+
+        if (!text.startsWith("\\")) {
+            text = "\\" + text;
+        }
+
+        if (!text.endsWith("\\")) {
+            text = text + "\\";
+        }
+
+        if (removeSlashFromStart) {
+            text = text.substring(1);
+        }
+        if (removeSlashFromEnd) {
+            text = text.substring(0, text.length() - 1);
+        }
+
+        return text;
+    }
+
     public static String addSlashes(String text) {
         return addSlashes(text, false, false);
     }

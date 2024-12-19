@@ -76,6 +76,7 @@ public class MigrationManager {
             PhpClass modelClass = getModelByTableName(tableName);
             if (modelClass != null) {
                 LaravelModel laravelModel = new LaravelModel();
+                laravelModel.setNamespaceName(StrUtil.addBackSlashes(modelClass.getNamespaceName(), true, true));
                 laravelModel.setModelName(modelClass.getName());
                 laravelModel.setTableName(tableName);
                 laravelModel.setFields(table.fields());
