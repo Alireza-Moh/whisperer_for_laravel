@@ -1,4 +1,4 @@
-package at.alirezamoh.whisperer_for_laravel.eloquent.table.indexes;
+package at.alirezamoh.whisperer_for_laravel.indexing;
 
 import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.FrameworkUtils;
 import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
@@ -9,6 +9,8 @@ import com.intellij.util.indexing.*;
 import com.intellij.util.io.DataExternalizer;
 import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
+import com.intellij.util.io.VoidDataExternalizer;
+import com.jetbrains.php.lang.PhpFileType;
 import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
@@ -18,24 +20,21 @@ import com.jetbrains.php.lang.psi.elements.impl.ClassReferenceImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
 import java.util.*;
 
 
-public class TableIndex extends FileBasedIndexExtension<String, List<String>> {
-    public static final ID<String, List<String>> INDEX_ID = ID.create("whisperer_for_laravel.db_tables");
+public class TableIndex extends FileBasedIndexExtension<String, Void> {
+    public static final ID<String, Void> INDEX_ID = ID.create("whisperer_for_laravel.db_tables");
 
     private static final String SCHEMA_CLASS = "\\Illuminate\\Support\\Facades\\Schema";
 
     @Override
-    public @NotNull ID<String, List<String>> getName() {
+    public @NotNull ID<String, Void> getName() {
         return INDEX_ID;
     }
 
     @Override
-    public @NotNull DataIndexer<String, List<String>, FileContent> getIndexer() {
+    public @NotNull DataIndexer<String, Void, FileContent> getIndexer() {
         return inputData -> {
             if (!FrameworkUtils.isLaravelProject(inputData.getProject())) {
                 return Collections.emptyMap();
@@ -47,15 +46,13 @@ public class TableIndex extends FileBasedIndexExtension<String, List<String>> {
                 return Collections.emptyMap();
             }
 
-            Map<String, List<String>> tables = new HashMap<>();
+            Map<String, Void> tables = new HashMap<>();
 
             for (MethodReference methodReference : PsiTreeUtil.findChildrenOfType(file, MethodReference.class)) {
                 if (shouldScanMethod(methodReference)) {
                     String tableName = extractTableName(methodReference);
-
                     if (tableName != null && !tableName.isEmpty()) {
-                        String path = inputData.getPsiFile().getVirtualFile().getPath();
-                        tables.computeIfAbsent(tableName, k -> new ArrayList<>()).add(path);
+                        tables.put(tableName, null);
                     }
                 }
             }
@@ -70,26 +67,8 @@ public class TableIndex extends FileBasedIndexExtension<String, List<String>> {
     }
 
     @Override
-    public @NotNull DataExternalizer<List<String>> getValueExternalizer() {
-        return new DataExternalizer<>() {
-            @Override
-            public void save(@NotNull DataOutput out, List<String> value) throws IOException {
-                out.writeInt(value.size());
-                for (String path : value) {
-                    out.writeUTF(path);
-                }
-            }
-
-            @Override
-            public List<String> read(@NotNull DataInput in) throws IOException {
-                int size = in.readInt();
-                List<String> value = new ArrayList<>(size);
-                for (int i = 0; i < size; i++) {
-                    value.add(in.readUTF());
-                }
-                return value;
-            }
-        };
+    public @NotNull DataExternalizer<Void> getValueExternalizer() {
+        return VoidDataExternalizer.INSTANCE;
     }
 
     @Override
@@ -99,7 +78,7 @@ public class TableIndex extends FileBasedIndexExtension<String, List<String>> {
 
     @Override
     public FileBasedIndex.@NotNull InputFilter getInputFilter() {
-        return file -> file.getName().endsWith(".php") && file.getPath().contains("migrations/");
+        return file -> file.getFileType() == PhpFileType.INSTANCE;
     }
 
     @Override
