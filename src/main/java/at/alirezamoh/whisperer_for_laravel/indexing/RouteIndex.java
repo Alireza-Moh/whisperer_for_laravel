@@ -1,8 +1,7 @@
-package at.alirezamoh.whisperer_for_laravel.routing.indexes;
+package at.alirezamoh.whisperer_for_laravel.indexing;
 
 import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.FrameworkUtils;
 import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
-import com.intellij.lang.javascript.index.gist.ListExternalizer;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -10,6 +9,8 @@ import com.intellij.util.indexing.*;
 import com.intellij.util.io.DataExternalizer;
 import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
+import com.intellij.util.io.VoidDataExternalizer;
+import com.jetbrains.php.lang.PhpFileType;
 import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.elements.impl.ClassReferenceImpl;
@@ -19,8 +20,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public class RouteIndex extends FileBasedIndexExtension<String, List<RouteData>> {
-    public static final ID<String, List<RouteData>> INDEX_ID = ID.create("whisperer_for_laravel.routing");
+public class RouteIndex extends FileBasedIndexExtension<String, Void> {
+    public static final ID<String, Void> INDEX_ID = ID.create("whisperer_for_laravel.routing");
 
     /**
      * The name of the method used to define route names
@@ -52,12 +53,12 @@ public class RouteIndex extends FileBasedIndexExtension<String, List<RouteData>>
     }};
 
     @Override
-    public @NotNull ID<String, List<RouteData>> getName() {
+    public @NotNull ID<String, Void> getName() {
         return INDEX_ID;
     }
 
     @Override
-    public @NotNull  DataIndexer<String, List<RouteData>, FileContent> getIndexer() {
+    public @NotNull  DataIndexer<String, Void, FileContent> getIndexer() {
         return inputData -> {
             if (!FrameworkUtils.isLaravelProject(inputData.getProject())) {
                 return Collections.emptyMap();
@@ -69,19 +70,16 @@ public class RouteIndex extends FileBasedIndexExtension<String, List<RouteData>>
                 return Collections.emptyMap();
             }
 
-            Map<String, List<RouteData>> routes = new HashMap<>();
-            List<RouteData> routeList = new ArrayList<>();
+            Map<String, Void> routes = new HashMap<>();
 
             for (MethodReference methodReference : PsiTreeUtil.findChildrenOfType(file, MethodReference.class)) {
                 if (isLaravelRouteMethod(methodReference)) {
-                    RouteData routeData = extractRouteData(methodReference);
+                    String routeData = extractRouteData(methodReference);
                     if (routeData != null) {
-                        routeList.add(routeData);
+                        routes.put(routeData, null);
                     }
                 }
             }
-
-            routes.put(inputData.getPsiFile().getVirtualFile().getPath(), routeList);
 
             return routes;
         };
@@ -93,8 +91,8 @@ public class RouteIndex extends FileBasedIndexExtension<String, List<RouteData>>
     }
 
     @Override
-    public @NotNull DataExternalizer<List<RouteData>> getValueExternalizer() {
-        return new ListExternalizer<>(new RouteDataExternalizer());
+    public @NotNull DataExternalizer<Void> getValueExternalizer() {
+        return VoidDataExternalizer.INSTANCE;
     }
 
     @Override
@@ -104,7 +102,7 @@ public class RouteIndex extends FileBasedIndexExtension<String, List<RouteData>>
 
     @Override
     public FileBasedIndex.@NotNull InputFilter getInputFilter() {
-        return file -> file.getName().endsWith(".php") && file.getPath().contains("routes/");
+        return file -> file.getFileType() == PhpFileType.INSTANCE;
     }
 
     @Override
@@ -120,7 +118,7 @@ public class RouteIndex extends FileBasedIndexExtension<String, List<RouteData>>
             && ROUTE_NAMESPACES.contains(classReferences.getFQN());
     }
 
-    private @Nullable RouteData extractRouteData(MethodReference methodReference) {
+    private @Nullable String extractRouteData(MethodReference methodReference) {
         if (!isValidRouteMethod(methodReference)) {
             return null;
         }
@@ -156,11 +154,10 @@ public class RouteIndex extends FileBasedIndexExtension<String, List<RouteData>>
         return null;
     }
 
-    private RouteData createRouteData(String routeName, PsiElement uriParameter, MethodReference methodReference) {
+    private String createRouteData(String routeName, PsiElement uriParameter, MethodReference methodReference) {
         String uri = StrUtil.removeQuotes(uriParameter.getText());
-        String filePath = methodReference.getContainingFile().getVirtualFile().getPath();
         int offset = methodReference.getTextOffset();
 
-        return new RouteData(routeName, uri, filePath, offset);
+        return uri + " | " + routeName + " | " + offset;
     }
 }
