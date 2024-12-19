@@ -1,12 +1,11 @@
 package at.alirezamoh.whisperer_for_laravel.eloquent.table;
 
-import at.alirezamoh.whisperer_for_laravel.eloquent.table.indexes.TableIndex;
+import at.alirezamoh.whisperer_for_laravel.indexing.TableIndex;
 import at.alirezamoh.whisperer_for_laravel.support.psiUtil.PsiUtil;
 import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
@@ -44,7 +43,7 @@ public class TableReference extends PsiReferenceBase<PsiElement> implements PsiP
         String text = StrUtil.removeQuotes(myElement.getText());
 
 
-        List <List<String>> paths = FileBasedIndex.getInstance().getValues(
+        Collection<VirtualFile> paths = FileBasedIndex.getInstance().getContainingFiles(
             TableIndex.INDEX_ID,
             text,
             GlobalSearchScope.allScope(project)
@@ -54,24 +53,13 @@ public class TableReference extends PsiReferenceBase<PsiElement> implements PsiP
             return ResolveResult.EMPTY_ARRAY;
         }
 
-        List<String> flattenedPaths = new ArrayList<>();
-        for (List<String> pathList : paths) {
-            if (pathList != null) {
-                flattenedPaths.addAll(pathList);
-            }
-        }
-
         List<ResolveResult> results = new ArrayList<>();
-        for (String path : flattenedPaths) {
+        for (VirtualFile path : paths) {
             if (path != null) {
-                VirtualFile targetFile = LocalFileSystem.getInstance().findFileByPath(path);
+                PsiFile psiFile = PsiManager.getInstance(project).findFile(path);
 
-                if (targetFile != null) {
-                    PsiFile psiFile = PsiManager.getInstance(project).findFile(targetFile);
-
-                    if (psiFile != null) {
-                        results.add(new PsiElementResolveResult(psiFile));
-                    }
+                if (psiFile != null) {
+                    results.add(new PsiElementResolveResult(psiFile));
                 }
             }
         }
