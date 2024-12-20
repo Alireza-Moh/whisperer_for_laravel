@@ -1,6 +1,7 @@
 package at.alirezamoh.whisperer_for_laravel.gate;
 
 import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.ClassUtils;
+import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.FrameworkUtils;
 import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.MethodUtils;
 import at.alirezamoh.whisperer_for_laravel.support.psiUtil.PsiUtil;
 import com.intellij.openapi.project.Project;
@@ -41,6 +42,12 @@ public class GateReferenceContributor extends PsiReferenceContributor {
 
                 @Override
                 public PsiReference @NotNull [] getReferencesByElement(@NotNull PsiElement element, @NotNull ProcessingContext context) {
+                    Project project = element.getProject();
+
+                    if (!FrameworkUtils.isLaravelProject(project) && FrameworkUtils.isLaravelFrameworkNotInstalled(project)) {
+                        return PsiReference.EMPTY_ARRAY;
+                    }
+
                     if (isInsideGateMethod(element, element.getProject())) {
                         String text = element.getText();
 

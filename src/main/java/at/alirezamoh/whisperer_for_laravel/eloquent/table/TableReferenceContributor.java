@@ -26,8 +26,8 @@ public class TableReferenceContributor extends PsiReferenceContributor {
                 public PsiReference @NotNull [] getReferencesByElement(@NotNull PsiElement psiElement, @NotNull ProcessingContext processingContext) {
                     Project project = psiElement.getProject();
 
-                    if (FrameworkUtils.isLaravelFrameworkNotInstalled(project)) {
-                        return new PsiReference[0];
+                    if (!FrameworkUtils.isLaravelProject(project) && FrameworkUtils.isLaravelFrameworkNotInstalled(project)) {
+                        return PsiReference.EMPTY_ARRAY;
                     }
 
                     if (isInsideCorrectMethod(psiElement)) {

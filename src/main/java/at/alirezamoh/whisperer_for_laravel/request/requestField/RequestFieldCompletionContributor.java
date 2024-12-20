@@ -1,6 +1,7 @@
 package at.alirezamoh.whisperer_for_laravel.request.requestField;
 
 import at.alirezamoh.whisperer_for_laravel.request.requestField.util.RequestFieldUtils;
+import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.FrameworkUtils;
 import at.alirezamoh.whisperer_for_laravel.support.psiUtil.PsiUtil;
 import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
 import com.intellij.codeInsight.completion.*;
@@ -31,6 +32,11 @@ public class RequestFieldCompletionContributor extends CompletionContributor {
                 protected void addCompletions(@NotNull CompletionParameters parameters, @NotNull ProcessingContext context, @NotNull CompletionResultSet resultSet) {
                     PsiElement element = parameters.getPosition().getOriginalElement();
 
+                    Project project = element.getProject();
+                    if (!FrameworkUtils.isLaravelProject(project) && FrameworkUtils.isLaravelFrameworkNotInstalled(project)) {
+                        return;
+                    }
+
                     if (element.getPrevSibling() == null) {
                         return;
                     }
@@ -41,7 +47,6 @@ public class RequestFieldCompletionContributor extends CompletionContributor {
                         return;
                     }
 
-                    Project project = element.getProject();
                     PhpClassImpl phpClass = RequestFieldUtils.resolveRequestClass(variable, project);
                     if (phpClass == null) {
                         return;

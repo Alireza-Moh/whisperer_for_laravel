@@ -2,8 +2,10 @@ package at.alirezamoh.whisperer_for_laravel.indexing;
 
 import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.FrameworkUtils;
 import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
+import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiReference;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.indexing.*;
 import com.intellij.util.io.DataExternalizer;
@@ -60,7 +62,9 @@ public class RouteIndex extends FileBasedIndexExtension<String, Void> {
     @Override
     public @NotNull  DataIndexer<String, Void, FileContent> getIndexer() {
         return inputData -> {
-            if (!FrameworkUtils.isLaravelProject(inputData.getProject())) {
+            Project project = inputData.getProject();
+
+            if (!FrameworkUtils.isLaravelProject(project) && FrameworkUtils.isLaravelFrameworkNotInstalled(project)) {
                 return Collections.emptyMap();
             }
 

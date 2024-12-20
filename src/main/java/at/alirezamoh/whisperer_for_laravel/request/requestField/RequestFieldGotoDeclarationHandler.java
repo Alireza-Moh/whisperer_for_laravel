@@ -1,6 +1,7 @@
 package at.alirezamoh.whisperer_for_laravel.request.requestField;
 
 import at.alirezamoh.whisperer_for_laravel.request.requestField.util.RequestFieldUtils;
+import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.FrameworkUtils;
 import com.intellij.codeInsight.navigation.actions.GotoDeclarationHandler;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
@@ -27,11 +28,15 @@ public class RequestFieldGotoDeclarationHandler implements GotoDeclarationHandle
             return null;
         }
 
+        Project project = sourceElement.getProject();
+        if (!FrameworkUtils.isLaravelProject(project) && FrameworkUtils.isLaravelFrameworkNotInstalled(project)) {
+            return null;
+        }
+
         if (!(sourceElement.getParent() instanceof FieldReferenceImpl fieldReference)) {
             return null;
         }
 
-        Project project = sourceElement.getProject();
         VariableImpl variable = (VariableImpl) fieldReference.getClassReference();
         PhpClassImpl phpClass = RequestFieldUtils.resolveRequestClass(variable, project);
 

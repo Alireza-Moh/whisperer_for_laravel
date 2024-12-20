@@ -1,6 +1,7 @@
 package at.alirezamoh.whisperer_for_laravel.request.requestField;
 
 import at.alirezamoh.whisperer_for_laravel.request.requestField.util.RequestFieldUtils;
+import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.FrameworkUtils;
 import com.intellij.codeInspection.InspectionSuppressor;
 import com.intellij.codeInspection.SuppressQuickFix;
 import com.intellij.openapi.project.Project;
@@ -55,6 +56,10 @@ public class RequestFieldSuppressor implements InspectionSuppressor {
     private boolean isFieldInFormRequestRules(FieldReference fieldReference) {
         PsiElement ref = fieldReference.getClassReference();
         Project project = fieldReference.getProject();
+
+        if (!FrameworkUtils.isLaravelProject(project) && FrameworkUtils.isLaravelFrameworkNotInstalled(project)) {
+            return false;
+        }
 
         if (ref == null) {
             return false;

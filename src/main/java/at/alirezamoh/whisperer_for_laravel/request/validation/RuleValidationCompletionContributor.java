@@ -30,7 +30,7 @@ public class RuleValidationCompletionContributor extends CompletionContributor {
                     PsiElement psiElement = completionParameters.getPosition().getOriginalElement().getParent();
                     Project project = psiElement.getProject();
 
-                    if (FrameworkUtils.isLaravelFrameworkNotInstalled(project)) {
+                    if (!FrameworkUtils.isLaravelProject(project) && FrameworkUtils.isLaravelFrameworkNotInstalled(project)) {
                         return;
                     }
 

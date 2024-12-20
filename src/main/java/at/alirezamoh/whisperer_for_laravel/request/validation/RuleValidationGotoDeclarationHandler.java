@@ -41,13 +41,12 @@ public class RuleValidationGotoDeclarationHandler implements GotoDeclarationHand
             return null;
         }
 
-        if (!(sourceElement.getParent() instanceof StringLiteralExpression stringLiteralExpression)) {
+        Project project = sourceElement.getProject();
+        if (!FrameworkUtils.isLaravelProject(project) && FrameworkUtils.isLaravelFrameworkNotInstalled(project)) {
             return null;
         }
 
-        Project project = sourceElement.getProject();
-
-        if (FrameworkUtils.isLaravelFrameworkNotInstalled(project)) {
+        if (!(sourceElement.getParent() instanceof StringLiteralExpression stringLiteralExpression)) {
             return null;
         }
 
