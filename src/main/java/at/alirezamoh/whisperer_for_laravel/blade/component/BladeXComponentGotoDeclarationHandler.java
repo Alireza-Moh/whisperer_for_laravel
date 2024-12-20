@@ -63,7 +63,7 @@ public class BladeXComponentGotoDeclarationHandler implements GotoDeclarationHan
 
         for (VirtualFile file : candidateFiles) {
             String fullPath = file.getPath().replace("\\", "/");
-            if (fullPath.contains("components/") && fullPath.endsWith(relativePath)) {
+            if (fullPath.endsWith(relativePath)) {
                 PsiFile psiFile = psiManager.findFile(file);
                 if (psiFile != null && psiFile.getFileType() instanceof BladeFileType) {
                     targets.add(psiFile);
