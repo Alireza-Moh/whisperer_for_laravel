@@ -1,30 +1,22 @@
-package at.alirezamoh.whisperer_for_laravel.formRequest;
+package at.alirezamoh.whisperer_for_laravel.request.validation.util;
 
+import at.alirezamoh.whisperer_for_laravel.request.requestField.util.RequestFieldUtils;
 import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.ClassUtils;
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.FrameworkUtils;
 import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.MethodUtils;
 import at.alirezamoh.whisperer_for_laravel.support.psiUtil.PsiUtil;
-import com.intellij.codeInsight.completion.*;
 import com.intellij.openapi.project.Project;
-import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.util.ProcessingContext;
-import com.jetbrains.php.lang.lexer.PhpTokenTypes;
 import com.jetbrains.php.lang.psi.elements.ArrayCreationExpression;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.impl.MethodImpl;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-/**
- * Contributes completion suggestions for Laravel validation rules
- */
-public class RuleValidationCompletionContributor extends CompletionContributor {
-    private String[] rulesKeysArray = {
+public class RuleValidationUtil {
+    public static String[] RULES = {
         "accepted", "accepted_if:", "active_url", "after:", "after_or_equal:", "alpha",
         "alpha_dash", "alpha_num", "array", "ascii", "bail", "before:", "before_or_equal:",
         "between:", "boolean", "confirmed", "current_password", "date", "date_equal:",
@@ -54,44 +46,13 @@ public class RuleValidationCompletionContributor extends CompletionContributor {
         put("validateWithBag", 1);
     }};
 
-
-    RuleValidationCompletionContributor() {
-        extend(
-            CompletionType.BASIC,
-            PlatformPatterns.or(
-                PlatformPatterns.psiElement(PhpTokenTypes.STRING_LITERAL),
-                PlatformPatterns.psiElement(PhpTokenTypes.STRING_LITERAL_SINGLE_QUOTE)
-            ),
-            new CompletionProvider<>() {
-
-                @Override
-                protected void addCompletions(@NotNull CompletionParameters completionParameters, @NotNull ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
-                    PsiElement psiElement = completionParameters.getPosition().getOriginalElement().getParent();
-                    Project project = psiElement.getProject();
-
-                    if (FrameworkUtils.isLaravelFrameworkNotInstalled(project)) {
-                        return;
-                    }
-
-                    if (isInsideCorrectMethod(psiElement, project)) {
-                        CompletionResultSet resultOnPipe = getCompletionResultSetOnPipe(psiElement, completionResultSet, completionParameters);
-                        if (resultOnPipe != null) {
-                            completionResultSet = resultOnPipe;
-                        }
-
-                        createLookUpElement(completionResultSet);
-                    }
-                }
-            });
-    }
-
     /**
      * Checks if the current context is valid for suggesting validation rules
      *
      * @param psiElement The current PSI element
      * @return True if the context is valid, false otherwise
      */
-    private boolean isInsideCorrectMethod(PsiElement psiElement, Project project) {
+    public static boolean isInsideCorrectMethod(PsiElement psiElement, Project project) {
         MethodReference methodReference = MethodUtils.resolveMethodReference(psiElement, 10);
 
         if (methodReference != null) {
@@ -102,18 +63,15 @@ public class RuleValidationCompletionContributor extends CompletionContributor {
         return isInsideRulesMethod(psiElement);
     }
 
-    private boolean isInsideRequestMethod(PsiElement psiElement, MethodReference methodReference, Project project) {
+    private static boolean isInsideRequestMethod(PsiElement psiElement, MethodReference methodReference, Project project) {
 
         return ClassUtils.isLaravelRelatedClass(methodReference, project)
-            && (
-                Objects.equals(methodReference.getName(), "validate")
-                || Objects.equals(methodReference.getName(), "validateWithBag")
-            )
+            && RequestFieldUtils.VALIDATION_METHODS.contains(methodReference.getName())
             && isRuleParam(methodReference, psiElement)
             && isInsideArrayValue(psiElement);
     }
 
-    private boolean isInsideValidatorMethod(PsiElement psiElement, MethodReference methodReference, Project project) {
+    private static boolean isInsideValidatorMethod(PsiElement psiElement, MethodReference methodReference, Project project) {
         return ClassUtils.isLaravelRelatedClass(methodReference, project)
             && Objects.equals(methodReference.getName(), "make")
             && isRuleParam(methodReference, psiElement)
@@ -123,7 +81,7 @@ public class RuleValidationCompletionContributor extends CompletionContributor {
     /**
      * Checks if the PSI element is inside a MethodImpl with the name 'rules'
      */
-    private boolean isInsideRulesMethod(PsiElement psiElement) {
+    private static boolean isInsideRulesMethod(PsiElement psiElement) {
         MethodImpl methodCall = PsiTreeUtil.getParentOfType(psiElement, MethodImpl.class);
 
         return methodCall != null
@@ -131,7 +89,7 @@ public class RuleValidationCompletionContributor extends CompletionContributor {
             && isInsideArrayValue(psiElement);
     }
 
-    private boolean isInsideArrayValue(PsiElement psiElement) {
+    private static boolean isInsideArrayValue(PsiElement psiElement) {
         if (PsiUtil.isRegularArray(psiElement, 10)) {
             ArrayCreationExpression array = PsiUtil.getRegularArray(psiElement, 10);
             if (array != null) {
@@ -144,7 +102,7 @@ public class RuleValidationCompletionContributor extends CompletionContributor {
         }
     }
 
-    public boolean isRuleParam(MethodReference method, PsiElement position) {
+    public static boolean isRuleParam(MethodReference method, PsiElement position) {
         Integer paramPositions = RULES_METHODS.get(method.getName());
 
         if (paramPositions == null) {
@@ -152,38 +110,5 @@ public class RuleValidationCompletionContributor extends CompletionContributor {
         }
 
         return MethodUtils.findParamIndex(position, false) == paramPositions;
-    }
-
-    /**
-     * Creates completion validation rules and adds them to the result set
-     *
-     * @param result The completion result set
-     */
-    private void createLookUpElement(@NotNull CompletionResultSet result) {
-        for (String key : rulesKeysArray) {
-            result.addElement(PsiUtil.buildSimpleLookupElement(key));
-        }
-    }
-
-    /**
-     * Returns a new CompletionResultSet with a prefix matcher based on the text after the last pipe symbol
-     * This method checks if the current PSI element's text contains a pipe symbol (|).
-     * If it does, it creates a new CompletionResultSet with a prefix matcher that matches
-     * the text after the last pipe symbol. This allows for accurate completion suggestions
-     * when the user is typing validation rules separated by pipes
-     * @return The new CompletionResultSet with a prefix matcher, or null if no pipe symbol is found
-     */
-    private CompletionResultSet getCompletionResultSetOnPipe(PsiElement psiElement, CompletionResultSet currentCompletionResult, CompletionParameters completionParameters) {
-        String text = psiElement.getText();
-        CompletionResultSet newCompletionResult = null;
-
-        if (text.contains("|")) {
-            int pipeIndex = text.lastIndexOf('|', completionParameters.getOffset() - psiElement.getTextRange().getStartOffset() - 1);
-            String newText = text.substring(pipeIndex + 1, completionParameters.getOffset() - psiElement.getTextRange().getStartOffset());
-
-            newCompletionResult = currentCompletionResult.withPrefixMatcher(newText);
-        }
-
-        return newCompletionResult;
     }
 }

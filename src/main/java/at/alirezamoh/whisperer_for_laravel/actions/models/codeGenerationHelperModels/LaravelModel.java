@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LaravelModel {
+    private String namespaceName;
+
     private List<Field> fields;
 
     private List<Method> methods;
@@ -64,6 +66,13 @@ public class LaravelModel {
         this.modelName = modelName;
     }
 
+    public String getNamespaceName() {
+        return namespaceName;
+    }
+
+    public void setNamespaceName(String namespaceName) {
+        this.namespaceName = namespaceName;
+    }
 
     public void addMethod(Method method) {
         this.methods.add(method);

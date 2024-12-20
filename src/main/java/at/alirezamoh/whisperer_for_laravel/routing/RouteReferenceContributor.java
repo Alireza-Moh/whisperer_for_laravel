@@ -1,13 +1,16 @@
 package at.alirezamoh.whisperer_for_laravel.routing;
 
+import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.ClassUtils;
 import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.FrameworkUtils;
 import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.MethodUtils;
 import at.alirezamoh.whisperer_for_laravel.support.psiUtil.PsiUtil;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.*;
 import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.lang.psi.elements.FunctionReference;
+import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,9 +25,23 @@ public class RouteReferenceContributor extends PsiReferenceContributor {
     /**
      * The names of the route helper functions
      */
-    public static Map<String, List<Integer>> ROUTE_METHODS = new HashMap<>() {{
-        put("route", List.of(0));
-        put("to_route", List.of(0));
+    private final Map<String, Integer> ROUTE_METHODS = new HashMap<>() {{
+        put("route", 0);
+        put("to_route", 0);
+        put("signedRoute", 0);
+    }};
+
+    /**
+     * Classes to provide route names autocompletion
+     */
+    private final List<String> ROUTE_CLASSES = List.of("\\Illuminate\\Support\\Facades\\Redirect", "\\Illuminate\\Support\\Facades\\URL");
+
+    /**
+     * Redirect and URL class methods
+     */
+    private final Map<String, Integer> REDIRECT_AND_URL_METHODS = new HashMap<>() {{
+        put("route", 0);
+        put("signedRoute", 0);
     }};
 
     /**
@@ -38,13 +55,15 @@ public class RouteReferenceContributor extends PsiReferenceContributor {
             new PsiReferenceProvider() {
                 @Override
                 public PsiReference @NotNull [] getReferencesByElement(@NotNull PsiElement psiElement, @NotNull ProcessingContext processingContext) {
-                    if (FrameworkUtils.isLaravelFrameworkNotInstalled(psiElement.getProject())) {
+                    Project project = psiElement.getProject();
+
+                    if (!FrameworkUtils.isLaravelProject(project) && FrameworkUtils.isLaravelFrameworkNotInstalled(project)) {
                         return PsiReference.EMPTY_ARRAY;
                     }
 
-                    if(psiElement instanceof StringLiteralExpression stringLiteralExpression && isInsideRouteFunctions(psiElement))
+                    if(isInsideCorrectMethod(psiElement))
                     {
-                        String text = stringLiteralExpression.getText();
+                        String text = psiElement.getOriginalElement().getText();
 
                         return new PsiReference[]{
                             new RouteReference(psiElement, new TextRange(PsiUtil.getStartOffset(text), PsiUtil.getEndOffset(text)))
@@ -61,17 +80,40 @@ public class RouteReferenceContributor extends PsiReferenceContributor {
      * @param psiElement The PSI element to check
      * @return           True or false
      */
-    private boolean isInsideRouteFunctions(@NotNull PsiElement psiElement) {
+    private boolean isInsideCorrectMethod(@NotNull PsiElement psiElement) {
+        MethodReference method = MethodUtils.resolveMethodReference(psiElement, 10);
         FunctionReference function = MethodUtils.resolveFunctionReference(psiElement, 10);
+        Project project = psiElement.getProject();
 
-        return function != null && isViewParam(function, psiElement);
+        return (
+            method != null
+                && isRouteParam(method, psiElement)
+                && ClassUtils.isCorrectRelatedClass(method, project, ROUTE_CLASSES)
+            ) 
+            || (function != null && isRouteParam(function, psiElement));
     }
 
-    private boolean isViewParam(FunctionReference reference, PsiElement position) {
-        int paramIndex = MethodUtils.findParamIndex(position, false);
+    /**
+     * General method to check if the given reference and position match the config parameter criteria
+     * @param reference The method or function reference
+     * @param position The PSI element position
+     * @return True or false
+     */
+    private boolean isRouteParam(PsiElement reference, PsiElement position) {
+        String referenceName = (reference instanceof MethodReference)
+            ? ((MethodReference) reference).getName()
+            : ((FunctionReference) reference).getName();
 
-        List<Integer> paramPositions = ROUTE_METHODS.get(reference.getName());
+        Integer expectedParamIndex = REDIRECT_AND_URL_METHODS.get(referenceName);
 
-        return paramPositions != null && paramPositions.contains(paramIndex);
+        if (expectedParamIndex == null) {
+            expectedParamIndex = ROUTE_METHODS.get(referenceName);
+        }
+
+        if (expectedParamIndex == null) {
+            return false;
+        }
+
+        return MethodUtils.findParamIndex(position, false) == expectedParamIndex;
     }
 }

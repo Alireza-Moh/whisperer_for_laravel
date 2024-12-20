@@ -53,4 +53,6 @@ final public class ProjectDefaultPaths {
     public static final String LARAVEL_DB_QUERY_RELATIONSHIPS_PATH = "/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/QueriesRelationships.php";
 
     public static final String LARAVEL_ILLUMINATE_PATH = "/vendor/laravel/framework/src/Illuminate/";
+
+    public static final String LARAVEL_VALIDATION_RULES = "/vendor/laravel/framework/src/Illuminate/Validation/Concerns/ValidatesAttributes.php";
 }

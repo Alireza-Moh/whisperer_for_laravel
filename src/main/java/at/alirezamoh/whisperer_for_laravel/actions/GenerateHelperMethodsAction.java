@@ -20,6 +20,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class GenerateHelperMethodsAction extends BaseAction {
     private Project project;
@@ -87,11 +89,13 @@ public class GenerateHelperMethodsAction extends BaseAction {
         List<LaravelModel> m = migrationManager.visit();
 
         if (!m.isEmpty()) {
-            LaravelModelGeneration g = new LaravelModelGeneration(m);
-            create(
-                g,
-                "laravelModels.ftl"
-            );
+            Map<String, List<LaravelModel>> groupedModels = m.stream()
+                .collect(Collectors.groupingBy(LaravelModel::getNamespaceName));
+
+            groupedModels.forEach((namespace, modelsInNamespace) -> {
+                LaravelModelGeneration generation = new LaravelModelGeneration(namespace, modelsInNamespace);
+                create(generation, "laravelModels.ftl");
+            });
         }
     }
 

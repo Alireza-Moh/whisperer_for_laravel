@@ -7,39 +7,36 @@
 
     <description>
         <![CDATA[
-        Whisperer For Laravel is a PhpStorm plugin designed to boost your productivity by streamlining the development process for Laravel applications.
+        <a href="https://alireza-moh.github.io/whisperer-for-laravel-docs/">Documentation</a><br>
+
+        Whisperer For Laravel is a PhpStorm plugin for Laravel applications
         With a set of powerful features, this plugin helps you work faster when developing Laravel applications in PhpStorm.
 
-        <h3>Features include:</h3>
+        <h3>Features:</h3>
         <ul>
-            <li><strong>Code Generation Helpers:</strong> Eloquent Models, Migrations, Controllers, Database Seeders, Config Files, Blade Components, Console Commands, Views, Jobs, Validation Rules, Policies, Observers, Mailables, Exceptions, Event Listeners, Middleware.</li>
-            <li><strong>Code Completion and Resolving:</strong> Form Request Validation Rules, Eloquent Table Names, Config File References, Blade Templates, Routing, Gates.</li>
-            <li><strong>Postfix Templates:</strong> A custom postfix template for dd() is included, allowing you to quickly wrap an expression in the dd() function for debugging purposes.</li>
-            <li><strong>Laravel Version Indicator:</strong> A status bar widget that displays the current version of Laravel used in the project.</li>
+            <li>Code Generation Helpers</li>
+            <li>Completions for: Route, validation, request fields, gates, config, views and a lot more</li>
+            <li>Blade components support</li>
+            <li>Laravel packages support: InertiaJs</li>
         </ul>
 
-        <h3>Installation:</h3>
-        <ol>
-            <li>Open PhpStorm</li>
-            <li>Navigate to File > Settings > Plugins</li>
-            <li>Search for Whisperer For Laravel</li>
-        </ol>
-
         <h3>Contributions:</h3>
-        <p>Contributions are always welcome! If you encounter any issues, feel free to open an issue on the <a href="https://github.com/Alireza-Moh/idea_whisperer_for_laravel/issues">GitHub Issues page</a>. If you want to contribute to the project, do not hesitate</p>
+        <p>Contributions are always welcome! If you encounter any issues, feel free to open an issue on the <a href="https://github.com/Alireza-Moh/whisperer_for_laravel">GitHub Issues page</a>. If you want to contribute to the project, do not hesitate</p>
         ]]>
     </description>
 
     <change-notes>
         <![CDATA[
-        <ul>
-            <li>Added setting option for module src folder and Laravel directory.</li>
-            <li>Added view mailable action</li>
-            <li>Added check for Laravel root directory when the default is overwritten.</li>
-            <li>Improved resolving and completion for configs, gates, routes, blade views</li>
-            <li>Added Inertia pages completion and resolving.</li>
-            <li>Added feature to provide controller method usage in routes</li>
-        </ul>
+            <ul>
+                <li>Triggers route names autocompletion for Redirect::route(), Redirect::signedRoute(), URL::route(), and URL::signedRoute() methods.</li>
+                <li>Suppresses "Property accessed via magic method" warning for request fields.</li>
+                <li>Adds request fields autocompletion and resolving.</li>
+                <li>Implements method to resolve validation rules.</li>
+                <li>Generates Eloquent models based on their namespace.</li>
+                <liAdds blade components autocompletion and resolving.</li>
+                <li>Fixes Inertia.js autocompletion to include pages located directly in the root folder.</li>
+                <li>Provides autocompletion for migration files and resolves related table files globally.</li>
+            </ul>
         ]]>
     </change-notes>
 
@@ -48,16 +45,17 @@
     <depends>com.intellij.modules.platform</depends>
     <depends>com.jetbrains.php.blade</depends>
 
-    <version>1.0.0</version>
+    <version>1.1.1</version>
 
     <extensions defaultExtensionNs="com.intellij">
         <notificationGroup id="NotificationGroup" displayType="BALLOON"/>
 
         <postStartupActivity implementation="at.alirezamoh.whisperer_for_laravel.settings.LaravelStartupActivity"/>
 
-        <fileBasedIndex implementation="at.alirezamoh.whisperer_for_laravel.routing.indexes.RouteIndex"/>
+        <fileBasedIndex implementation="at.alirezamoh.whisperer_for_laravel.indexing.RouteIndex"/>
+        <fileBasedIndex implementation="at.alirezamoh.whisperer_for_laravel.indexing.TableIndex"/>
 
-        <projectConfigurable parentId="language" instance="at.alirezamoh.whisperer_for_laravel.settings.SettingConfigurable" id="idea_whisperer_for_laravel_settings" displayName="Whisperer For Laravel" nonDefaultProject="true"/>
+        <projectConfigurable parentId="language" instance="at.alirezamoh.whisperer_for_laravel.settings.SettingConfigurable" id="whisperer_for_laravel_settings" displayName="Whisperer For Laravel" nonDefaultProject="true"/>
         <projectService serviceImplementation="at.alirezamoh.whisperer_for_laravel.settings.SettingsState"/>
 
         <statusBarWidgetFactory implementation="at.alirezamoh.whisperer_for_laravel.extension.LaravelVersion" id="LaravelVersion" order="first" />
@@ -69,10 +67,13 @@
         <psi.referenceContributor language="PHP" implementation="at.alirezamoh.whisperer_for_laravel.inertia.InertiaReferenceContributor"/>
         <psi.referenceContributor language="PHP" implementation="at.alirezamoh.whisperer_for_laravel.eloquent.table.TableReferenceContributor"/>
 
-        <completion.contributor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.formRequest.RuleValidationCompletionContributor"/>
+        <completion.contributor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.request.validation.RuleValidationCompletionContributor"/>
         <completion.contributor language="XML" implementationClass="at.alirezamoh.whisperer_for_laravel.blade.component.BladeXComponentCompletionContributor"/>
+        <completion.contributor  language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.request.requestField.RequestFieldCompletionContributor"/>
 
         <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.blade.component.BladeXComponentGotoDeclarationHandler"/>
+        <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.request.validation.RuleValidationGotoDeclarationHandler"/>
+        <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.request.requestField.RequestFieldGotoDeclarationHandler"/>
 
         <codeInsight.template.postfixTemplateProvider language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.postfixes.dd.DDPostfixProvider" />
 

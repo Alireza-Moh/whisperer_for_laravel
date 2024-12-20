@@ -1,26 +1,22 @@
 package at.alirezamoh.whisperer_for_laravel.routing;
 
-import at.alirezamoh.whisperer_for_laravel.routing.indexes.RouteData;
-import at.alirezamoh.whisperer_for_laravel.routing.indexes.RouteIndex;
+import at.alirezamoh.whisperer_for_laravel.indexing.RouteIndex;
 import at.alirezamoh.whisperer_for_laravel.support.WhispererForLaravelIcon;
 import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiManager;
-import com.intellij.psi.PsiReferenceBase;
+import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.indexing.FileBasedIndex;
+import com.jetbrains.php.lang.psi.elements.MethodReference;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Provides references to Laravel routes within a project
@@ -28,7 +24,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * suggestions for route names in various contexts, such as in the `route`
  * helper function or in Blade templates
  */
-public class RouteReference extends PsiReferenceBase<PsiElement> {
+public class RouteReference extends PsiReferenceBase<PsiElement> implements PsiPolyVariantReference {
     /**
      * The current project
      */
@@ -52,38 +48,7 @@ public class RouteReference extends PsiReferenceBase<PsiElement> {
      */
     @Override
     public @Nullable PsiElement resolve() {
-        String routeName = StrUtil.removeQuotes(myElement.getText());
-        AtomicReference<PsiElement> foundedElement = new AtomicReference<>();
-
-        FileBasedIndex.getInstance().processAllKeys(RouteIndex.INDEX_ID, fileName -> {
-            List<List<RouteData>> routes = FileBasedIndex.getInstance()
-                .getValues(RouteIndex.INDEX_ID, fileName, GlobalSearchScope.projectScope(project));
-
-            for (List<RouteData> allRoutes : routes) {
-                for (RouteData route : allRoutes) {
-                    if (route.name().equals(routeName)) {
-                        VirtualFile virtualFile = LocalFileSystem.getInstance().findFileByPath(route.filePath());
-
-                        if (virtualFile == null) {
-                            return false;
-                        }
-
-                        PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualFile);
-                        if (psiFile != null) {
-                            PsiElement element = psiFile.findElementAt(route.offset());
-                            if (element != null) {
-                                foundedElement.set(element);
-
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-            return true;
-        }, project);
-
-        return foundedElement.get();
+        return null;
     }
 
     /**
@@ -94,24 +59,56 @@ public class RouteReference extends PsiReferenceBase<PsiElement> {
     public Object @NotNull [] getVariants() {
         List<LookupElementBuilder> variants = new ArrayList<>();
 
-        FileBasedIndex.getInstance().processAllKeys(RouteIndex.INDEX_ID, key -> {
-            List<List<RouteData>> routes = FileBasedIndex.getInstance()
-                .getValues(RouteIndex.INDEX_ID, key, GlobalSearchScope.projectScope(project));
+         Collection<String> routes = FileBasedIndex.getInstance().getAllKeys(RouteIndex.INDEX_ID, project);
 
-            for (List<RouteData> allRoutes : routes) {
-                for (RouteData route : allRoutes) {
-                    variants.add(
-                        LookupElementBuilder
-                            .create(route.name())
-                            .bold()
-                            .withTypeText(route.uri(), true)
-                            .withIcon(WhispererForLaravelIcon.LARAVEL_ICON)
-                    );
-                }
-            }
-            return true;
-        }, project);
+         for (String route : routes) {
+             String[] split = route.split(" \\| ");
+
+             if (split.length >= 3) {
+                 variants.add(
+                     LookupElementBuilder
+                         .create(split[1])
+                         .bold()
+                         .withTypeText(split[0], true)
+                         .withIcon(WhispererForLaravelIcon.LARAVEL_ICON)
+                 );
+             }
+         };
 
         return variants.toArray();
+    }
+
+    @Override
+    public ResolveResult @NotNull [] multiResolve(boolean b) {
+        String routeName = StrUtil.removeQuotes(myElement.getText());
+        List<ResolveResult> results = new ArrayList<>();
+        FileBasedIndex fileBasedIndex = FileBasedIndex.getInstance();
+
+        Collection<String> keys = fileBasedIndex.getAllKeys(RouteIndex.INDEX_ID, project);
+
+        for (String key : keys) {
+            String[] split = key.split(" \\| ");
+
+            if (split.length >= 3 && split[1].equals(routeName)) {
+                Collection<VirtualFile> files = fileBasedIndex.getContainingFiles(
+                    RouteIndex.INDEX_ID, key, GlobalSearchScope.allScope(project)
+                );
+
+                for (VirtualFile file : files) {
+                    PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
+                    if (psiFile != null) {
+                        PsiElement element = psiFile.findElementAt(Integer.parseInt(split[2]));
+                        if (element != null) {
+                            PsiElement parent = element.getParent().getParent();
+                            if (parent instanceof MethodReference methodReference) {
+                                results.add(new PsiElementResolveResult(methodReference));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return results.toArray(new ResolveResult[0]);
     }
 }

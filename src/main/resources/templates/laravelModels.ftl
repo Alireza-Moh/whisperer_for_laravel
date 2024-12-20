@@ -2,7 +2,7 @@
 
 /** @noinspection all */
 
-namespace App\Models {
+namespace ${namespace} {
 
    use IdeaWhispererForLaravel\Helper\BaseQueryBuilder;
    use Illuminate\Support\Carbon;

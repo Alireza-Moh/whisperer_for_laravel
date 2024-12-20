@@ -9,6 +9,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
+import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.jetbrains.php.blade.BladeFileType;
@@ -31,7 +32,7 @@ public class BladeXComponentGotoDeclarationHandler implements GotoDeclarationHan
 
         Project project = sourceElement.getProject();
 
-        if (FrameworkUtils.isLaravelFrameworkNotInstalled(project)) {
+        if (!FrameworkUtils.isLaravelProject(project) && FrameworkUtils.isLaravelFrameworkNotInstalled(project)) {
             return null;
         }
 

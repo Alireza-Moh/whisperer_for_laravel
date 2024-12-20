@@ -4,6 +4,7 @@ import com.intellij.openapi.project.Project;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
+import com.jetbrains.php.lang.psi.elements.PhpTypedElement;
 import com.jetbrains.php.lang.psi.elements.impl.PhpClassAliasImpl;
 import com.jetbrains.php.lang.psi.elements.impl.PhpClassImpl;
 import org.jetbrains.annotations.Nullable;
@@ -78,5 +79,41 @@ public class ClassUtils {
         }
 
         return false;
+    }
+
+    public static boolean isCorrectRelatedClass(MethodReference methodReference, Project project, String classFqn) {
+        List<PhpClassImpl> resolvedClasses = MethodUtils.resolveMethodClasses(methodReference, project);
+
+        for (PhpClassImpl clazz : resolvedClasses) {
+            PhpClass foundedClass = getClassByFQN(project, classFqn);
+
+            if (foundedClass != null && isChildOf(clazz, foundedClass)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Resolves a PHP class from a typed element
+     *
+     * @param typedElement the PHP typed element (e.g., variable or reference)
+     * @param project the current project
+     * @return the resolved PhpClassImpl instance or null if not found
+     */
+    public static PhpClassImpl getClassFromTypedElement(PhpTypedElement typedElement, Project project) {
+        if (typedElement == null) {
+            return null;
+        }
+
+        PhpIndex phpIndex = PhpIndex.getInstance(project);
+        String classFQN = typedElement.getDeclaredType().getTypes().stream().findFirst().orElse("");
+
+        return phpIndex.getClassesByFQN(classFQN).stream()
+            .filter(clazz -> clazz instanceof PhpClassImpl)
+            .map(clazz -> (PhpClassImpl) clazz)
+            .findFirst()
+            .orElse(null);
     }
 }

@@ -68,7 +68,9 @@ public class BladeReferenceContributor extends PsiReferenceContributor {
 
                 @Override
                 public PsiReference @NotNull [] getReferencesByElement(@NotNull PsiElement psiElement, @NotNull ProcessingContext processingContext) {
-                    if (FrameworkUtils.isLaravelFrameworkNotInstalled(psiElement.getProject())) {
+                    Project project = psiElement.getProject();
+
+                    if (!FrameworkUtils.isLaravelProject(project) && FrameworkUtils.isLaravelFrameworkNotInstalled(project)) {
                         return PsiReference.EMPTY_ARRAY;
                     }
 
@@ -130,8 +132,6 @@ public class BladeReferenceContributor extends PsiReferenceContributor {
      * @return true or false
      */
     private boolean isExpectedFacadeMethod(String methodName, List<PhpClassImpl> resolvedClasses, PhpClass expectedClass, Map<String, Integer> methodMap) {
-        boolean index = methodMap.containsKey(methodName);
-        boolean s =resolvedClasses.stream().anyMatch(clazz -> ClassUtils.isChildOf(clazz, expectedClass));
         return methodMap.containsKey(methodName)
             && expectedClass != null
             && resolvedClasses.stream().anyMatch(clazz -> ClassUtils.isChildOf(clazz, expectedClass));
