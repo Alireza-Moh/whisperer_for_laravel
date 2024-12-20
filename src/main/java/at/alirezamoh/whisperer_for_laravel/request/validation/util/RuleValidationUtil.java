@@ -1,5 +1,6 @@
 package at.alirezamoh.whisperer_for_laravel.request.validation.util;
 
+import at.alirezamoh.whisperer_for_laravel.request.requestField.util.RequestFieldUtils;
 import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.ClassUtils;
 import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.MethodUtils;
 import at.alirezamoh.whisperer_for_laravel.support.psiUtil.PsiUtil;
@@ -65,10 +66,7 @@ public class RuleValidationUtil {
     private static boolean isInsideRequestMethod(PsiElement psiElement, MethodReference methodReference, Project project) {
 
         return ClassUtils.isLaravelRelatedClass(methodReference, project)
-            && (
-            Objects.equals(methodReference.getName(), "validate")
-                || Objects.equals(methodReference.getName(), "validateWithBag")
-        )
+            && RequestFieldUtils.VALIDATION_METHODS.contains(methodReference.getName())
             && isRuleParam(methodReference, psiElement)
             && isInsideArrayValue(psiElement);
     }
@@ -85,9 +83,6 @@ public class RuleValidationUtil {
      */
     private static boolean isInsideRulesMethod(PsiElement psiElement) {
         MethodImpl methodCall = PsiTreeUtil.getParentOfType(psiElement, MethodImpl.class);
-
-        boolean s = methodCall != null && methodCall.getName().equals("rules");
-        boolean ss = isInsideArrayValue(psiElement);
 
         return methodCall != null
             && methodCall.getName().equals("rules")

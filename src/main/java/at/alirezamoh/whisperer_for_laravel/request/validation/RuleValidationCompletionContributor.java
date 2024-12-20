@@ -43,7 +43,8 @@ public class RuleValidationCompletionContributor extends CompletionContributor {
                         createLookUpElement(completionResultSet);
                     }
                 }
-            });
+            }
+        );
     }
 
     /**
