@@ -130,8 +130,6 @@ public class BladeReferenceContributor extends PsiReferenceContributor {
      * @return true or false
      */
     private boolean isExpectedFacadeMethod(String methodName, List<PhpClassImpl> resolvedClasses, PhpClass expectedClass, Map<String, Integer> methodMap) {
-        boolean index = methodMap.containsKey(methodName);
-        boolean s =resolvedClasses.stream().anyMatch(clazz -> ClassUtils.isChildOf(clazz, expectedClass));
         return methodMap.containsKey(methodName)
             && expectedClass != null
             && resolvedClasses.stream().anyMatch(clazz -> ClassUtils.isChildOf(clazz, expectedClass));
