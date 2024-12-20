@@ -1,5 +1,5 @@
 <idea-plugin>
-    <id>at.alirezamoh.whisperer_for_laravel</id>
+    <id>at.alirezamoh.idea_whisperer_for_laravel</id>
 
     <name>Whisperer For Laravel</name>
 
