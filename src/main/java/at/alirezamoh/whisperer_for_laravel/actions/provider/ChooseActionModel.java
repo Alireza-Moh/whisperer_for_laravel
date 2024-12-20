@@ -20,7 +20,7 @@ public class ChooseActionModel implements ChooseByNameModel {
 
     public ChooseActionModel() {
         DefaultActionGroup actionGroup = (DefaultActionGroup) ActionManager.getInstance()
-            .getAction("at.alirezamoh.idea_whisperer_for_laravel.AllCodeGenerationActionsGroupAction");
+            .getAction("at.alirezamoh.whisperer_for_laravel.AllCodeGenerationActionsGroupAction");
 
         this.allActions = actionGroup.getChildActionsOrStubs();
     }
