@@ -1,4 +1,4 @@
-package at.alirezamoh.whisperer_for_laravel.blade;
+package at.alirezamoh.whisperer_for_laravel.blade.viewName;
 
 import com.intellij.psi.PsiDirectory;
 

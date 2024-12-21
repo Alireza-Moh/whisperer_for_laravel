@@ -1,6 +1,6 @@
-package at.alirezamoh.whisperer_for_laravel.blade.visitors;
+package at.alirezamoh.whisperer_for_laravel.blade.viewName.visitors;
 
-import at.alirezamoh.whisperer_for_laravel.blade.BladeModule;
+import at.alirezamoh.whisperer_for_laravel.blade.viewName.BladeModule;
 import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.whisperer_for_laravel.support.ProjectDefaultPaths;
 import at.alirezamoh.whisperer_for_laravel.support.applicationModules.visitors.BaseServiceProviderVisitor;

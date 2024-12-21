@@ -1,6 +1,6 @@
-package at.alirezamoh.whisperer_for_laravel.blade;
+package at.alirezamoh.whisperer_for_laravel.blade.viewName;
 
-import at.alirezamoh.whisperer_for_laravel.blade.visitors.BladeFileCollector;
+import at.alirezamoh.whisperer_for_laravel.blade.viewName.visitors.BladeFileCollector;
 import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;

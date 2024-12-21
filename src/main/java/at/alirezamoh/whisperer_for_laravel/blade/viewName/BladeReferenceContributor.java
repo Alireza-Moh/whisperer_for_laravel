@@ -1,4 +1,4 @@
-package at.alirezamoh.whisperer_for_laravel.blade;
+package at.alirezamoh.whisperer_for_laravel.blade.viewName;
 
 import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.ClassUtils;
 import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.FrameworkUtils;
@@ -39,7 +39,7 @@ public class BladeReferenceContributor extends PsiReferenceContributor {
      * The names of the methods in the 'Route' facade that can reference Blade files
      */
     public static Map<String, Integer> ROUTE_METHODS = new HashMap<>() {{
-        put("view", 1);
+        put("view", 0);
     }};
 
     /**

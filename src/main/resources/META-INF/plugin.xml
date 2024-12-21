@@ -61,8 +61,8 @@
         <statusBarWidgetFactory implementation="at.alirezamoh.whisperer_for_laravel.extension.LaravelVersion" id="LaravelVersion" order="first" />
 
         <psi.referenceContributor language="PHP" implementation="at.alirezamoh.whisperer_for_laravel.config.ConfigReferenceContributor"/>
-        <psi.referenceContributor language="PHP" implementation="at.alirezamoh.whisperer_for_laravel.blade.BladeReferenceContributor"/>
-        <psi.referenceContributor language="PHP" implementation="at.alirezamoh.whisperer_for_laravel.routing.RouteReferenceContributor"/>
+        <psi.referenceContributor language="PHP" implementation="at.alirezamoh.whisperer_for_laravel.blade.viewName.BladeReferenceContributor"/>
+        <psi.referenceContributor language="PHP" implementation="at.alirezamoh.whisperer_for_laravel.routing.routeName.RouteReferenceContributor"/>
         <psi.referenceContributor language="PHP" implementation="at.alirezamoh.whisperer_for_laravel.gate.GateReferenceContributor"/>
         <psi.referenceContributor language="PHP" implementation="at.alirezamoh.whisperer_for_laravel.inertia.InertiaReferenceContributor"/>
         <psi.referenceContributor language="PHP" implementation="at.alirezamoh.whisperer_for_laravel.eloquent.table.TableReferenceContributor"/>

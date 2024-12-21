@@ -1,6 +1,7 @@
 package at.alirezamoh.whisperer_for_laravel.blade.component;
 
 import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.FrameworkUtils;
+import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
 import com.intellij.codeInsight.navigation.actions.GotoDeclarationHandler;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
@@ -9,14 +10,17 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
-import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.blade.BladeFileType;
+import com.jetbrains.php.lang.psi.elements.PhpClass;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * A GotoDeclarationHandler that navigates to the Blade component
@@ -55,22 +59,29 @@ public class BladeXComponentGotoDeclarationHandler implements GotoDeclarationHan
         );
 
         PsiManager psiManager = PsiManager.getInstance(project);
+        Collection<PsiElement> targets = new ArrayList<>(findComponentPhpClass(componentName, project));
 
         for (VirtualFile file : candidateFiles) {
             String fullPath = file.getPath().replace("\\", "/");
-            if (fullPath.contains("components/") && fullPath.endsWith(relativePath)) {
+            if (fullPath.endsWith(relativePath)) {
                 PsiFile psiFile = psiManager.findFile(file);
                 if (psiFile != null && psiFile.getFileType() instanceof BladeFileType) {
-                    return new PsiElement[]{psiFile};
+                    targets.add(psiFile);
                 }
             }
         }
 
-        return null;
+        return targets.isEmpty() ? null : targets.toArray(new PsiElement[0]);
     }
 
     @Override
     public @Nullable String getActionText(@NotNull DataContext context) {
         return null;
+    }
+
+    private Collection<PhpClass> findComponentPhpClass(String componentName, Project project) {
+        String componentNameInCamelCase = StrUtil.camel(componentName);
+
+        return PhpIndex.getInstance(project).getClassesByName(componentNameInCamelCase);
     }
 }
