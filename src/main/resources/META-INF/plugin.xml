@@ -69,7 +69,8 @@
 
         <completion.contributor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.request.validation.RuleValidationCompletionContributor"/>
         <completion.contributor language="XML" implementationClass="at.alirezamoh.whisperer_for_laravel.blade.component.BladeXComponentCompletionContributor"/>
-        <completion.contributor  language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.request.requestField.RequestFieldCompletionContributor"/>
+        <completion.contributor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.request.requestField.RequestFieldCompletionContributor"/>
+        <completion.contributor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.routing.namespace.RouteNamespaceCompletionContributor"/>
 
         <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.blade.component.BladeXComponentGotoDeclarationHandler"/>
         <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.request.validation.RuleValidationGotoDeclarationHandler"/>

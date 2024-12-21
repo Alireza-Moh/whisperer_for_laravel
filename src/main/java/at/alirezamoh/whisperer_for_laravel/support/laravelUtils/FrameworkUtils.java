@@ -23,7 +23,7 @@ public class FrameworkUtils {
 
     public static boolean isLaravelProject(Project project) {
         File composerFile = getComposerFile(project);
-        if (!composerFile.exists()) {
+        if (composerFile == null) {
             return false;
         }
 
@@ -40,6 +40,10 @@ public class FrameworkUtils {
     public static @Nullable String laravelVersion(Project project) {
         File composerFile = getComposerFile(project);
 
+        if (composerFile == null) {
+            return null;
+        }
+
         try (FileReader reader = new FileReader(composerFile)) {
             JsonObject jsonObject = JsonParser.parseReader(reader).getAsJsonObject();
             JsonObject require = jsonObject.getAsJsonObject("require");
@@ -54,8 +58,13 @@ public class FrameworkUtils {
         return null;
     }
 
-    private static File getComposerFile(Project project) {
+    private static @Nullable File getComposerFile(Project project) {
         SettingsState settingsState = SettingsState.getInstance(project);
+
+        if (settingsState == null) {
+            return null;
+        }
+
         String defaultPath = project.getBasePath();
 
         if (!settingsState.isLaravelDirectoryEmpty()) {
