@@ -19,10 +19,8 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * Provides references to Laravel routes within a project
  * This class resolves references to route names and provides code completion
  * suggestions for route names in various contexts, such as in the `route`
- * helper function or in Blade templates
  */
 public class RouteReference extends PsiReferenceBase<PsiElement> implements PsiPolyVariantReference {
     /**
