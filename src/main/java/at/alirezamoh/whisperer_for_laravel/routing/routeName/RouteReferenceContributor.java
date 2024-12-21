@@ -1,4 +1,4 @@
-package at.alirezamoh.whisperer_for_laravel.routing;
+package at.alirezamoh.whisperer_for_laravel.routing.routeName;
 
 import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.ClassUtils;
 import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.FrameworkUtils;
