@@ -2,15 +2,14 @@ package at.alirezamoh.whisperer_for_laravel.request.requestField;
 
 import at.alirezamoh.whisperer_for_laravel.request.requestField.util.RequestFieldUtils;
 import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.FrameworkUtils;
+import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
 import com.intellij.codeInsight.navigation.actions.GotoDeclarationHandler;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.util.PsiTreeUtil;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.elements.impl.FieldReferenceImpl;
-import com.jetbrains.php.lang.psi.elements.impl.MethodImpl;
 import com.jetbrains.php.lang.psi.elements.impl.PhpClassImpl;
 import com.jetbrains.php.lang.psi.elements.impl.VariableImpl;
 import org.jetbrains.annotations.NotNull;
@@ -33,36 +32,42 @@ public class RequestFieldGotoDeclarationHandler implements GotoDeclarationHandle
             return null;
         }
 
-        if (!(sourceElement.getParent() instanceof FieldReferenceImpl fieldReference)) {
-            return null;
+        PsiElement parentElement = resolveParentElement(sourceElement);
+        if (parentElement instanceof VariableImpl variable) {
+            return findDeclarationTargets(variable, project, sourceElement.getParent());
         }
 
-        VariableImpl variable = (VariableImpl) fieldReference.getClassReference();
-        PhpClassImpl phpClass = RequestFieldUtils.resolveRequestClass(variable, project);
-
-        if (phpClass == null) {
-            return null;
-        }
-
-        Collection<ArrayHashElement> rules = RequestFieldUtils.getRules(phpClass, project);
-        if (rules == null && "\\Illuminate\\Http\\Request".equals(phpClass.getFQN())) {
-            MethodImpl method = PsiTreeUtil.getParentOfType(fieldReference, MethodImpl.class);
-            if (method != null) {
-                rules = RequestFieldUtils.extractValidationRulesFromMethod(method);
-            }
-        }
-
-        if (rules != null) {
-            return rules.stream()
-                .filter(rule -> RequestFieldUtils.isMatchingRule(fieldReference, rule))
-                .map(ArrayHashElement::getKey)
-                .toArray(PsiElement[]::new);
-        }
         return null;
     }
 
     @Override
     public @Nullable String getActionText(@NotNull DataContext context) {
         return null;
+    }
+
+    private PsiElement resolveParentElement(PsiElement sourceElement) {
+        PsiElement parent = sourceElement.getParent().getParent().getParent();
+        if (parent instanceof ArrayAccessExpression arrayAccessExpression) {
+            return arrayAccessExpression.getValue();
+        }
+
+        parent = sourceElement.getParent();
+        return parent instanceof FieldReferenceImpl fieldReference ? fieldReference.getClassReference() : null;
+    }
+
+    private PsiElement[] findDeclarationTargets(VariableImpl variable, Project project, PsiElement contextElement) {
+        PhpClassImpl phpClass = RequestFieldUtils.resolveRequestClass(variable, project);
+        if (phpClass == null) {
+            return null;
+        }
+
+        Collection<ArrayHashElement> rules = RequestFieldUtils.resolveRulesFromVariable(variable, project, contextElement);
+
+        return rules == null
+            ? null
+            : rules.stream()
+                .filter(rule -> RequestFieldUtils.isMatchingRule(contextElement, rule))
+                .map(ArrayHashElement::getKey)
+                .toArray(PsiElement[]::new);
     }
 }

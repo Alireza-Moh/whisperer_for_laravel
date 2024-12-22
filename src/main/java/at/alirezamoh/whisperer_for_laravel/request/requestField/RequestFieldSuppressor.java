@@ -31,7 +31,11 @@ public class RequestFieldSuppressor implements InspectionSuppressor {
 
     @Override
     public boolean isSuppressedFor(@NotNull PsiElement psiElement, @NotNull String s) {
-        if (!suppressedPhpInspections.contains(s)) {
+        Project project = psiElement.getProject();
+        if (
+            (!FrameworkUtils.isLaravelProject(project) && FrameworkUtils.isLaravelFrameworkNotInstalled(project))
+            || !suppressedPhpInspections.contains(s)
+        ) {
             return false;
         }
 
@@ -39,7 +43,7 @@ public class RequestFieldSuppressor implements InspectionSuppressor {
             return false;
         }
 
-        return isFieldInFormRequestRules(fieldReference);
+        return isFieldInFormRequestRules(fieldReference, project);
     }
 
     @Override
@@ -53,19 +57,9 @@ public class RequestFieldSuppressor implements InspectionSuppressor {
      * @param fieldReference the field reference to check
      * @return true or false
      */
-    private boolean isFieldInFormRequestRules(FieldReference fieldReference) {
-        PsiElement ref = fieldReference.getClassReference();
-        Project project = fieldReference.getProject();
-
-        if (!FrameworkUtils.isLaravelProject(project) && FrameworkUtils.isLaravelFrameworkNotInstalled(project)) {
-            return false;
-        }
-
-        if (ref == null) {
-            return false;
-        }
-
-        if (!(ref instanceof VariableImpl variable)) {
+    private boolean isFieldInFormRequestRules(FieldReference fieldReference, Project project) {
+        VariableImpl variable = getVariableFromFieldReference(fieldReference);
+        if (variable == null) {
             return false;
         }
 
@@ -74,20 +68,40 @@ public class RequestFieldSuppressor implements InspectionSuppressor {
             return false;
         }
 
-        Collection<ArrayHashElement> rules = RequestFieldUtils.getRules(phpClass, project);
-        if (rules != null) {
-            return rules.stream().anyMatch(rule -> RequestFieldUtils.isMatchingRule(fieldReference, rule));
-        }
+        Collection<ArrayHashElement> rules = getRulesFromPhpClassOrMethod(phpClass, fieldReference, project);
 
-        if (RequestFieldUtils.REQUEST.equals(phpClass.getFQN())) {
+        return rules != null
+            && rules.stream().anyMatch(rule -> RequestFieldUtils.isMatchingRule(fieldReference, rule));
+    }
+
+    /**
+     * Retrieves the variable from a FieldReference if it exists.
+     */
+    private @Nullable VariableImpl getVariableFromFieldReference(FieldReference fieldReference) {
+        PsiElement ref = fieldReference.getClassReference();
+        if (ref instanceof VariableImpl variable) {
+            return variable;
+        }
+        return null;
+    }
+
+    /**
+     * Retrieves rules from the given PhpClass or its parent method, if applicable.
+     */
+    private @Nullable Collection<ArrayHashElement> getRulesFromPhpClassOrMethod(
+        PhpClassImpl phpClass,
+        FieldReference fieldReference,
+        Project project
+    ) {
+        Collection<ArrayHashElement> rules = RequestFieldUtils.getRules(phpClass, project);
+
+        if (rules == null && RequestFieldUtils.REQUEST.equals(phpClass.getFQN())) {
             MethodImpl method = PsiTreeUtil.getParentOfType(fieldReference, MethodImpl.class);
             if (method != null) {
-                rules = RequestFieldUtils.extractValidationRulesFromMethod(method);
-                return rules.stream().anyMatch(rule -> RequestFieldUtils.isMatchingRule(fieldReference, rule));
+                return RequestFieldUtils.extractValidationRulesFromMethod(method);
             }
         }
 
-
-        return false;
+        return rules;
     }
 }

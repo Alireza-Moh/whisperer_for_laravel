@@ -2,17 +2,14 @@ package at.alirezamoh.whisperer_for_laravel.request.requestField;
 
 import at.alirezamoh.whisperer_for_laravel.request.requestField.util.RequestFieldUtils;
 import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.FrameworkUtils;
-import at.alirezamoh.whisperer_for_laravel.support.psiUtil.PsiUtil;
-import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
 import com.intellij.codeInsight.completion.*;
 import com.intellij.openapi.project.Project;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.*;
-import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.lang.lexer.PhpTokenTypes;
 import com.jetbrains.php.lang.psi.elements.*;
-import com.jetbrains.php.lang.psi.elements.impl.MethodImpl;
+import com.jetbrains.php.lang.psi.elements.impl.ArrayIndexImpl;
 import com.jetbrains.php.lang.psi.elements.impl.PhpClassImpl;
 import com.jetbrains.php.lang.psi.elements.impl.VariableImpl;
 import org.jetbrains.annotations.NotNull;
@@ -26,55 +23,58 @@ public class RequestFieldCompletionContributor extends CompletionContributor {
     public RequestFieldCompletionContributor() {
         extend(
             CompletionType.BASIC,
-            PlatformPatterns.psiElement().withElementType(PhpTokenTypes.IDENTIFIER),
+            PlatformPatterns.or(
+                PlatformPatterns.psiElement().withElementType(PhpTokenTypes.IDENTIFIER),
+                PlatformPatterns.psiElement(PhpTokenTypes.STRING_LITERAL)
+                    .withSuperParent(2, ArrayIndexImpl.class)
+                    .withSuperParent(3, ArrayAccessExpression.class),
+                PlatformPatterns.psiElement(PhpTokenTypes.STRING_LITERAL)
+                    .withSuperParent(2, ArrayIndexImpl.class)
+                    .withSuperParent(3, ArrayAccessExpression.class)
+            ),
             new CompletionProvider<>() {
                 @Override
                 protected void addCompletions(@NotNull CompletionParameters parameters, @NotNull ProcessingContext context, @NotNull CompletionResultSet resultSet) {
-                    PsiElement element = parameters.getPosition().getOriginalElement();
+                    PsiElement position = parameters.getPosition().getOriginalElement();
 
-                    Project project = element.getProject();
+                    Project project = position.getProject();
                     if (!FrameworkUtils.isLaravelProject(project) && FrameworkUtils.isLaravelFrameworkNotInstalled(project)) {
                         return;
                     }
 
-                    if (element.getPrevSibling() == null) {
-                        return;
-                    }
-
-                    PsiElement parent = element.getPrevSibling().getPrevSibling();
-
-                    if (!(parent instanceof VariableImpl variable)) {
-                        return;
-                    }
-
-                    PhpClassImpl phpClass = RequestFieldUtils.resolveRequestClass(variable, project);
-                    if (phpClass == null) {
-                        return;
-                    }
-
-                    Collection<ArrayHashElement> rules = RequestFieldUtils.getRules(phpClass, project);
-                    if (rules == null && RequestFieldUtils.REQUEST.equals(phpClass.getFQN())) {
-                        MethodImpl method = PsiTreeUtil.getParentOfType(element, MethodImpl.class);
-                        if (method != null) {
-                            RequestFieldUtils.extractValidationRulesFromMethod(method).forEach(rule -> addCompletionFromRule(rule, resultSet));
-                        }
-                    } else if (rules != null) {
-                        rules.forEach(rule -> addCompletionFromRule(rule, resultSet));
+                    PsiElement targetElement = getTargetElement(position);
+                    if (targetElement instanceof VariableImpl variable) {
+                        handleVariableCompletions(variable, project, resultSet, position);
                     }
                 }
             }
         );
     }
 
-    private void addCompletionFromRule(ArrayHashElement rule, CompletionResultSet resultSet) {
-        PsiElement key = rule.getKey();
-        if (key instanceof StringLiteralExpression stringLiteralExpression) {
-            resultSet.addElement(
-                PrioritizedLookupElement.withPriority(
-                    PsiUtil.buildSimpleLookupElement(StrUtil.removeQuotes(stringLiteralExpression.getText())),
-                    1000
-                )
-            );
+    private PsiElement getTargetElement(PsiElement position) {
+        PsiElement parent = position.getParent().getParent().getParent();
+        if (parent instanceof ArrayAccessExpression arrayAccess) {
+            return arrayAccess.getValue();
         }
+
+        PsiElement prevSibling = position.getPrevSibling();
+
+        return prevSibling != null ? prevSibling.getPrevSibling() : null;
+    }
+
+    private void handleVariableCompletions(
+        VariableImpl variable,
+        Project project,
+        CompletionResultSet resultSet,
+        PsiElement contextElement
+    ) {
+        PhpClassImpl phpClass = RequestFieldUtils.resolveRequestClass(variable, project);
+        if (phpClass == null) {
+            return;
+        }
+
+        Collection<ArrayHashElement> rules = RequestFieldUtils.resolveRulesFromVariable(variable, project, contextElement);
+        RequestFieldUtils.processRules(rules, resultSet);
     }
 }
+

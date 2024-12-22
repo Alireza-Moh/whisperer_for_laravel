@@ -80,6 +80,8 @@
         <codeInsight.template.postfixTemplateProvider language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.postfixes.dd.DDPostfixProvider" />
 
         <errorHandler implementation="com.intellij.diagnostic.JetBrainsMarketplaceErrorReportSubmitter"/>
+
+        <lang.inspectionSuppressor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.request.requestField.RequestFieldSuppressor"/>
     </extensions>
 
     <actions>
