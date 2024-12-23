@@ -15,6 +15,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
+import com.intellij.psi.PsiDirectory;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -68,6 +69,8 @@ public class GenerateHelperMethodsAction extends BaseAction {
                 public void run(@NotNull ProgressIndicator indicator) {
                     indicator.setIndeterminate(true);
                     try {
+                        ApplicationManager.getApplication().invokeAndWait(() -> deletePluginVendorDir());
+
                         ApplicationManager.getApplication().runReadAction(() -> {
                             createModelsHelperData(indicator);
                             createBaseQueryBuilderMethods(indicator);
@@ -79,6 +82,20 @@ public class GenerateHelperMethodsAction extends BaseAction {
                     }
                 }
             }.queue();
+        });
+    }
+
+    private void deletePluginVendorDir() {
+        ApplicationManager.getApplication().runWriteAction(() -> {
+            PsiDirectory pluginVendor = DirectoryPsiUtil.getDirectory(project, ProjectDefaultPaths.WHISPERER_FOR_LARAVEL_DIR_PATH);
+
+            if (pluginVendor != null) {
+                try {
+                    pluginVendor.delete();
+                } catch (Exception e) {
+                    Notify.notifyError(project, "Could not delete the plugin vendor directory");
+                }
+            }
         });
     }
 

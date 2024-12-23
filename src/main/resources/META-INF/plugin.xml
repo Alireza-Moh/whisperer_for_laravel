@@ -36,6 +36,8 @@
                 <liAdds blade components autocompletion and resolving.</li>
                 <li>Fixes Inertia.js autocompletion to include pages located directly in the root folder.</li>
                 <li>Provides autocompletion for migration files and resolves related table files globally.</li>
+                <li>Adds autocompletion for controller actions and namespaces in route definitions</li>
+                <li>Adds middleware autocompletion.</li>
             </ul>
         ]]>
     </change-notes>
@@ -45,7 +47,7 @@
     <depends>com.intellij.modules.platform</depends>
     <depends>com.jetbrains.php.blade</depends>
 
-    <version>1.1.1</version>
+    <version>1.1.2</version>
 
     <extensions defaultExtensionNs="com.intellij">
         <notificationGroup id="NotificationGroup" displayType="BALLOON"/>
@@ -66,10 +68,14 @@
         <psi.referenceContributor language="PHP" implementation="at.alirezamoh.whisperer_for_laravel.gate.GateReferenceContributor"/>
         <psi.referenceContributor language="PHP" implementation="at.alirezamoh.whisperer_for_laravel.inertia.InertiaReferenceContributor"/>
         <psi.referenceContributor language="PHP" implementation="at.alirezamoh.whisperer_for_laravel.eloquent.table.TableReferenceContributor"/>
+        <psi.referenceContributor language="PHP" implementation="at.alirezamoh.whisperer_for_laravel.routing.middleware.MiddlewareReferenceContributor"/>
+        <psi.referenceContributor language="PHP" implementation="at.alirezamoh.whisperer_for_laravel.routing.routeAction.RouteActionReferenceContributor"/>
+        <psi.referenceContributor language="PHP" implementation="at.alirezamoh.whisperer_for_laravel.routing.resourceRoute.ResourceRouteReferenceContributor"/>
 
         <completion.contributor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.request.validation.RuleValidationCompletionContributor"/>
         <completion.contributor language="XML" implementationClass="at.alirezamoh.whisperer_for_laravel.blade.component.BladeXComponentCompletionContributor"/>
-        <completion.contributor  language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.request.requestField.RequestFieldCompletionContributor"/>
+        <completion.contributor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.request.requestField.RequestFieldCompletionContributor"/>
+        <completion.contributor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.routing.namespace.RouteNamespaceCompletionContributor"/>
 
         <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.blade.component.BladeXComponentGotoDeclarationHandler"/>
         <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.request.validation.RuleValidationGotoDeclarationHandler"/>
@@ -78,6 +84,8 @@
         <codeInsight.template.postfixTemplateProvider language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.postfixes.dd.DDPostfixProvider" />
 
         <errorHandler implementation="com.intellij.diagnostic.JetBrainsMarketplaceErrorReportSubmitter"/>
+
+        <lang.inspectionSuppressor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.request.requestField.RequestFieldSuppressor"/>
     </extensions>
 
     <actions>

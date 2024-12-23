@@ -1,15 +1,19 @@
 package at.alirezamoh.whisperer_for_laravel.request.requestField.util;
 
 import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.ClassUtils;
+import at.alirezamoh.whisperer_for_laravel.support.psiUtil.PsiUtil;
 import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
+import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.jetbrains.php.lang.psi.elements.*;
+import com.jetbrains.php.lang.psi.elements.impl.FieldReferenceImpl;
 import com.jetbrains.php.lang.psi.elements.impl.MethodImpl;
 import com.jetbrains.php.lang.psi.elements.impl.PhpClassImpl;
 import com.jetbrains.php.lang.psi.elements.impl.VariableImpl;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
@@ -119,15 +123,62 @@ final public class RequestFieldUtils {
     /**
      * Checks whether a field reference matches a given rule key
      *
-     * @param fieldReference the field rule to match
+     * @param element the field rule to match
      * @param rule the rule to check
      * @return true or false
      */
-    public static boolean isMatchingRule(FieldReference fieldReference, ArrayHashElement rule) {
+    public static boolean isMatchingRule(@Nullable PsiElement element, ArrayHashElement rule) {
         PsiElement key = rule.getKey();
-        if (key instanceof StringLiteralExpression stringLiteralExpression) {
-            return Objects.equals(fieldReference.getName(), StrUtil.removeQuotes(stringLiteralExpression.getText()));
+        if (!(key instanceof StringLiteralExpression ruleAsString)) {
+            return false;
         }
+
+        String ruleName = StrUtil.removeQuotes(ruleAsString.getText());
+
+        if (element instanceof StringLiteralExpression stringLiteralExpression) {
+            return Objects.equals(
+                StrUtil.removeQuotes(stringLiteralExpression.getText()),
+                ruleName
+            );
+        }
+
+        if (element instanceof FieldReferenceImpl fieldReference && fieldReference.getName() != null) {
+            return Objects.equals(
+                StrUtil.removeQuotes(fieldReference.getName()),
+                ruleName
+            );
+        }
+
         return false;
+    }
+
+    public static Collection<ArrayHashElement> resolveRulesFromVariable(VariableImpl variable, Project project, PsiElement contextElement) {
+        PhpClassImpl phpClass = resolveRequestClass(variable, project);
+        if (phpClass == null) {
+            return null;
+        }
+
+        Collection<ArrayHashElement> rules = getRules(phpClass, project);
+        if (rules == null && REQUEST.equals(phpClass.getFQN())) {
+            MethodImpl method = PsiTreeUtil.getParentOfType(contextElement, MethodImpl.class);
+            if (method != null) {
+                rules = extractValidationRulesFromMethod(method);
+            }
+        }
+
+        return rules;
+    }
+
+    public static void processRules(Collection<ArrayHashElement> rules, CompletionResultSet resultSet) {
+        if (rules == null) return;
+
+        rules.forEach(rule -> {
+            PsiElement key = rule.getKey();
+            if (key instanceof StringLiteralExpression stringLiteral) {
+                resultSet.addElement(
+                    PsiUtil.buildSimpleLookupElement(StrUtil.removeQuotes(stringLiteral.getText()))
+                );
+            }
+        });
     }
 }
