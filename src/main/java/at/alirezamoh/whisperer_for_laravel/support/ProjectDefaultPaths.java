@@ -44,9 +44,7 @@ final public class ProjectDefaultPaths {
 
     public static final String ELOQUENT_MODEL_PATH = "/Models/";
 
-    public static final String APP_SERVICE_PROVIDER_PATH = "Providers/AppServiceProvider.php";
-
-    public static final String IDEA_WHISPERER_FOR_LARAVEL_PATH = "vendor/_idea_whisperer_for_laravel/";
+    public static final String WHISPERER_FOR_LARAVEL_DIR_PATH = "vendor/_idea_whisperer_for_laravel/";
 
     public static final String LARAVEL_DB_QUERY_BUILDER_PATH = "/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php";
 

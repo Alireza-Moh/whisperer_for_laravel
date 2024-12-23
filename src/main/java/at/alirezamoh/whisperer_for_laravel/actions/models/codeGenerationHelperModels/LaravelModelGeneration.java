@@ -17,8 +17,8 @@ public class LaravelModelGeneration extends BaseModel {
         this.slug = "";
         this.name = "idea_whisperer_for_laravel_models_" + shortUuid;
         this.extension = ".php";
-        this.destination = "/" + ProjectDefaultPaths.IDEA_WHISPERER_FOR_LARAVEL_PATH;
-        this.filePath = ProjectDefaultPaths.IDEA_WHISPERER_FOR_LARAVEL_PATH + this.name + ".php";
+        this.destination = "/" + ProjectDefaultPaths.WHISPERER_FOR_LARAVEL_DIR_PATH;
+        this.filePath = ProjectDefaultPaths.WHISPERER_FOR_LARAVEL_DIR_PATH + this.name + ".php";
     }
 
     public List<LaravelModel> getModels() {
