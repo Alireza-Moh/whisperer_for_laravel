@@ -68,6 +68,7 @@
         <psi.referenceContributor language="PHP" implementation="at.alirezamoh.whisperer_for_laravel.eloquent.table.TableReferenceContributor"/>
         <psi.referenceContributor language="PHP" implementation="at.alirezamoh.whisperer_for_laravel.routing.middleware.MiddlewareReferenceContributor"/>
         <psi.referenceContributor language="PHP" implementation="at.alirezamoh.whisperer_for_laravel.routing.routeAction.RouteActionReferenceContributor"/>
+        <psi.referenceContributor language="PHP" implementation="at.alirezamoh.whisperer_for_laravel.routing.resourceRoute.ResourceRouteReferenceContributor"/>
 
         <completion.contributor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.request.validation.RuleValidationCompletionContributor"/>
         <completion.contributor language="XML" implementationClass="at.alirezamoh.whisperer_for_laravel.blade.component.BladeXComponentCompletionContributor"/>

@@ -1,4 +1,4 @@
-package at.alirezamoh.whisperer_for_laravel.routing.routeAction;
+package at.alirezamoh.whisperer_for_laravel.routing.resourceRoute;
 
 import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.ClassUtils;
 import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.FrameworkUtils;
@@ -20,31 +20,21 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * This class allows the IDE to recognize and resolve controllers with its methods
+ * This class allows the IDE to recognize and resolve controller methods for the route resource() method
  */
-public class RouteActionReferenceContributor extends PsiReferenceContributor {
+public class ResourceRouteReferenceContributor extends PsiReferenceContributor {
     /**
      * The names of the route methods
      */
     public static Map<String, Integer> ROUTE_METHODS = new HashMap<>() {{
-        put("get", 1);
-        put("post", 1);
-        put("put", 1);
-        put("delete", 1);
-        put("patch", 1);
-        put("options", 1);
-        put("any", 1);
-        put("match", 1);
-        put("fallback", 0);
+        put("only", 0);
     }};
 
     /**
      * Route class
      */
     private final List<String> ROUTE_NAMESPACES = new ArrayList<>() {{
-        add("\\Illuminate\\Routing\\Route");
-        add("\\Illuminate\\Support\\Facades\\Route");
-        add("\\Route");
+        add("\\Illuminate\\Routing\\PendingResourceRegistration");
     }};
 
     @Override
@@ -68,7 +58,7 @@ public class RouteActionReferenceContributor extends PsiReferenceContributor {
                         String text = psiElement.getOriginalElement().getText();
 
                         return new PsiReference[]{
-                            new RouteActionReference(psiElement, new TextRange(PsiUtil.getStartOffset(text), PsiUtil.getEndOffset(text)))
+                            new ResourceRouteActionReference(psiElement, new TextRange(PsiUtil.getStartOffset(text), PsiUtil.getEndOffset(text)))
                         };
                     }
                     return PsiReference.EMPTY_ARRAY;
