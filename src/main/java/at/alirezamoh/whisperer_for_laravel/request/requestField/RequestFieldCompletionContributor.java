@@ -30,6 +30,12 @@ public class RequestFieldCompletionContributor extends CompletionContributor {
                     .withSuperParent(3, ArrayAccessExpression.class),
                 PlatformPatterns.psiElement(PhpTokenTypes.STRING_LITERAL)
                     .withSuperParent(2, ArrayIndexImpl.class)
+                    .withSuperParent(3, ArrayAccessExpression.class),
+                PlatformPatterns.psiElement(PhpTokenTypes.STRING_LITERAL_SINGLE_QUOTE)
+                    .withSuperParent(2, ArrayIndexImpl.class)
+                    .withSuperParent(3, ArrayAccessExpression.class),
+                PlatformPatterns.psiElement(PhpTokenTypes.STRING_LITERAL_SINGLE_QUOTE)
+                    .withSuperParent(2, ArrayIndexImpl.class)
                     .withSuperParent(3, ArrayAccessExpression.class)
             ),
             new CompletionProvider<>() {
