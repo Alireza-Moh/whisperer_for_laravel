@@ -14,7 +14,9 @@ import com.jetbrains.php.lang.psi.elements.ParameterList;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -31,7 +33,11 @@ public class MiddlewareReferenceContributor extends PsiReferenceContributor {
     /**
      * Route class
      */
-    private final String ROUTE_CLASS ="\\Illuminate\\Routing\\Route";
+    private final List<String> ROUTE_NAMESPACES = new ArrayList<>() {{
+        add("\\Illuminate\\Routing\\Route");
+        add("\\Illuminate\\Support\\Facades\\Route");
+        add("\\Route");
+    }};
 
     @Override
     public void registerReferenceProviders(@NotNull PsiReferenceRegistrar psiReferenceRegistrar) {
@@ -74,7 +80,7 @@ public class MiddlewareReferenceContributor extends PsiReferenceContributor {
 
         return method != null
             && isMiddlewareParam(method, psiElement)
-            && ClassUtils.isCorrectRelatedClass(method, project, ROUTE_CLASS);
+            && ClassUtils.isCorrectRelatedClass(method, project, ROUTE_NAMESPACES);
     }
 
     /**
