@@ -18,7 +18,6 @@ import java.util.List;
 
 /**
  * This class resolves references to middleware groups and aliases and provides completion
- * helper function or in Blade templates
  */
 public class MiddlewareReference extends PsiReferenceBase<PsiElement> {
     /**
