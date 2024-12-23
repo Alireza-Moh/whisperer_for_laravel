@@ -1,6 +1,7 @@
 package at.alirezamoh.whisperer_for_laravel.routing.namespace;
 
 import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.ClassUtils;
+import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.MethodUtils;
 import at.alirezamoh.whisperer_for_laravel.support.psiUtil.PsiUtil;
 import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
 import com.intellij.codeInsight.completion.*;
@@ -22,7 +23,16 @@ public class RouteNamespaceCompletionContributor extends CompletionContributor {
         add("\\Illuminate\\Routing\\Route");
         add("\\Illuminate\\Support\\Facades\\Route");
         add("\\Route");
+        add("\\Illuminate\\Routing\\RouteRegistrar");
     }};
+
+    /**
+     * The names of the methods for autocompletion
+     */
+    public static Map<String, Integer> NAMESPACE_METHODS = new HashMap<>() {{
+        put("namespace", 0);
+    }};
+
 
     public RouteNamespaceCompletionContributor() {
         extend(
@@ -37,11 +47,11 @@ public class RouteNamespaceCompletionContributor extends CompletionContributor {
                 protected void addCompletions(@NotNull CompletionParameters completionParameters, @NotNull ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
                     PsiElement element = completionParameters.getPosition().getOriginalElement();
 
-                    PsiElement parent = element.getParent().getParent().getParent();
+                    MethodReference method = MethodUtils.resolveMethodReference(element, 10);
                     if (
-                        parent instanceof MethodReference methodReference
-                        && Objects.equals(methodReference.getName(), "namespace")
-                        && ClassUtils.isCorrectRelatedClass(methodReference, element.getProject(), ROUTE_NAMESPACES)
+                        method != null
+                        && isNamespaceParam(method, element)
+                        && ClassUtils.isCorrectRelatedClass(method, element.getProject(), ROUTE_NAMESPACES)
                     )
                     {
                         for (String namespace : getAllNamespaces(completionResultSet, element)) {
@@ -75,5 +85,21 @@ public class RouteNamespaceCompletionContributor extends CompletionContributor {
             }
         });
         return namespaces;
+    }
+
+    /**
+     * Check if the given reference and position match the namespace parameter criteria
+     * @param reference The method
+     * @param position The PSI element position
+     * @return True or false
+     */
+    private boolean isNamespaceParam(MethodReference reference, PsiElement position) {
+        Integer expectedParamIndex = NAMESPACE_METHODS.get(reference.getName());
+
+        if (expectedParamIndex == null) {
+            return false;
+        }
+
+        return MethodUtils.findParamIndex(position, false) == expectedParamIndex;
     }
 }
