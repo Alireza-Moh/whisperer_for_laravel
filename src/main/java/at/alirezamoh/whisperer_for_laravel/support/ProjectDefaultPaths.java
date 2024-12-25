@@ -42,6 +42,8 @@ final public class ProjectDefaultPaths {
 
     public static final String CONTROLLER_PATH = "/Http/Controllers/";
 
+    public static final String JSON_RESOURCE_PATH = "/Http/Resources/";
+
     public static final String ELOQUENT_MODEL_PATH = "/Models/";
 
     public static final String WHISPERER_FOR_LARAVEL_DIR_PATH = "vendor/_idea_whisperer_for_laravel/";

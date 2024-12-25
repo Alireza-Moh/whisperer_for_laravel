@@ -15,6 +15,10 @@ public class Field {
 
     private RenameField renameField;
 
+    public Field(String name) {
+        this.name = name;
+    }
+
     public Field(String type, String name, boolean nullable) {
         this.type = type;
         this.name = name;

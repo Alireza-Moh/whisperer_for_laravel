@@ -3,12 +3,14 @@ package at.alirezamoh.whisperer_for_laravel.actions;
 import at.alirezamoh.whisperer_for_laravel.actions.models.BaseModel;
 import at.alirezamoh.whisperer_for_laravel.actions.models.codeGenerationHelperModels.*;
 import at.alirezamoh.whisperer_for_laravel.actions.models.dataTables.Method;
+import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.whisperer_for_laravel.support.ProjectDefaultPaths;
 import at.alirezamoh.whisperer_for_laravel.support.codeGeneration.MigrationManager;
 import at.alirezamoh.whisperer_for_laravel.support.codeGeneration.vistors.ClassMethodLoader;
 import at.alirezamoh.whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
 import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.FrameworkUtils;
 import at.alirezamoh.whisperer_for_laravel.support.notification.Notify;
+import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
 import at.alirezamoh.whisperer_for_laravel.support.template.TemplateLoader;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
@@ -87,7 +89,14 @@ public class GenerateHelperMethodsAction extends BaseAction {
 
     private void deletePluginVendorDir() {
         ApplicationManager.getApplication().runWriteAction(() -> {
-            PsiDirectory pluginVendor = DirectoryPsiUtil.getDirectory(project, ProjectDefaultPaths.WHISPERER_FOR_LARAVEL_DIR_PATH);
+            SettingsState settingsState = SettingsState.getInstance(project);
+            String path = ProjectDefaultPaths.WHISPERER_FOR_LARAVEL_DIR_PATH;
+
+            if (!settingsState.isLaravelDirectoryEmpty()) {
+                path = StrUtil.addSlashes(settingsState.getLaravelDirectoryPath(), false, true) + path;
+            }
+
+            PsiDirectory pluginVendor = DirectoryPsiUtil.getDirectory(project, path);
 
             if (pluginVendor != null) {
                 try {
