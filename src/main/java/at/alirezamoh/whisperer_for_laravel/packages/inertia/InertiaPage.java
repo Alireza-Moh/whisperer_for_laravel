@@ -1,4 +1,4 @@
-package at.alirezamoh.whisperer_for_laravel.inertia;
+package at.alirezamoh.whisperer_for_laravel.packages.inertia;
 
 import com.intellij.psi.PsiFile;
 

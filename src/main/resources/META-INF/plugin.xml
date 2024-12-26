@@ -66,7 +66,7 @@
         <psi.referenceContributor language="PHP" implementation="at.alirezamoh.whisperer_for_laravel.blade.viewName.BladeReferenceContributor"/>
         <psi.referenceContributor language="PHP" implementation="at.alirezamoh.whisperer_for_laravel.routing.routeName.RouteReferenceContributor"/>
         <psi.referenceContributor language="PHP" implementation="at.alirezamoh.whisperer_for_laravel.gate.GateReferenceContributor"/>
-        <psi.referenceContributor language="PHP" implementation="at.alirezamoh.whisperer_for_laravel.inertia.InertiaReferenceContributor"/>
+        <psi.referenceContributor language="PHP" implementation="at.alirezamoh.whisperer_for_laravel.packages.inertia.InertiaReferenceContributor"/>
         <psi.referenceContributor language="PHP" implementation="at.alirezamoh.whisperer_for_laravel.eloquent.table.TableReferenceContributor"/>
         <psi.referenceContributor language="PHP" implementation="at.alirezamoh.whisperer_for_laravel.routing.middleware.MiddlewareReferenceContributor"/>
         <psi.referenceContributor language="PHP" implementation="at.alirezamoh.whisperer_for_laravel.routing.routeAction.RouteActionReferenceContributor"/>
