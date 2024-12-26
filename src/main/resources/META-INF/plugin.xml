@@ -172,6 +172,9 @@
 
                 <action class="at.alirezamoh.whisperer_for_laravel.actions.BroadcastingChannelAction" text="Create Broadcasting Channel" icon="/icons/laravelIcon.svg">
                 </action>
+
+                <action class="at.alirezamoh.whisperer_for_laravel.actions.DbFactoryAction" text="Create Database Factory" icon="/icons/laravelIcon.svg">
+                </action>
             </group>
         </group>
     </actions>
