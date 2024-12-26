@@ -179,6 +179,11 @@
                 <action class="at.alirezamoh.whisperer_for_laravel.actions.ViewComposerAction" text="Create View Composer" icon="/icons/laravelIcon.svg">
                 </action>
             </group>
+
+            <separator />
+
+            <action class="at.alirezamoh.whisperer_for_laravel.actions.WhispererForLaravelSettingsNavigationAction" text="Whisper For Laravel Settings" icon="/icons/laravelIcon.svg">
+            </action>
         </group>
     </actions>
 </idea-plugin>
