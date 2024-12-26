@@ -46,7 +46,7 @@ public class DbFactoryModel extends BaseModel {
         }
         else {
             initDestination();
-            initNamespace("");
+            initNamespace("Database\\Seeders");
             initFilePath();
         }
     }
