@@ -157,6 +157,9 @@
 
                 <action class="at.alirezamoh.whisperer_for_laravel.actions.JsonResourceAction" text="Create Json Resource" icon="/icons/laravelIcon.svg">
                 </action>
+
+                <action class="at.alirezamoh.whisperer_for_laravel.actions.JsonResourceCollectionAction" text="Create Json Resource Collection" icon="/icons/laravelIcon.svg">
+                </action>
             </group>
         </group>
     </actions>
