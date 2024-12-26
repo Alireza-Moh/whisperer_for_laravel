@@ -166,6 +166,9 @@
 
                 <action class="at.alirezamoh.whisperer_for_laravel.actions.EloquentScopeAction" text="Create Eloquent Scope" icon="/icons/laravelIcon.svg">
                 </action>
+
+                <action class="at.alirezamoh.whisperer_for_laravel.actions.EloquentCastAction" text="Create Eloquent Cast" icon="/icons/laravelIcon.svg">
+                </action>
             </group>
         </group>
     </actions>
