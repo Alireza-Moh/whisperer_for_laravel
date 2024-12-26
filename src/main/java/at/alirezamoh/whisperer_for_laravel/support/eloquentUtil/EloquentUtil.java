@@ -78,9 +78,8 @@ public class EloquentUtil {
     }
 
     private void extractFieldsFromClass(PhpClass phpClass, boolean withRelations, List<Field> fields) {
-        com.jetbrains.php.lang.psi.elements.Field[] modelFields = phpClass.getOwnFields();
-        for (com.jetbrains.php.lang.psi.elements.Field field : modelFields) {
-            PsiElement prev = field.getPrevSibling();
+        for (com.jetbrains.php.lang.psi.elements.Field field : phpClass.getOwnFields()) {
+            PsiElement prev = field.getPrevPsiSibling();
 
             if (withRelations) {
                 fields.add(new Field(field.getName()));
