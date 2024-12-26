@@ -175,6 +175,9 @@
 
                 <action class="at.alirezamoh.whisperer_for_laravel.actions.DbFactoryAction" text="Create Database Factory" icon="/icons/laravelIcon.svg">
                 </action>
+
+                <action class="at.alirezamoh.whisperer_for_laravel.actions.ViewComposerAction" text="Create View Composer" icon="/icons/laravelIcon.svg">
+                </action>
             </group>
         </group>
     </actions>
