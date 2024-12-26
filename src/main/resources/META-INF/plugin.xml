@@ -163,6 +163,9 @@
 
                 <action class="at.alirezamoh.whisperer_for_laravel.actions.FormRequestAction" text="Create Form Request" icon="/icons/laravelIcon.svg">
                 </action>
+
+                <action class="at.alirezamoh.whisperer_for_laravel.actions.EloquentScopeAction" text="Create Eloquent Scope" icon="/icons/laravelIcon.svg">
+                </action>
             </group>
         </group>
     </actions>

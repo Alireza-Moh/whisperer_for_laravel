@@ -48,6 +48,8 @@ final public class ProjectDefaultPaths {
 
     public static final String ELOQUENT_MODEL_PATH = "/Models/";
 
+    public static final String ELOQUENT_SCOPE_PATH = "/Models/Scopes";
+
     public static final String WHISPERER_FOR_LARAVEL_DIR_PATH = "vendor/_idea_whisperer_for_laravel/";
 
     public static final String LARAVEL_DB_QUERY_BUILDER_PATH = "/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php";
