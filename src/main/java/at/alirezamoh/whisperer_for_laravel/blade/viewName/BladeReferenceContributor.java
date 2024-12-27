@@ -160,7 +160,7 @@ public class BladeReferenceContributor extends PsiReferenceContributor {
     }
 
     /**
-     * Generalized logic to check if a parameter matches the expected method and map.
+     * Check if a parameter matches the expected method and map.
      *
      * @param position The PSI element position.
      * @param methodName The method name.
