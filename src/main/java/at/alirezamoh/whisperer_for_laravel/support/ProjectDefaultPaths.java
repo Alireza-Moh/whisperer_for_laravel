@@ -4,13 +4,9 @@ package at.alirezamoh.whisperer_for_laravel.support;
  * Stores default paths for various Laravel project components
  */
 final public class ProjectDefaultPaths {
-    public static final String LARAVEL_BOOTSTRAP_PROVIDERS_PATH = "/bootstrap/providers.php";
-
     public static final String VIEW_PATH = "/resources/views/";
 
     public static final String CONFIG_PATH = "/config/";
-
-    public static final String ROUTE_PATH = "/routes/";
 
     public static final String BLADE_COMPONENT_CLASS_PATH = "/View/Components/";
 
@@ -58,7 +54,7 @@ final public class ProjectDefaultPaths {
 
     public static final String VIEW_COMPOSER_PATH = "/Http/ViewComposers/";
 
-    public static final String WHISPERER_FOR_LARAVEL_DIR_PATH = "vendor/_idea_whisperer_for_laravel/";
+    public static final String WHISPERER_FOR_LARAVEL_DIR_PATH = "vendor/whisperer_for_laravel/";
 
     public static final String LARAVEL_DB_QUERY_BUILDER_PATH = "/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php";
 

@@ -14,6 +14,7 @@ import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
 import at.alirezamoh.whisperer_for_laravel.support.template.TemplateLoader;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
@@ -28,6 +29,8 @@ import java.util.stream.Collectors;
 
 public class GenerateHelperMethodsAction extends BaseAction {
     private Project project;
+
+    private static final Logger LOG = Logger.getInstance(GenerateHelperMethodsAction.class);
 
     List<String> ignoreMethods = Arrays.asList(
         "__call",
@@ -80,6 +83,7 @@ public class GenerateHelperMethodsAction extends BaseAction {
 
                         Notify.notifySuccess(project, "Code generation successful");
                     } catch (Exception e) {
+                        LOG.error("Could not create helper code", e);
                         Notify.notifyError(project, "Could not create helper code");
                     }
                 }
@@ -102,6 +106,7 @@ public class GenerateHelperMethodsAction extends BaseAction {
                 try {
                     pluginVendor.delete();
                 } catch (Exception e) {
+                    LOG.error("Could not delete the plugin vendor directory", e);
                     Notify.notifyError(project, "Could not delete the plugin vendor directory");
                 }
             }
@@ -119,7 +124,7 @@ public class GenerateHelperMethodsAction extends BaseAction {
                 .collect(Collectors.groupingBy(LaravelModel::getNamespaceName));
 
             groupedModels.forEach((namespace, modelsInNamespace) -> {
-                LaravelModelGeneration generation = new LaravelModelGeneration(namespace, modelsInNamespace);
+                LaravelModelGeneration generation = new LaravelModelGeneration(namespace, modelsInNamespace, SettingsState.getInstance(project));
                 create(generation, "laravelModels.ftl");
             });
         }
@@ -145,7 +150,7 @@ public class GenerateHelperMethodsAction extends BaseAction {
 
         if (!baseQueryBuilderMethods.isEmpty()) {
             create(
-                new LaravelDbBuilder(baseQueryBuilderMethods),
+                new LaravelDbBuilder(baseQueryBuilderMethods, SettingsState.getInstance(project)),
                 "baseDbQueryBuilder.ftl"
             );
         }

@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
  */
 @State(
     name="Settings",
-    storages = {@Storage("idea_whisperer_for_laravel.xml")}
+    storages = {@Storage("whisperer_for_laravel.xml")}
 )
 public class SettingsState implements PersistentStateComponent<SettingsState> {
     private static Project project;
