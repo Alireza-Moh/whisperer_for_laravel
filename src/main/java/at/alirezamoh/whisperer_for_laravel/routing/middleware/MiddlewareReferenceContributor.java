@@ -28,6 +28,7 @@ public class MiddlewareReferenceContributor extends PsiReferenceContributor {
      */
     private final Map<String, Integer> MIDDLEWARE_METHODS = new HashMap<>() {{
         put("middleware", 0);
+        put("withoutMiddleware", 0);
     }};
 
     /**

@@ -1,13 +1,18 @@
 package at.alirezamoh.whisperer_for_laravel.config;
 
-import at.alirezamoh.whisperer_for_laravel.config.resolvers.ConfigFileResolver;
-import at.alirezamoh.whisperer_for_laravel.config.resolvers.ConfigKeyCollector;
+import at.alirezamoh.whisperer_for_laravel.config.util.ConfigKeyCollector;
+import at.alirezamoh.whisperer_for_laravel.config.util.ConfigKeyResolver;
+import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
+import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiReferenceBase;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class ConfigReference extends PsiReferenceBase<PsiElement> {
     public ConfigReference(@NotNull PsiElement element, TextRange rangeInElement) {
@@ -16,22 +21,32 @@ public class ConfigReference extends PsiReferenceBase<PsiElement> {
 
     @Override
     public @Nullable PsiElement resolve() {
-        Project project = myElement.getProject();
-        ConfigFileResolver configFileResolver = new ConfigFileResolver(project, myElement);
+        String text = StrUtil.removeQuotes(myElement.getText());
 
-        return configFileResolver.resolveConfigKey();
+        if (text.isEmpty()) {
+            return null;
+        }
+
+        Project project = myElement.getProject();
+        PsiManager psiManager = PsiManager.getInstance(project);
+        ConfigKeyResolver configKeyResolver = ConfigKeyResolver.INSTANCE;
+
+        PsiElement resolvedElement = configKeyResolver.resolveInConfigFiles(text, project, psiManager);
+
+        if (resolvedElement != null) {
+            return resolvedElement;
+        }
+
+        return configKeyResolver.resolveInServiceProviders(text, project);
     }
 
-    /**
-     * Returns an array of variants (code completion suggestions) for the reference
-     * This method collects config keys from both standard config files and module config files
-     * (if applicable) and returns them as LookupElementBuilder objects
-     * @return An array of LookupElementBuilder objects representing the config key variants
-     */
+
     @Override
     public Object @NotNull [] getVariants() {
-        ConfigKeyCollector configKeyCollector = new ConfigKeyCollector(myElement.getProject());
+        Project project = myElement.getProject();
 
-        return configKeyCollector.startSearching().getVariants().toArray();
+        List<LookupElementBuilder> variants = ConfigKeyCollector.INSTANCE.collectViews(project);
+
+        return variants.toArray();
     }
 }

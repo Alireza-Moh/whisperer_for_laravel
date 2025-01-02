@@ -2,10 +2,10 @@ package at.alirezamoh.whisperer_for_laravel.support.template;
 
 import at.alirezamoh.whisperer_for_laravel.actions.models.BaseModel;
 import at.alirezamoh.whisperer_for_laravel.support.notification.Notify;
-import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.command.WriteCommandAction;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
@@ -53,6 +53,8 @@ public class TemplateLoader {
     private boolean showSuccessMessage = true;
 
     private boolean overwriteFile = false;
+
+    private static final Logger LOG = Logger.getInstance(TemplateLoader.class);
 
     /**
      * @param project  The current project
@@ -102,12 +104,14 @@ public class TemplateLoader {
                     if (e instanceof AccessDeniedException) {
                         Notify.notifyError(
                             project,
-                            "Could not create directory.\n" +
-                                "Permission Issue on Folder: It appears that PHPStorm does not have the necessary permissions to access the folder\n" +
-                                "It might be related to WSL"
+                            """
+                                Could not create directory.
+                                Permission Issue on Folder: It appears that PHPStorm does not have the necessary permissions to access the folder
+                                It might be related to WSL"""
                         );
                     }
                     else {
+                        LOG.error("Could not create " + object.getDestination() + " directory", e);
                         Notify.notifyError(
                             project,
                             "Could not create " + object.getDestination() + " directory"
@@ -125,7 +129,7 @@ public class TemplateLoader {
     public @Nullable PsiFile createTemplateOnly() {
         PsiFile createdFile = null;
         try {
-            String filePath = StrUtil.removeDoubleSlashes(project.getBasePath() + object.getFilePath());
+            String filePath = project.getBasePath() + object.getFilePath();
             File file = new File(filePath);
             if (file.exists() && !overwriteFile) {
                 Notify.notifyWarning(
@@ -158,7 +162,7 @@ public class TemplateLoader {
                 );
             }
         } catch (IOException | TemplateException ex) {
-            ex.printStackTrace();
+            LOG.error("Could not create " + object.getName() + " file", ex);
             Notify.notifyError(
                 project,
                 "Could not create " + object.getName() + " file"

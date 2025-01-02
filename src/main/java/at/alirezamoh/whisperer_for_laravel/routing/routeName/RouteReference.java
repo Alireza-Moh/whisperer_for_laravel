@@ -1,6 +1,6 @@
 package at.alirezamoh.whisperer_for_laravel.routing.routeName;
 
-import at.alirezamoh.whisperer_for_laravel.indexing.RouteIndex;
+import at.alirezamoh.whisperer_for_laravel.indexes.RouteIndex;
 import at.alirezamoh.whisperer_for_laravel.support.WhispererForLaravelIcon;
 import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;

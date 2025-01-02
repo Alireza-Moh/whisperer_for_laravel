@@ -1,8 +1,6 @@
 package at.alirezamoh.whisperer_for_laravel.config.visitors;
 
-import at.alirezamoh.whisperer_for_laravel.support.WhispererForLaravelIcon;
 import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
-import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -22,48 +20,18 @@ public class ArrayReturnPsiRecursiveVisitor extends PsiRecursiveElementWalkingVi
     /**
      * List of the collected config keys
      */
-    private List<LookupElementBuilder> suggestions = new ArrayList<>();
-
-    /**
-     * Map of ArrayHashElement objects and their corresponding config key strings
-     */
-    private Map<ArrayHashElement, String> suggestionsWithCorrectPsiElement = new HashMap<>();
-
-    /**
-     * The name of the directory containing the config file
-     */
-    private String dirName;
-
-    /**
-     * The name of the config file
-     */
-    private String configFileName;
+    private Map<String, String> variants = new HashMap<>();
 
     /**
      * The parent keys leading to the current config key
      */
-    private String parentKeys;
+    private String parentKey;
 
     /**
-     * The namespace for the config keys
+     * @param parentKey      The parent keys leading to the current config key
      */
-    private String configNamespace;
-
-    private boolean forModule;
-
-    /**
-     * @param dirName         The name of the directory containing the config file
-     * @param configFileName  The name of the config file
-     * @param parentKeys      The parent keys leading to the current config key
-     * @param configNamespace The namespace for the config keys
-     * @param forModule       Should append file name to the string
-     */
-    public ArrayReturnPsiRecursiveVisitor(String dirName, String configFileName, String parentKeys, String configNamespace, boolean forModule) {
-        this.dirName = dirName;
-        this.configFileName = configFileName;
-        this.parentKeys = parentKeys;
-        this.configNamespace = configNamespace;
-        this.forModule = forModule;
+    public ArrayReturnPsiRecursiveVisitor(String parentKey) {
+        this.parentKey = parentKey;
     }
 
     /**
@@ -90,36 +58,8 @@ public class ArrayReturnPsiRecursiveVisitor extends PsiRecursiveElementWalkingVi
         }
     }
 
-    /**
-     * Returns the list of the collected config keys
-     * @return config keys
-     */
-    public List<LookupElementBuilder> getSuggestions() {
-        return suggestions;
-    }
-
-    /**
-     * Returns a map of ArrayHashElement objects and their corresponding config key strings
-     * @return The map of ArrayHashElement objects and config key strings
-     */
-    public Map<ArrayHashElement, String> getSuggestionsWithCorrectPsiElement() {
-        return suggestionsWithCorrectPsiElement;
-    }
-
-    /**
-     * Builds a LookupElementBuilder for a config key
-     * @param key   The config key
-     * @param value The config value
-     * @return      The LookupElementBuilder
-     */
-    public LookupElementBuilder buildLookupElement(String key, String value) {
-        return LookupElementBuilder
-                .create(key)
-                .withLookupString(key)
-                .withPresentableText(key)
-                .withTailText(value, true)
-                .bold()
-                .withIcon(WhispererForLaravelIcon.LARAVEL_ICON);
+    public Map<String, String> getVariants() {
+        return variants;
     }
 
     /**
@@ -131,44 +71,34 @@ public class ArrayReturnPsiRecursiveVisitor extends PsiRecursiveElementWalkingVi
         List<ArrayHashElement> hashElements = PsiTreeUtil.getChildrenOfTypeAsList(arrayCreationExpression, ArrayHashElement.class);
 
         for(ArrayHashElement hashElement: hashElements) {
-            this.addLookup(hashElement, this.dirName, this.configFileName, this.parentKeys);
+            this.addVariant(hashElement, this.parentKey);
         }
     }
 
     /**
-     * Adds a config key as a lookup element
+     * Adds a config key as a variant
      * This method handles nested arrays and generates the full key path
      * @param hashElement The ArrayHashElement representing the config key
-     * @param dirName     The name of the directory containing the config file
-     * @param filename    The name of the config file
-     * @param parentKeys  The parent keys leading to the current config key
+     * @param parentKey The parent keys leading to the current config key
      */
-    private void addLookup(@NotNull ArrayHashElement hashElement, String dirName, String filename, String parentKeys) {
+    private void addVariant(@NotNull ArrayHashElement hashElement, String parentKey) {
         String key = this.getHashKey(hashElement);
-        String fullKey = this.generateFullKey(dirName, filename, parentKeys, key);
-
-        if (!this.configNamespace.isEmpty()) {
-            fullKey = this.configNamespace + "." + fullKey;
+        if (key.isEmpty()) {
+            return;
         }
+
+        String fullKey = this.generateFullKey(parentKey, key);
         PhpPsiElement value = hashElement.getValue();
 
         if (value instanceof ArrayCreationExpressionImpl myArrayCreationExpressionImpl) {
             iterateOverArrayCreationExpression(
-                dirName,
                 myArrayCreationExpressionImpl,
-                this.getKeyWithParent(parentKeys, key),
-                filename
+                this.getKeyWithParent(parentKey, key)
             );
-            this.suggestions.add(
-                this.buildLookupElement(fullKey, "")
-            );
+            variants.put(fullKey, "");
         } else {
-            this.suggestions.add(
-                this.buildLookupElement(fullKey, this.getValueAsString(value))
-            );
+            variants.put(fullKey, this.getValueAsString(value));
         }
-
-        this.suggestionsWithCorrectPsiElement.put(hashElement, fullKey);
     }
 
     /**
@@ -177,48 +107,45 @@ public class ArrayReturnPsiRecursiveVisitor extends PsiRecursiveElementWalkingVi
      * @return The extracted key
      */
     private String getHashKey(ArrayHashElement hashElement) {
-        return Objects.requireNonNull(hashElement.getKey()).getText();
+        PsiElement key = hashElement.getKey();
+        if
+        (
+            key instanceof FunctionReferenceImpl
+            || key instanceof TernaryExpressionImpl
+            || key instanceof ClassConstantReferenceImpl
+            || key instanceof UnaryExpressionImpl
+            || key instanceof MethodReferenceImpl
+            || key instanceof ConcatenationExpressionImpl
+        )
+        {
+            return "";
+        }
+        return Objects.requireNonNull(key).getText();
     }
 
     /**
      * Generates the full key path for a config key
-     * @param dirName     The directory name
-     * @param filename    The file name
-     * @param parentKeys  The parent keys
+     * @param parentKey  The parent keys
      * @param key         The current key
      * @return            The full key path
      */
-    private String generateFullKey(String dirName, String filename, String parentKeys, String key) {
-        String prefixedKey = parentKeys.isEmpty() ? "" : parentKeys + ".";
+    private String generateFullKey(String parentKey, String key) {
+        String prefixedKey = parentKey.isEmpty() ? "" : parentKey + ".";
 
-        if (forModule) {
-            return StrUtil.removeQuotes(prefixedKey + key);
-        }
-        else {
-            if (dirName.isEmpty()) {
-                return StrUtil.removeQuotes(filename + "." + prefixedKey + key);
-            }
-            else {
-                return StrUtil.removeQuotes(dirName + "." + filename + "." + prefixedKey + key);
-            }
-        }
+        return StrUtil.removeQuotes(prefixedKey + key);
     }
 
     /**
      * Iterates over the hash elements of a nested array creation expression
-     * @param dirName         The directory name
      * @param arrayExpression The array creation expression
-     * @param parentKeys      The parent keys
-     * @param filename        The file name
+     * @param parentKey     The parent keys
      */
     private void iterateOverArrayCreationExpression(
-        String dirName,
         ArrayCreationExpressionImpl arrayExpression,
-        String parentKeys,
-        String filename
+        String parentKey
     ) {
         for (ArrayHashElement hashElement : arrayExpression.getHashElements()) {
-            this.addLookup(hashElement, dirName, filename, parentKeys);
+            this.addVariant(hashElement, parentKey);
         }
     }
 
@@ -243,11 +170,11 @@ public class ArrayReturnPsiRecursiveVisitor extends PsiRecursiveElementWalkingVi
         if
         (
             valueElement instanceof FunctionReferenceImpl
-                || valueElement instanceof TernaryExpressionImpl
-                || valueElement instanceof ClassConstantReferenceImpl
-                || valueElement instanceof UnaryExpressionImpl
-                || valueElement instanceof MethodReferenceImpl
-                || valueElement instanceof ConcatenationExpressionImpl
+            || valueElement instanceof TernaryExpressionImpl
+            || valueElement instanceof ClassConstantReferenceImpl
+            || valueElement instanceof UnaryExpressionImpl
+            || valueElement instanceof MethodReferenceImpl
+            || valueElement instanceof ConcatenationExpressionImpl
         )
         {
             return "";
@@ -255,7 +182,7 @@ public class ArrayReturnPsiRecursiveVisitor extends PsiRecursiveElementWalkingVi
 
         String value = valueElement.getText();
         if (!value.isEmpty()) {
-            value = " = " + StrUtil.removeQuotes(value);
+            value = StrUtil.removeQuotes(value);
         }
         return value;
     }

@@ -1,4 +1,4 @@
-package at.alirezamoh.whisperer_for_laravel.inertia;
+package at.alirezamoh.whisperer_for_laravel.packages.inertia;
 
 import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;

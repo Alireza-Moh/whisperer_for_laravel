@@ -1,4 +1,4 @@
-package at.alirezamoh.whisperer_for_laravel.indexing;
+package at.alirezamoh.whisperer_for_laravel.indexes;
 
 import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.FrameworkUtils;
 import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;

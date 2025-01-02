@@ -3,15 +3,18 @@ package at.alirezamoh.whisperer_for_laravel.actions;
 import at.alirezamoh.whisperer_for_laravel.actions.models.BaseModel;
 import at.alirezamoh.whisperer_for_laravel.actions.models.codeGenerationHelperModels.*;
 import at.alirezamoh.whisperer_for_laravel.actions.models.dataTables.Method;
+import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.whisperer_for_laravel.support.ProjectDefaultPaths;
 import at.alirezamoh.whisperer_for_laravel.support.codeGeneration.MigrationManager;
 import at.alirezamoh.whisperer_for_laravel.support.codeGeneration.vistors.ClassMethodLoader;
 import at.alirezamoh.whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
 import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.FrameworkUtils;
 import at.alirezamoh.whisperer_for_laravel.support.notification.Notify;
+import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
 import at.alirezamoh.whisperer_for_laravel.support.template.TemplateLoader;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
@@ -26,6 +29,8 @@ import java.util.stream.Collectors;
 
 public class GenerateHelperMethodsAction extends BaseAction {
     private Project project;
+
+    private static final Logger LOG = Logger.getInstance(GenerateHelperMethodsAction.class);
 
     List<String> ignoreMethods = Arrays.asList(
         "__call",
@@ -78,6 +83,7 @@ public class GenerateHelperMethodsAction extends BaseAction {
 
                         Notify.notifySuccess(project, "Code generation successful");
                     } catch (Exception e) {
+                        LOG.error("Could not create helper code", e);
                         Notify.notifyError(project, "Could not create helper code");
                     }
                 }
@@ -87,12 +93,20 @@ public class GenerateHelperMethodsAction extends BaseAction {
 
     private void deletePluginVendorDir() {
         ApplicationManager.getApplication().runWriteAction(() -> {
-            PsiDirectory pluginVendor = DirectoryPsiUtil.getDirectory(project, ProjectDefaultPaths.WHISPERER_FOR_LARAVEL_DIR_PATH);
+            SettingsState settingsState = SettingsState.getInstance(project);
+            String path = ProjectDefaultPaths.WHISPERER_FOR_LARAVEL_DIR_PATH;
+
+            if (!settingsState.isLaravelDirectoryEmpty()) {
+                path = StrUtil.addSlashes(settingsState.getLaravelDirectoryPath(), false, true) + path;
+            }
+
+            PsiDirectory pluginVendor = DirectoryPsiUtil.getDirectory(project, path);
 
             if (pluginVendor != null) {
                 try {
                     pluginVendor.delete();
                 } catch (Exception e) {
+                    LOG.error("Could not delete the plugin vendor directory", e);
                     Notify.notifyError(project, "Could not delete the plugin vendor directory");
                 }
             }
@@ -110,7 +124,7 @@ public class GenerateHelperMethodsAction extends BaseAction {
                 .collect(Collectors.groupingBy(LaravelModel::getNamespaceName));
 
             groupedModels.forEach((namespace, modelsInNamespace) -> {
-                LaravelModelGeneration generation = new LaravelModelGeneration(namespace, modelsInNamespace);
+                LaravelModelGeneration generation = new LaravelModelGeneration(namespace, modelsInNamespace, SettingsState.getInstance(project));
                 create(generation, "laravelModels.ftl");
             });
         }
@@ -136,7 +150,7 @@ public class GenerateHelperMethodsAction extends BaseAction {
 
         if (!baseQueryBuilderMethods.isEmpty()) {
             create(
-                new LaravelDbBuilder(baseQueryBuilderMethods),
+                new LaravelDbBuilder(baseQueryBuilderMethods, SettingsState.getInstance(project)),
                 "baseDbQueryBuilder.ftl"
             );
         }

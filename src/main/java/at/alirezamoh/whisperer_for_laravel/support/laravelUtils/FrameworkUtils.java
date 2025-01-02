@@ -5,6 +5,7 @@ import at.alirezamoh.whisperer_for_laravel.support.directoryUtil.DirectoryPsiUti
 import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import org.jetbrains.annotations.Nullable;
@@ -13,6 +14,8 @@ import java.io.File;
 import java.io.FileReader;
 
 public class FrameworkUtils {
+    private static final Logger LOG = Logger.getInstance(FrameworkUtils.class);
+
     private FrameworkUtils() {}
 
     public static boolean isLaravelFrameworkNotInstalled(Project project) {
@@ -33,6 +36,7 @@ public class FrameworkUtils {
 
             return require != null && require.has("laravel/framework");
         } catch (Exception e) {
+            LOG.error("Could not read composer file", e);
             return false;
         }
     }
@@ -52,6 +56,7 @@ public class FrameworkUtils {
                 return require.get("laravel/framework").getAsString().replace("^", "");
             }
         } catch (Exception e) {
+            LOG.error("Could not read composer file", e);
             return null;
         }
 

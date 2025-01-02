@@ -1,6 +1,6 @@
 package at.alirezamoh.whisperer_for_laravel.eloquent.table;
 
-import at.alirezamoh.whisperer_for_laravel.indexing.TableIndex;
+import at.alirezamoh.whisperer_for_laravel.indexes.TableIndex;
 import at.alirezamoh.whisperer_for_laravel.support.psiUtil.PsiUtil;
 import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
