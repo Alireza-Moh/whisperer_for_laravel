@@ -28,16 +28,12 @@
     <change-notes>
         <![CDATA[
             <ul>
-                <li>Triggers route names autocompletion for Redirect::route(), Redirect::signedRoute(), URL::route(), and URL::signedRoute() methods.</li>
-                <li>Suppresses "Property accessed via magic method" warning for request fields.</li>
-                <li>Adds request fields autocompletion and resolving.</li>
-                <li>Implements method to resolve validation rules.</li>
-                <li>Generates Eloquent models based on their namespace.</li>
-                <liAdds blade components autocompletion and resolving.</li>
-                <li>Fixes Inertia.js autocompletion to include pages located directly in the root folder.</li>
-                <li>Provides autocompletion for migration files and resolves related table files globally.</li>
-                <li>Adds autocompletion for controller actions and namespaces in route definitions</li>
-                <li>Adds middleware autocompletion.</li>
+                <li>Adds new code-generation actions: json-resource, json-resource-collection, form-request, eloquent-scope, eloquent-cast, broadcasting-channel, db-factory, view-composer</li>
+                <li>Adds navigation link to the plugin settings in the tool menu.</li>
+                <li>Adds env values completion.</li>
+                <li>Adds support for `withoutMiddleware()`</li>
+                <li>Adds indexing for config keys and blade files</li>
+                <li>Fixes some bugs.</li>
             </ul>
         ]]>
     </change-notes>
@@ -47,7 +43,7 @@
     <depends>com.intellij.modules.platform</depends>
     <depends>com.jetbrains.php.blade</depends>
 
-    <version>1.1.2</version>
+    <version>1.1.3</version>
 
     <extensions defaultExtensionNs="com.intellij">
         <notificationGroup id="NotificationGroup" displayType="BALLOON"/>
