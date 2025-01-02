@@ -14,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.awt.*;
 import java.util.Arrays;
+import java.util.Objects;
 
 public class ChooseActionModel implements ChooseByNameModel {
     private AnAction[] allActions;
@@ -22,7 +23,12 @@ public class ChooseActionModel implements ChooseByNameModel {
         DefaultActionGroup actionGroup = (DefaultActionGroup) ActionManager.getInstance()
             .getAction("at.alirezamoh.whisperer_for_laravel.AllCodeGenerationActionsGroupAction");
 
-        this.allActions = actionGroup.getChildActionsOrStubs();
+        this.allActions = Arrays.stream(actionGroup.getChildActionsOrStubs())
+            .map(action -> action instanceof com.intellij.openapi.actionSystem.ActionStub stub
+                ? ActionManager.getInstance().getAction(stub.getId())
+                : action)
+            .filter(Objects::nonNull)
+            .toArray(AnAction[]::new);
     }
 
     @Override
@@ -32,7 +38,7 @@ public class ChooseActionModel implements ChooseByNameModel {
 
     @Override
     public @NotNull @NlsContexts.Label String getNotInMessage() {
-        return "No actions found";
+        return "No matches found";
     }
 
     @Override
