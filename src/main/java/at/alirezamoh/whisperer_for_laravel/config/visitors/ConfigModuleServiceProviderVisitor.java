@@ -1,6 +1,6 @@
 package at.alirezamoh.whisperer_for_laravel.config.visitors;
 
-import at.alirezamoh.whisperer_for_laravel.config.ConfigModule;
+import at.alirezamoh.whisperer_for_laravel.config.util.ConfigModule;
 import at.alirezamoh.whisperer_for_laravel.support.applicationModules.visitors.BaseServiceProviderVisitor;
 import at.alirezamoh.whisperer_for_laravel.support.psiUtil.PsiUtil;
 import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;

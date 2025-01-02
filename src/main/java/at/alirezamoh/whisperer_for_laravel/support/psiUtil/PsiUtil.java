@@ -3,8 +3,13 @@ package at.alirezamoh.whisperer_for_laravel.support.psiUtil;
 import at.alirezamoh.whisperer_for_laravel.support.WhispererForLaravelIcon;
 import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
+import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiManager;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.elements.impl.ArrayHashElementImpl;
 import org.jetbrains.annotations.NotNull;
@@ -175,5 +180,13 @@ public class PsiUtil {
         }
 
         return null;
+    }
+
+    public static @Nullable VirtualFile resolveFilePath(@NotNull String filePath) {
+        return LocalFileSystem.getInstance().findFileByPath(filePath);
+    }
+
+    public static @Nullable PsiFile resolvePsiFile(@NotNull VirtualFile file, @NotNull Project project) {
+        return PsiManager.getInstance(project).findFile(file);
     }
 }

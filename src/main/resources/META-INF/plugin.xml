@@ -54,8 +54,10 @@
 
         <postStartupActivity implementation="at.alirezamoh.whisperer_for_laravel.settings.LaravelStartupActivity"/>
 
-        <fileBasedIndex implementation="at.alirezamoh.whisperer_for_laravel.indexing.RouteIndex"/>
-        <fileBasedIndex implementation="at.alirezamoh.whisperer_for_laravel.indexing.TableIndex"/>
+        <fileBasedIndex implementation="at.alirezamoh.whisperer_for_laravel.indexes.RouteIndex"/>
+        <fileBasedIndex implementation="at.alirezamoh.whisperer_for_laravel.indexes.TableIndex"/>
+        <fileBasedIndex implementation="at.alirezamoh.whisperer_for_laravel.indexes.ConfigIndex"/>
+        <fileBasedIndex implementation="at.alirezamoh.whisperer_for_laravel.indexes.ServiceProviderIndex"/>
 
         <projectConfigurable parentId="language" instance="at.alirezamoh.whisperer_for_laravel.settings.SettingConfigurable" id="whisperer_for_laravel_settings" displayName="Whisperer For Laravel" nonDefaultProject="true"/>
         <projectService serviceImplementation="at.alirezamoh.whisperer_for_laravel.settings.SettingsState"/>

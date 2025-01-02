@@ -1,9 +1,8 @@
 package at.alirezamoh.whisperer_for_laravel.blade.viewName.visitors;
 
-import at.alirezamoh.whisperer_for_laravel.blade.viewName.BladeModule;
+import at.alirezamoh.whisperer_for_laravel.indexes.ServiceProviderIndex;
 import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.whisperer_for_laravel.support.ProjectDefaultPaths;
-import at.alirezamoh.whisperer_for_laravel.support.applicationModules.visitors.BaseServiceProviderVisitor;
 import at.alirezamoh.whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
 import at.alirezamoh.whisperer_for_laravel.support.psiUtil.PsiUtil;
 import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
@@ -11,8 +10,12 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.util.indexing.FileBasedIndex;
 import com.jetbrains.php.blade.BladeFileType;
-import com.jetbrains.php.lang.psi.elements.PhpClass;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.function.BiConsumer;
 
 import java.util.*;
 
@@ -21,11 +24,6 @@ public class BladeFileCollector {
      * List of the blade files
      */
     private List<LookupElementBuilder> variants = new ArrayList<>();
-
-    /**
-     * Map of PsiFile and their corresponding bladeFile name
-     */
-    private Map<PsiFile, String> bladeFilesWithCorrectPsiFile = new HashMap<>();
 
     /**
      * The current project
@@ -60,10 +58,12 @@ public class BladeFileCollector {
         PsiDirectory defaultResDir = DirectoryPsiUtil.getDirectory(project, defaultViewPath);
 
         if (defaultResDir != null) {
-            searchForBladeFiles(defaultResDir, "", "");
+            collectBladeFiles(defaultResDir, "", null, (viewName, filePath) -> {
+                variants.add(PsiUtil.buildSimpleLookupElement(viewName));
+            });
         }
 
-        searchForBladeFilesInModules();
+        getBladeFilesFormServiceProviders();
 
         return this;
     }
@@ -72,36 +72,30 @@ public class BladeFileCollector {
         return variants;
     }
 
-    public Map<PsiFile, String> getBladeFilesWithCorrectPsiFile() {
-        return bladeFilesWithCorrectPsiFile;
-    }
-
-    public void setWithPsiFile(boolean withPsiFile) {
-        this.withPsiFile = withPsiFile;
-    }
-
     /**
-     * Recursively searches for Blade files within a directory
+     * Recursively processes Blade files within a directory
+     *
      * @param directory     The directory to search in
      * @param currentPath   The current path being traversed
      * @param viewNamespace The view namespace to prepend to the file name
+     * @param processor     A callback to handle each found Blade file
      */
-    public void searchForBladeFiles(PsiDirectory directory, String currentPath, String viewNamespace) {
+    public static void collectBladeFiles(
+        PsiDirectory directory,
+        String currentPath,
+        @Nullable String viewNamespace,
+        BiConsumer<String, String> processor
+    ) {
         for (PsiFile file : directory.getFiles()) {
             if (file.getFileType() instanceof BladeFileType) {
                 String fileName = file.getName().replace(".blade.php", "");
                 String finalFileName = currentPath.isEmpty() ? fileName : currentPath + "." + fileName;
 
-                if (!viewNamespace.isEmpty()) {
+                if (viewNamespace != null && !viewNamespace.isEmpty()) {
                     finalFileName = viewNamespace + "::" + finalFileName;
                 }
 
-                if (withPsiFile) {
-                    bladeFilesWithCorrectPsiFile.put(file, finalFileName);
-                }
-                else {
-                    variants.add(PsiUtil.buildSimpleLookupElement(finalFileName));
-                }
+                processor.accept(finalFileName, file.getVirtualFile().getPath());
             }
         }
 
@@ -110,25 +104,36 @@ public class BladeFileCollector {
                 ? subdirectory.getName()
                 : currentPath + "." + subdirectory.getName();
 
-            searchForBladeFiles(subdirectory, newPath, viewNamespace);
+            collectBladeFiles(subdirectory, newPath, viewNamespace, processor);
         }
     }
 
     /**
      * Searches for bladeFiles within module
      */
-    private void searchForBladeFilesInModules() {
-        BladeModuleServiceProviderVisitor bladeModuleServiceProviderVisitor = new BladeModuleServiceProviderVisitor(project);
+    private void getBladeFilesFormServiceProviders() {
+        FileBasedIndex fileBasedIndex = FileBasedIndex.getInstance();
 
-        for (PhpClass serviceProvider : BaseServiceProviderVisitor.getProviders(project)) {
-            serviceProvider.acceptChildren(bladeModuleServiceProviderVisitor);
-            List<BladeModule> bladeModules = bladeModuleServiceProviderVisitor.getBladeFilesInModule();
+        fileBasedIndex.processAllKeys(ServiceProviderIndex.INDEX_ID, serviceProviderKey -> {
+            fileBasedIndex.processValues(
+                ServiceProviderIndex.INDEX_ID,
+                serviceProviderKey,
+                null,
+                (file, serviceProvider) -> {
+                    if (serviceProvider == null) return true;
 
-            if (!bladeModules.isEmpty()) {
-                for (BladeModule bladeModule : bladeModules) {
-                    searchForBladeFiles(bladeModule.bladeDir(), "", bladeModule.viewNamespace());
-                }
-            }
-        }
+                    for (Map.Entry<String, String> entry : serviceProvider.getBladeFiles().entrySet()) {
+                        variants.add(
+                            PsiUtil.buildSimpleLookupElement(entry.getKey())
+                        );
+                    }
+
+                    return true;
+                },
+                GlobalSearchScope.allScope(project)
+            );
+
+            return true;
+        }, project);
     }
 }

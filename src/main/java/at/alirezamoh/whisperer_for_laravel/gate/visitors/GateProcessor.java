@@ -4,7 +4,7 @@ import at.alirezamoh.whisperer_for_laravel.support.applicationModules.visitors.B
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
-import com.jetbrains.php.lang.psi.elements.PhpClass;
+import com.intellij.psi.PsiFile;
 
 import java.util.List;
 
@@ -30,7 +30,7 @@ public class GateProcessor {
     }
 
     private void traverseAndAccept(PsiElementVisitor visitor) {
-        for (PhpClass serviceProvider : BaseServiceProviderVisitor.getProviders(project)) {
+        for (PsiFile serviceProvider : BaseServiceProviderVisitor.getProviders(project)) {
             serviceProvider.acceptChildren(visitor);
         }
     }

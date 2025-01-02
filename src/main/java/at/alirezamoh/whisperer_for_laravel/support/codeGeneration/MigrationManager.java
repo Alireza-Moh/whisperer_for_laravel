@@ -5,7 +5,7 @@ import at.alirezamoh.whisperer_for_laravel.actions.models.dataTables.Field;
 import at.alirezamoh.whisperer_for_laravel.actions.models.dataTables.Method;
 import at.alirezamoh.whisperer_for_laravel.actions.models.dataTables.Relation;
 import at.alirezamoh.whisperer_for_laravel.actions.models.dataTables.Table;
-import at.alirezamoh.whisperer_for_laravel.indexing.TableIndex;
+import at.alirezamoh.whisperer_for_laravel.indexes.TableIndex;
 import at.alirezamoh.whisperer_for_laravel.support.codeGeneration.vistors.MigrationVisitor;
 import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.ClassUtils;
 import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.LaravelPaths;
