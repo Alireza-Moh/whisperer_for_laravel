@@ -3,6 +3,7 @@ package at.alirezamoh.whisperer_for_laravel.routing.routeAction;
 import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
 import at.alirezamoh.whisperer_for_laravel.support.psiUtil.PsiUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PhpClassUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
@@ -40,15 +41,6 @@ public class RouteActionReference extends PsiReferenceBase<PsiElement> {
      * Default path to the controllers directory in a standard Laravel application.
      */
     private final String DEFAULT_CONTROLLER_PATH = "app/Http/Controllers/";
-
-    /**
-     * List of method names to ignore when processing controller methods.
-     */
-    private final List<String> IGNORE_LIST = new ArrayList<>() {{
-        add("__construct");
-        add("__index");
-        add("__invoke");
-    }};
 
     public RouteActionReference(@NotNull PsiElement element, TextRange rangeInElement) {
         super(element, rangeInElement);
@@ -159,12 +151,10 @@ public class RouteActionReference extends PsiReferenceBase<PsiElement> {
             if (element instanceof PhpFile controllerFile) {
                 for (PhpClass phpClass : PsiTreeUtil.findChildrenOfType(controllerFile, PhpClass.class)) {
                     String fqn = phpClass.getPresentableFQN().replace("/", "\\");
-                    for (Method method : phpClass.getMethods()) {
+                    for (Method method : PhpClassUtils.getClassPublicMethod(phpClass)) {
                         String methodName = method.getName();
-                        if (method.getModifier().isPublic() && !method.isAbstract() && !IGNORE_LIST.contains(methodName)) {
-                            String methodString = fqn + "@" + methodName;
-                            elements.put(methodString, method);
-                        }
+                        String methodString = fqn + "@" + methodName;
+                        elements.put(methodString, method);
                     }
                 }
             } else if (element instanceof PsiDirectory) {
