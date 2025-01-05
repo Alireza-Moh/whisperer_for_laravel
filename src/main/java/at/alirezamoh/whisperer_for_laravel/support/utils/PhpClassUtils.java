@@ -13,7 +13,7 @@ public class PhpClassUtils {
      * @param phpClass The PhpClass instance to extract public methods from.
      * @return A list of public methods (non-magic) defined in the given class
      */
-    static public List<Method> getClassPublicMethod(PhpClass phpClass) {
+    public static List<Method> getClassPublicMethod(PhpClass phpClass) {
         ArrayList<Method> methods = new ArrayList<>();
 
         for(Method method: phpClass.getMethods()) {
