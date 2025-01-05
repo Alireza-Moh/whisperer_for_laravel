@@ -1,7 +1,7 @@
 package at.alirezamoh.whisperer_for_laravel.actions.views;
 
 import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
-import at.alirezamoh.whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.DirectoryUtils;
 import at.alirezamoh.whisperer_for_laravel.support.notification.Notify;
 import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.openapi.project.Project;
@@ -169,7 +169,7 @@ public abstract class BaseDialog extends DialogWrapper {
             return;
         }
 
-        PsiDirectory rootDir = DirectoryPsiUtil.getDirectory(project, moduleRootPath);
+        PsiDirectory rootDir = DirectoryUtils.getDirectory(project, moduleRootPath);
         if (rootDir != null) {
             addRootApp();
             for (PsiDirectory module : rootDir.getSubdirectories()) {
@@ -195,7 +195,7 @@ public abstract class BaseDialog extends DialogWrapper {
         if (projectSettingState.isLaravelDirectoryEmpty()) {
             path = StrUtils.addSlashes(projectSettingState.getLaravelDirectoryPath()) + "app";
         }
-        PsiDirectory rootApp = DirectoryPsiUtil.getDirectory(project, path);
+        PsiDirectory rootApp = DirectoryUtils.getDirectory(project, path);
         if (rootApp != null) {
             modules.put("/app", "App root path");
         }

@@ -1,7 +1,7 @@
 package at.alirezamoh.whisperer_for_laravel.eloquent.table;
 
 import at.alirezamoh.whisperer_for_laravel.indexes.TableIndex;
-import at.alirezamoh.whisperer_for_laravel.support.psiUtil.PsiUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
@@ -74,7 +74,7 @@ public class TableReference extends PsiReferenceBase<PsiElement> implements PsiP
 
         for (String table : tables) {
             variants.add(
-                PsiUtil.buildSimpleLookupElement(table)
+                PsiElementUtils.buildSimpleLookupElement(table)
             );
         }
 

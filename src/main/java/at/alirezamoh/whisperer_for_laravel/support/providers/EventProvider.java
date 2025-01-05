@@ -2,7 +2,7 @@ package at.alirezamoh.whisperer_for_laravel.support.providers;
 
 import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.whisperer_for_laravel.support.ProjectDefaultPaths;
-import at.alirezamoh.whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.DirectoryUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
@@ -134,7 +134,7 @@ public class EventProvider {
      */
     private PsiDirectory getDirectoryWithPath(String relativePath) {
         String fullPath = buildFullPath(relativePath);
-        return DirectoryPsiUtil.getDirectory(this.project, fullPath);
+        return DirectoryUtils.getDirectory(this.project, fullPath);
     }
 
     /**

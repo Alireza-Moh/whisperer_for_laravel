@@ -4,8 +4,8 @@ import at.alirezamoh.whisperer_for_laravel.blade.viewName.visitors.BladeFileColl
 import at.alirezamoh.whisperer_for_laravel.indexes.ServiceProviderIndex;
 import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.whisperer_for_laravel.support.ProjectDefaultPaths;
-import at.alirezamoh.whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
-import at.alirezamoh.whisperer_for_laravel.support.psiUtil.PsiUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.DirectoryUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
@@ -88,7 +88,7 @@ public class BladeReference extends PsiReferenceBase<PsiElement> {
             ) + ProjectDefaultPaths.VIEW_PATH;
         }
 
-        return DirectoryPsiUtil.getDirectory(project, defaultViewPath);
+        return DirectoryUtils.getDirectory(project, defaultViewPath);
     }
 
     private PsiElement searchInServiceProviderForBladeFile(String viewPath) {
@@ -104,9 +104,9 @@ public class BladeReference extends PsiReferenceBase<PsiElement> {
                     for (Map.Entry<String, String> entry : serviceProvider.getBladeFiles().entrySet()) {
 
                         if (entry.getKey().equals(viewPath)) {
-                            VirtualFile virtualFile = PsiUtil.resolveFilePath(entry.getValue());
+                            VirtualFile virtualFile = PsiElementUtils.resolveFilePath(entry.getValue());
                             if (virtualFile != null) {
-                                foundedElement.set(PsiUtil.resolvePsiFile(virtualFile, project));
+                                foundedElement.set(PsiElementUtils.resolvePsiFile(virtualFile, project));
                                 return false;
                             }
                         }

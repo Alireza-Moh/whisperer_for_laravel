@@ -7,7 +7,7 @@ import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.whisperer_for_laravel.support.ProjectDefaultPaths;
 import at.alirezamoh.whisperer_for_laravel.support.codeGeneration.MigrationManager;
 import at.alirezamoh.whisperer_for_laravel.support.codeGeneration.vistors.ClassMethodLoader;
-import at.alirezamoh.whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.DirectoryUtils;
 import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.FrameworkUtils;
 import at.alirezamoh.whisperer_for_laravel.support.notification.Notify;
 import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
@@ -100,7 +100,7 @@ public class GenerateHelperMethodsAction extends BaseAction {
                 path = StrUtils.addSlashes(settingsState.getLaravelDirectoryPath(), false, true) + path;
             }
 
-            PsiDirectory pluginVendor = DirectoryPsiUtil.getDirectory(project, path);
+            PsiDirectory pluginVendor = DirectoryUtils.getDirectory(project, path);
 
             if (pluginVendor != null) {
                 try {
@@ -138,13 +138,13 @@ public class GenerateHelperMethodsAction extends BaseAction {
 
         baseQueryBuilderMethods.addAll(
             methodLoader.loadMethodsWithIgnore(
-                DirectoryPsiUtil.getFileByName(project, ProjectDefaultPaths.LARAVEL_DB_QUERY_BUILDER_PATH),
+                DirectoryUtils.getFileByName(project, ProjectDefaultPaths.LARAVEL_DB_QUERY_BUILDER_PATH),
                 ignoreMethods
             )
         );
         baseQueryBuilderMethods.addAll(
             methodLoader.loadMethods(
-                DirectoryPsiUtil.getFileByName(project, ProjectDefaultPaths.LARAVEL_DB_QUERY_RELATIONSHIPS_PATH)
+                DirectoryUtils.getFileByName(project, ProjectDefaultPaths.LARAVEL_DB_QUERY_RELATIONSHIPS_PATH)
             )
         );
 

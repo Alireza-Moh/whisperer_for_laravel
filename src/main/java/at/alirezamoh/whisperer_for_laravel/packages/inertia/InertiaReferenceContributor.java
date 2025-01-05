@@ -3,7 +3,7 @@ package at.alirezamoh.whisperer_for_laravel.packages.inertia;
 import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.ClassUtils;
 import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.FrameworkUtils;
 import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.MethodUtils;
-import at.alirezamoh.whisperer_for_laravel.support.psiUtil.PsiUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
@@ -57,12 +57,17 @@ public class InertiaReferenceContributor extends PsiReferenceContributor {
                         return PsiReference.EMPTY_ARRAY;
                     }
 
-                    if (isInsideCorrectMethod(psiElement)) {
-                        String text = psiElement.getText();
+                    if (!(psiElement instanceof StringLiteralExpression stringLiteralExpression)) {
+                        return PsiReference.EMPTY_ARRAY;
+                    }
 
+                    if (isInsideCorrectMethod(psiElement)) {
                         return new PsiReference[]{new InertiaReference(
-                            psiElement,
-                            new TextRange(PsiUtil.getStartOffset(text), PsiUtil.getEndOffset(text))
+                            stringLiteralExpression,
+                            new TextRange(
+                                PsiElementUtils.getStartOffset(stringLiteralExpression),
+                                PsiElementUtils.getEndOffset(stringLiteralExpression)
+                            )
                         )};
                     }
 

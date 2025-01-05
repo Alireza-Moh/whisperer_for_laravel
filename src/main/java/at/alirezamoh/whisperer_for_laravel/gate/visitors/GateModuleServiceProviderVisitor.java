@@ -2,7 +2,7 @@ package at.alirezamoh.whisperer_for_laravel.gate.visitors;
 
 import at.alirezamoh.whisperer_for_laravel.gate.util.GateUtil;
 import at.alirezamoh.whisperer_for_laravel.support.applicationModules.visitors.BaseServiceProviderVisitor;
-import at.alirezamoh.whisperer_for_laravel.support.psiUtil.PsiUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
@@ -36,7 +36,7 @@ public class GateModuleServiceProviderVisitor extends BaseServiceProviderVisitor
     }
 
     private void getAbilities(MethodReference method) {
-        String ability = PsiUtil.getFirstParameterFromMethod(method);
+        String ability = PsiElementUtils.getMethodParameterAt(method, 0);
 
         if (ability != null) {
             variants.add(ability);

@@ -1,7 +1,7 @@
 package at.alirezamoh.whisperer_for_laravel.request.requestField.util;
 
 import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.ClassUtils;
-import at.alirezamoh.whisperer_for_laravel.support.psiUtil.PsiUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.openapi.project.Project;
@@ -176,7 +176,7 @@ final public class RequestFieldUtils {
             PsiElement key = rule.getKey();
             if (key instanceof StringLiteralExpression stringLiteral) {
                 resultSet.addElement(
-                    PsiUtil.buildSimpleLookupElement(StrUtils.removeQuotes(stringLiteral.getText()))
+                    PsiElementUtils.buildSimpleLookupElement(StrUtils.removeQuotes(stringLiteral.getText()))
                 );
             }
         });

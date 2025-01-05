@@ -1,7 +1,7 @@
 package at.alirezamoh.whisperer_for_laravel.support.laravelUtils;
 
 import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
-import at.alirezamoh.whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.DirectoryUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -19,7 +19,7 @@ public class FrameworkUtils {
     private FrameworkUtils() {}
 
     public static boolean isLaravelFrameworkNotInstalled(Project project) {
-        PsiDirectory psiDirectory = DirectoryPsiUtil.getDirectory(project, "/vendor/laravel/framework/");
+        PsiDirectory psiDirectory = DirectoryUtils.getDirectory(project, "/vendor/laravel/framework/");
 
         return psiDirectory == null;
     }

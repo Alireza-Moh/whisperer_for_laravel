@@ -1,8 +1,8 @@
 package at.alirezamoh.whisperer_for_laravel.packages.inertia;
 
 import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
-import at.alirezamoh.whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
-import at.alirezamoh.whisperer_for_laravel.support.psiUtil.PsiUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.DirectoryUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
@@ -51,7 +51,7 @@ public class InertiaReference extends PsiReferenceBase<PsiElement> {
         List<LookupElementBuilder> variants = new ArrayList<>();
         for (InertiaPage page : pages) {
             variants.add(
-                PsiUtil.buildSimpleLookupElement(page.getPath())
+                PsiElementUtils.buildSimpleLookupElement(page.getPath())
             );
         }
 
@@ -77,7 +77,7 @@ public class InertiaReference extends PsiReferenceBase<PsiElement> {
 
         String[] paths = settings.getInertiaPageComponentRootPath().split(";");
         for (String path : paths) {
-            PsiDirectory potentialDir = DirectoryPsiUtil.getDirectory(
+            PsiDirectory potentialDir = DirectoryUtils.getDirectory(
                 project,
                 StrUtils.removeDoubleForwardSlashes(
                     defaultPath +

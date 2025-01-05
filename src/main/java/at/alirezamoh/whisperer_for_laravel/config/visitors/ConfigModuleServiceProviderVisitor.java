@@ -2,7 +2,7 @@ package at.alirezamoh.whisperer_for_laravel.config.visitors;
 
 import at.alirezamoh.whisperer_for_laravel.config.util.ConfigModule;
 import at.alirezamoh.whisperer_for_laravel.support.applicationModules.visitors.BaseServiceProviderVisitor;
-import at.alirezamoh.whisperer_for_laravel.support.psiUtil.PsiUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -63,8 +63,8 @@ public class ConfigModuleServiceProviderVisitor extends BaseServiceProviderVisit
      * @param method method reference being visited
      */
     private void initParameters(MethodReference method) {
-        String configKeyIdentifier = PsiUtil.getSecondParameterFromMethod(method);
-        String configFileName = PsiUtil.getFirstParameterFromMethod(method);
+        String configKeyIdentifier = PsiElementUtils.getMethodParameterAt(method, 1);
+        String configFileName = PsiElementUtils.getMethodParameterAt(method, 0);
 
         if (configKeyIdentifier == null || configFileName == null) {
             return;

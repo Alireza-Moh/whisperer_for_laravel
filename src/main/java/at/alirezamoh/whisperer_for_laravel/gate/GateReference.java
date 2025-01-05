@@ -1,7 +1,7 @@
 package at.alirezamoh.whisperer_for_laravel.gate;
 
 import at.alirezamoh.whisperer_for_laravel.gate.visitors.GateProcessor;
-import at.alirezamoh.whisperer_for_laravel.support.psiUtil.PsiUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
@@ -31,7 +31,7 @@ public class GateReference extends PsiReferenceBase<PsiElement> {
 
         for (String gate : gateProcessor.collectGates()) {
             variants.add(
-                PsiUtil.buildSimpleLookupElement(gate)
+                PsiElementUtils.buildSimpleLookupElement(gate)
             );
         }
 

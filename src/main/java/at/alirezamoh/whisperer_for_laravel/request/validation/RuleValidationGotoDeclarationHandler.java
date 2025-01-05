@@ -2,7 +2,7 @@ package at.alirezamoh.whisperer_for_laravel.request.validation;
 
 import at.alirezamoh.whisperer_for_laravel.request.validation.util.RuleValidationUtil;
 import at.alirezamoh.whisperer_for_laravel.support.ProjectDefaultPaths;
-import at.alirezamoh.whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.DirectoryUtils;
 import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.FrameworkUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.codeInsight.navigation.actions.GotoDeclarationHandler;
@@ -120,7 +120,7 @@ public class RuleValidationGotoDeclarationHandler implements GotoDeclarationHand
         List<PsiElement> methodsList = new ArrayList<>();
         String methodName = StrUtils.camel("validate_" + ruleName, '_');
 
-        PsiFile validationAttributeFile = DirectoryPsiUtil.getFileByName(project, ProjectDefaultPaths.LARAVEL_VALIDATION_RULES);
+        PsiFile validationAttributeFile = DirectoryUtils.getFileByName(project, ProjectDefaultPaths.LARAVEL_VALIDATION_RULES);
         if (validationAttributeFile != null) {
             Collection<Method> methods = PsiTreeUtil.findChildrenOfType(validationAttributeFile, Method.class);
 

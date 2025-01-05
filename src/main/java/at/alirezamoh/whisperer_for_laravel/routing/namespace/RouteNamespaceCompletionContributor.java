@@ -2,7 +2,7 @@ package at.alirezamoh.whisperer_for_laravel.routing.namespace;
 
 import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.ClassUtils;
 import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.MethodUtils;
-import at.alirezamoh.whisperer_for_laravel.support.psiUtil.PsiUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.codeInsight.completion.*;
 import com.intellij.patterns.PlatformPatterns;
@@ -56,7 +56,7 @@ public class RouteNamespaceCompletionContributor extends CompletionContributor {
                     {
                         for (String namespace : getAllNamespaces(completionResultSet, element)) {
                             completionResultSet.addElement(
-                                PsiUtil.buildSimpleLookupElement(namespace)
+                                PsiElementUtils.buildSimpleLookupElement(namespace)
                             );
                         }
                     }

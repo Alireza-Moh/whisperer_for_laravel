@@ -3,7 +3,7 @@ package at.alirezamoh.whisperer_for_laravel.request.validation.util;
 import at.alirezamoh.whisperer_for_laravel.request.requestField.util.RequestFieldUtils;
 import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.ClassUtils;
 import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.MethodUtils;
-import at.alirezamoh.whisperer_for_laravel.support.psiUtil.PsiUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -90,15 +90,15 @@ public class RuleValidationUtil {
     }
 
     private static boolean isInsideArrayValue(PsiElement psiElement) {
-        if (PsiUtil.isRegularArray(psiElement, 10)) {
-            ArrayCreationExpression array = PsiUtil.getRegularArray(psiElement, 10);
+        if (PsiElementUtils.isRegularArray(psiElement, 10)) {
+            ArrayCreationExpression array = PsiElementUtils.getRegularArray(psiElement, 10);
             if (array != null) {
-                return PsiUtil.isAssocArray(array.getParent(), 10) && PsiUtil.isInArrayValue(array, 10);
+                return PsiElementUtils.isAssocArray(array.getParent(), 10) && PsiElementUtils.isInArrayValue(array, 10);
             }
             return false;
         }
         else {
-            return PsiUtil.isAssocArray(psiElement, 10) && PsiUtil.isInArrayValue(psiElement, 10);
+            return PsiElementUtils.isAssocArray(psiElement, 10) && PsiElementUtils.isInArrayValue(psiElement, 10);
         }
     }
 

@@ -3,7 +3,7 @@ package at.alirezamoh.whisperer_for_laravel.routing.routeAction;
 import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.ClassUtils;
 import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.FrameworkUtils;
 import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.MethodUtils;
-import at.alirezamoh.whisperer_for_laravel.support.psiUtil.PsiUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.patterns.PlatformPatterns;
@@ -63,12 +63,20 @@ public class RouteActionReferenceContributor extends PsiReferenceContributor {
                         return PsiReference.EMPTY_ARRAY;
                     }
 
+                    if (!(psiElement instanceof StringLiteralExpression stringLiteralExpression)) {
+                        return PsiReference.EMPTY_ARRAY;
+                    }
+
                     if(isInsideCorrectMethod(psiElement))
                     {
-                        String text = psiElement.getOriginalElement().getText();
-
                         return new PsiReference[]{
-                            new RouteActionReference(psiElement, new TextRange(PsiUtil.getStartOffset(text), PsiUtil.getEndOffset(text)))
+                            new RouteActionReference(
+                                stringLiteralExpression,
+                                new TextRange(
+                                    PsiElementUtils.getStartOffset(stringLiteralExpression),
+                                    PsiElementUtils.getEndOffset(stringLiteralExpression)
+                                )
+                            )
                         };
                     }
                     return PsiReference.EMPTY_ARRAY;

@@ -2,8 +2,8 @@ package at.alirezamoh.whisperer_for_laravel.routing.middleware;
 
 import at.alirezamoh.whisperer_for_laravel.gate.visitors.GateProcessor;
 import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
-import at.alirezamoh.whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
-import at.alirezamoh.whisperer_for_laravel.support.psiUtil.PsiUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.DirectoryUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
@@ -78,14 +78,14 @@ public class MiddlewareReference extends PsiReferenceBase<PsiElement> {
 
         for (PsiElement element : collectAllMiddlewares()) {
             variants.add(
-                PsiUtil.buildSimpleLookupElement(StrUtils.removeQuotes(element.getText()))
+                PsiElementUtils.buildSimpleLookupElement(StrUtils.removeQuotes(element.getText()))
             );
         }
 
         GateProcessor gateProcessor = new GateProcessor(project);
         for (String gate : gateProcessor.collectGates()) {
             variants.add(
-                PsiUtil.buildSimpleLookupElement("can:" + gate)
+                PsiElementUtils.buildSimpleLookupElement("can:" + gate)
             );
         }
 
@@ -101,8 +101,8 @@ public class MiddlewareReference extends PsiReferenceBase<PsiElement> {
             filename = laravelDir + filename;
             baseMiddlewareFilePath = laravelDir + baseMiddlewareFilePath;
         }
-        PsiFile appFile = DirectoryPsiUtil.getFileByName(project, filename);
-        PsiFile baseMiddlewareFile = DirectoryPsiUtil.getFileByName(project, baseMiddlewareFilePath);
+        PsiFile appFile = DirectoryUtils.getFileByName(project, filename);
+        PsiFile baseMiddlewareFile = DirectoryUtils.getFileByName(project, baseMiddlewareFilePath);
 
         AppFileVisitor visitor = new AppFileVisitor();
 

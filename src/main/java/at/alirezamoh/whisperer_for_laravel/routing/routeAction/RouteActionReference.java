@@ -1,8 +1,8 @@
 package at.alirezamoh.whisperer_for_laravel.routing.routeAction;
 
 import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
-import at.alirezamoh.whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
-import at.alirezamoh.whisperer_for_laravel.support.psiUtil.PsiUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.DirectoryUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PhpClassUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
@@ -76,7 +76,7 @@ public class RouteActionReference extends PsiReferenceBase<PsiElement> {
 
         for (Map.Entry<String, PsiElement> entry : getAllControllersWithActions().entrySet()) {
             variants.add(
-                PsiUtil.buildSimpleLookupElement(entry.getKey())
+                PsiElementUtils.buildSimpleLookupElement(entry.getKey())
             );
         }
 
@@ -98,7 +98,7 @@ public class RouteActionReference extends PsiReferenceBase<PsiElement> {
         }
 
 
-        PsiDirectory controllerDir = DirectoryPsiUtil.getDirectory(project, path);
+        PsiDirectory controllerDir = DirectoryUtils.getDirectory(project, path);
 
         if (controllerDir != null) {
             collectPhpClasses(controllerDir, elements);
@@ -122,12 +122,12 @@ public class RouteActionReference extends PsiReferenceBase<PsiElement> {
                     + StrUtils.addSlashes(modulesPath, true, false);
             }
 
-            PsiDirectory modulesDir = DirectoryPsiUtil.getDirectory(project, modulesPath);
+            PsiDirectory modulesDir = DirectoryUtils.getDirectory(project, modulesPath);
 
             if (modulesDir != null) {
                 String moduleSrc = StrUtils.addSlashes(settingsState.getModuleSrcDirectoryPath()) + "Http/Controllers/";
                 for (PsiDirectory module : modulesDir.getSubdirectories()) {
-                    PsiDirectory controllerDirInModule =DirectoryPsiUtil.getDirectory(
+                    PsiDirectory controllerDirInModule = DirectoryUtils.getDirectory(
                         project,
                         StrUtils.removeDoubleForwardSlashes(modulesPath + "/" + module.getName() + moduleSrc)
                     );
