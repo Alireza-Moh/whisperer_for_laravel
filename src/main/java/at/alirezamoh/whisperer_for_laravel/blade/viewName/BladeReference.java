@@ -6,7 +6,7 @@ import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.whisperer_for_laravel.support.ProjectDefaultPaths;
 import at.alirezamoh.whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
 import at.alirezamoh.whisperer_for_laravel.support.psiUtil.PsiUtil;
-import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -44,7 +44,7 @@ public class BladeReference extends PsiReferenceBase<PsiElement> {
      */
     @Override
     public @Nullable PsiElement resolve() {
-        String viewPath = StrUtil.removeQuotes(myElement.getText());
+        String viewPath = StrUtils.removeQuotes(myElement.getText());
 
         if (viewPath.contains("::")) {
             return searchInServiceProviderForBladeFile(viewPath);
@@ -81,7 +81,7 @@ public class BladeReference extends PsiReferenceBase<PsiElement> {
         String defaultViewPath = ProjectDefaultPaths.VIEW_PATH;
 
         if (!settingsState.isLaravelDirectoryEmpty()) {
-            defaultViewPath = StrUtil.addSlashes(
+            defaultViewPath = StrUtils.addSlashes(
                 settingsState.getLaravelDirectoryPath(),
                 false,
                 true

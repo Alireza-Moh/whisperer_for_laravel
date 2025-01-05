@@ -1,7 +1,7 @@
 package at.alirezamoh.whisperer_for_laravel.env;
 
 import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
-import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
@@ -62,9 +62,9 @@ public class EnvFileParser {
         String filePath = project.getBasePath() + "/.env";
         SettingsState settings = SettingsState.getInstance(project);
         if (!settings.isLaravelDirectoryEmpty()) {
-            filePath = project.getBasePath() + StrUtil.addSlashes(settings.getLaravelDirectoryPath()) + ".env";
+            filePath = project.getBasePath() + StrUtils.addSlashes(settings.getLaravelDirectoryPath()) + ".env";
         }
 
-        return new File(StrUtil.removeDoubleSlashes(filePath));
+        return new File(StrUtils.removeDoubleForwardSlashes(filePath));
     }
 }

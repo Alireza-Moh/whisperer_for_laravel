@@ -4,7 +4,7 @@ import at.alirezamoh.whisperer_for_laravel.actions.models.dataTables.Field;
 import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.whisperer_for_laravel.support.ProjectDefaultPaths;
 import at.alirezamoh.whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
-import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
@@ -67,7 +67,7 @@ public class EloquentUtil {
         String path = ProjectDefaultPaths.WHISPERER_FOR_LARAVEL_DIR_PATH;
 
         if (!settingsState.isLaravelDirectoryEmpty()) {
-            path = StrUtil.addSlashes(settingsState.getLaravelDirectoryPath(), false, true) + path;
+            path = StrUtils.addSlashes(settingsState.getLaravelDirectoryPath(), false, true) + path;
         }
 
         return DirectoryPsiUtil.getDirectory(project, path);

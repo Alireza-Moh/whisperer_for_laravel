@@ -3,7 +3,7 @@ package at.alirezamoh.whisperer_for_laravel.config.visitors;
 import at.alirezamoh.whisperer_for_laravel.config.util.ConfigModule;
 import at.alirezamoh.whisperer_for_laravel.support.applicationModules.visitors.BaseServiceProviderVisitor;
 import at.alirezamoh.whisperer_for_laravel.support.psiUtil.PsiUtil;
-import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
@@ -82,7 +82,7 @@ public class ConfigModuleServiceProviderVisitor extends BaseServiceProviderVisit
                     PsiElement rightOperand = concatenationExpression.getRightOperand();
                     if (rightOperand instanceof StringLiteralExpression relativePathConfigFilePath && parentDir != null) {
                         VirtualFile resolvedVirtualFile = parentDir.findFileByRelativePath(
-                            StrUtil.removeQuotes(relativePathConfigFilePath.getText())
+                            StrUtils.removeQuotes(relativePathConfigFilePath.getText())
                         );
 
                         if (resolvedVirtualFile != null) {

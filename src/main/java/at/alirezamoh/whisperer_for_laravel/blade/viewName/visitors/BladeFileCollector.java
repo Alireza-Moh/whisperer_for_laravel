@@ -5,7 +5,7 @@ import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.whisperer_for_laravel.support.ProjectDefaultPaths;
 import at.alirezamoh.whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
 import at.alirezamoh.whisperer_for_laravel.support.psiUtil.PsiUtil;
-import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
@@ -48,7 +48,7 @@ public class BladeFileCollector {
     public BladeFileCollector startSearching() {
         String defaultViewPath = ProjectDefaultPaths.VIEW_PATH;
         if (!projectSettingState.isLaravelDirectoryEmpty()) {
-            defaultViewPath = StrUtil.addSlashes(
+            defaultViewPath = StrUtils.addSlashes(
                 projectSettingState.getLaravelDirectoryPath(),
                 false,
                 true

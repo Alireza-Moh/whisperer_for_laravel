@@ -3,7 +3,7 @@ package at.alirezamoh.whisperer_for_laravel.support.providers;
 import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.whisperer_for_laravel.support.ProjectDefaultPaths;
 import at.alirezamoh.whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
-import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
@@ -85,7 +85,7 @@ public class EventProvider {
         for (PsiDirectory module : rootDir.getSubdirectories()) {
             String path = "/Events/";
             if (!projectSettingState.isModuleSrcDirectoryEmpty()) {
-                path = StrUtil.addSlashes(
+                path = StrUtils.addSlashes(
                     projectSettingState.getModuleSrcDirectoryPath(),
                     false,
                     true
@@ -145,7 +145,7 @@ public class EventProvider {
     private String buildFullPath(String relativePath) {
         String basePath = projectSettingState.isLaravelDirectoryEmpty()
             ? ""
-            : StrUtil.addSlashes(
+            : StrUtils.addSlashes(
                 projectSettingState.getLaravelDirectoryPath(),
                 false,
                 true

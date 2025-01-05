@@ -3,7 +3,7 @@ package at.alirezamoh.whisperer_for_laravel.routing.routeAction;
 import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
 import at.alirezamoh.whisperer_for_laravel.support.psiUtil.PsiUtil;
-import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
@@ -63,7 +63,7 @@ public class RouteActionReference extends PsiReferenceBase<PsiElement> {
      */
     @Override
     public @Nullable PsiElement resolve() {
-        String targetAction = StrUtil.removeQuotes(myElement.getText());
+        String targetAction = StrUtils.removeQuotes(myElement.getText());
 
         for (Map.Entry<String, PsiElement> entry : getAllControllersWithActions().entrySet()) {
             if (entry.getKey().equals(targetAction)) {
@@ -101,7 +101,7 @@ public class RouteActionReference extends PsiReferenceBase<PsiElement> {
         String path = DEFAULT_CONTROLLER_PATH;
 
         if (!settingsState.isLaravelDirectoryEmpty()) {
-            String laravelDir = StrUtil.addSlashes(settingsState.getLaravelDirectoryPath());
+            String laravelDir = StrUtils.addSlashes(settingsState.getLaravelDirectoryPath());
             path = laravelDir + path;
         }
 
@@ -126,18 +126,18 @@ public class RouteActionReference extends PsiReferenceBase<PsiElement> {
         if (settingsState.isModuleApplication()) {
             String modulesPath = settingsState.getModulesDirectoryPath();
             if (!settingsState.isLaravelDirectoryEmpty()) {
-                modulesPath = StrUtil.addSlashes(settingsState.getLaravelDirectoryPath())
-                    + StrUtil.addSlashes(modulesPath, true, false);
+                modulesPath = StrUtils.addSlashes(settingsState.getLaravelDirectoryPath())
+                    + StrUtils.addSlashes(modulesPath, true, false);
             }
 
             PsiDirectory modulesDir = DirectoryPsiUtil.getDirectory(project, modulesPath);
 
             if (modulesDir != null) {
-                String moduleSrc = StrUtil.addSlashes(settingsState.getModuleSrcDirectoryPath()) + "Http/Controllers/";
+                String moduleSrc = StrUtils.addSlashes(settingsState.getModuleSrcDirectoryPath()) + "Http/Controllers/";
                 for (PsiDirectory module : modulesDir.getSubdirectories()) {
                     PsiDirectory controllerDirInModule =DirectoryPsiUtil.getDirectory(
                         project,
-                        StrUtil.removeDoubleSlashes(modulesPath + "/" + module.getName() + moduleSrc)
+                        StrUtils.removeDoubleForwardSlashes(modulesPath + "/" + module.getName() + moduleSrc)
                     );
 
                     if (controllerDirInModule != null) {

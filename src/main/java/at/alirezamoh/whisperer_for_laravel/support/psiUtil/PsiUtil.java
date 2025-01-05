@@ -1,7 +1,7 @@
 package at.alirezamoh.whisperer_for_laravel.support.psiUtil;
 
 import at.alirezamoh.whisperer_for_laravel.support.WhispererForLaravelIcon;
-import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
@@ -74,7 +74,7 @@ public class PsiUtil {
         if (parameters != null) {
             PsiElement namespaceParameter = parameters.getParameter(0);
             if (namespaceParameter != null) {
-                key = StrUtil.removeQuotes(namespaceParameter.getText());
+                key = StrUtils.removeQuotes(namespaceParameter.getText());
             }
         }
 
@@ -93,7 +93,7 @@ public class PsiUtil {
         if (parameters != null) {
             PsiElement namespaceParameter = parameters.getParameter(1);
             if (namespaceParameter != null) {
-                key = StrUtil.removeQuotes(namespaceParameter.getText());
+                key = StrUtils.removeQuotes(namespaceParameter.getText());
             }
         }
 

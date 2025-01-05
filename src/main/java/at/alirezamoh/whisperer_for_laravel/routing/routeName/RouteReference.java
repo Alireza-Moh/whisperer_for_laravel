@@ -2,7 +2,7 @@ package at.alirezamoh.whisperer_for_laravel.routing.routeName;
 
 import at.alirezamoh.whisperer_for_laravel.indexes.RouteIndex;
 import at.alirezamoh.whisperer_for_laravel.support.WhispererForLaravelIcon;
-import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
@@ -78,7 +78,7 @@ public class RouteReference extends PsiReferenceBase<PsiElement> implements PsiP
 
     @Override
     public ResolveResult @NotNull [] multiResolve(boolean b) {
-        String routeName = StrUtil.removeQuotes(myElement.getText());
+        String routeName = StrUtils.removeQuotes(myElement.getText());
         List<ResolveResult> results = new ArrayList<>();
         FileBasedIndex fileBasedIndex = FileBasedIndex.getInstance();
 

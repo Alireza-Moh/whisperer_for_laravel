@@ -3,7 +3,7 @@ package at.alirezamoh.whisperer_for_laravel.routing.namespace;
 import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.ClassUtils;
 import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.MethodUtils;
 import at.alirezamoh.whisperer_for_laravel.support.psiUtil.PsiUtil;
-import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.codeInsight.completion.*;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiElement;
@@ -72,7 +72,7 @@ public class RouteNamespaceCompletionContributor extends CompletionContributor {
                 int lastBackslashIndex = fqn.lastIndexOf("\\");
 
                 if (lastBackslashIndex > 0) {
-                    String namespace = StrUtil.addSlashes(
+                    String namespace = StrUtils.addSlashes(
                         fqn.substring(0, lastBackslashIndex),
                         true,
                         true

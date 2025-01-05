@@ -2,7 +2,7 @@ package at.alirezamoh.whisperer_for_laravel.actions.views;
 
 import at.alirezamoh.whisperer_for_laravel.actions.models.BladeComponentClassModel;
 import at.alirezamoh.whisperer_for_laravel.actions.models.BladeComponentViewModel;
-import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.ValidationInfo;
@@ -58,10 +58,10 @@ public class BladeComponentView extends BaseDialog {
             unformattedModuleFullPath = "";
         }
 
-        String name = StrUtil.removeDoubleSlashes(
+        String name = StrUtils.removeDoubleForwardSlashes(
             bladeComponentClassModel.getFolderPath()
-                + StrUtil.addSlashes(
-                    StrUtil.toLowerFirstLetter(bladeComponentClassModel.getName())
+                + StrUtils.addSlashes(
+                    StrUtils.lcFirst(bladeComponentClassModel.getName())
             )
         );
         return new BladeComponentViewModel(

@@ -1,7 +1,7 @@
 package at.alirezamoh.whisperer_for_laravel.support.codeGeneration.vistors;
 
 import at.alirezamoh.whisperer_for_laravel.actions.models.dataTables.Method;
-import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
@@ -139,7 +139,7 @@ public class ClassMethodLoader {
                             String[] parts = type.split("[\\s,<>|]+");
 
                             for (String part : parts) {
-                                String cleanedPart = StrUtil.removeExtension(part);
+                                String cleanedPart = StrUtils.removePhpExtension(part);
                                 if (phpTypes.contains(cleanedPart) && !tempType.toString().contains(cleanedPart)) {
                                     getParamType(part, tempType);
                                 }

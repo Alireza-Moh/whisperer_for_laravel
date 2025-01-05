@@ -1,7 +1,7 @@
 package at.alirezamoh.whisperer_for_laravel.actions.models;
 
 import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
-import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 
 import java.util.Arrays;
 
@@ -175,7 +175,7 @@ abstract public class BaseModel {
      * Returns the file path
      */
     public String getFilePath() {
-        return StrUtil.addSlashes(filePath);
+        return StrUtils.addSlashes(filePath);
     }
 
     public String getFormattedModuleFullPath() {
@@ -190,11 +190,11 @@ abstract public class BaseModel {
         this.destination = destination;
 
         if (settingsState.isLaravelDirectoryEmpty()) {
-            filePath = StrUtil.removeDoubleSlashes(destination + "/" + getName() + extension);
+            filePath = StrUtils.removeDoubleForwardSlashes(destination + "/" + getName() + extension);
         }
         else {
-            filePath = StrUtil.removeDoubleSlashes(
-                StrUtil.addSlashes(settingsState.getLaravelDirectoryPath())
+            filePath = StrUtils.removeDoubleForwardSlashes(
+                StrUtils.addSlashes(settingsState.getLaravelDirectoryPath())
                     + destination
                     + "/"
                     + getName()
@@ -260,7 +260,7 @@ abstract public class BaseModel {
     }
 
     protected void initFilePath() {
-        filePath = StrUtil.removeDoubleSlashes(destination + "/" + getName() + extension);
+        filePath = StrUtils.removeDoubleForwardSlashes(destination + "/" + getName() + extension);
     }
 
     protected void initDestination() {
@@ -317,54 +317,54 @@ abstract public class BaseModel {
                     }
                     else {
                         basePath = unformattedModuleFullPath
-                            + StrUtil.addSlashes(settingsState.getModuleSrcDirectoryPath())
+                            + StrUtils.addSlashes(settingsState.getModuleSrcDirectoryPath())
                             + defaultDestination;
                     }
                 }
 
                 if (!normalizedFolderPath.isEmpty()) {
-                    basePath = basePath + StrUtil.addSlashes(normalizedFolderPath);
+                    basePath = basePath + StrUtils.addSlashes(normalizedFolderPath);
                 }
             }
             else {
-                basePath = StrUtil.addSlashes(settingsState.getLaravelDirectoryPath())
+                basePath = StrUtils.addSlashes(settingsState.getLaravelDirectoryPath())
                     + unformattedModuleFullPath;
 
                 if (!settingsState.isModuleSrcDirectoryEmpty() && !withoutModuleSrcPath) {
                     if (!unformattedModuleFullPath.equals("/app")) {
-                        basePath = basePath + StrUtil.addSlashes(settingsState.getModuleSrcDirectoryPath());
+                        basePath = basePath + StrUtils.addSlashes(settingsState.getModuleSrcDirectoryPath());
                     }
                 }
 
-                basePath = basePath + StrUtil.addSlashes(defaultDestination);
+                basePath = basePath + StrUtils.addSlashes(defaultDestination);
 
                 if (!normalizedFolderPath.isEmpty()) {
-                    basePath = basePath + StrUtil.addSlashes(normalizedFolderPath);
+                    basePath = basePath + StrUtils.addSlashes(normalizedFolderPath);
                 }
             }
         }
         else {
             if (settingsState.isLaravelDirectoryEmpty()) {
-                basePath = unformattedModuleFullPath + StrUtil.addSlashes(defaultDestination);
+                basePath = unformattedModuleFullPath + StrUtils.addSlashes(defaultDestination);
 
                 if (!normalizedFolderPath.isEmpty()) {
                     basePath = basePath + normalizedFolderPath;
                 }
             }
             else {
-                basePath = StrUtil.removeDoubleSlashes(
-                    StrUtil.addSlashes(settingsState.getLaravelDirectoryPath())
+                basePath = StrUtils.removeDoubleForwardSlashes(
+                    StrUtils.addSlashes(settingsState.getLaravelDirectoryPath())
                         + unformattedModuleFullPath
-                        + StrUtil.addSlashes(defaultDestination)
+                        + StrUtils.addSlashes(defaultDestination)
                 );
 
                 if (!normalizedFolderPath.isEmpty()) {
-                    basePath = basePath + StrUtil.addSlashes(normalizedFolderPath);
+                    basePath = basePath + StrUtils.addSlashes(normalizedFolderPath);
                 }
             }
         }
 
-        return StrUtil.removeDoubleSlashes(basePath);
+        return StrUtils.removeDoubleForwardSlashes(basePath);
     }
 
     public String generateDestinationBasedWithoutModuleSrcPath() {
@@ -383,46 +383,46 @@ abstract public class BaseModel {
                 }
 
                 if (!normalizedFolderPath.isEmpty()) {
-                    basePath = basePath + StrUtil.addSlashes(normalizedFolderPath);
+                    basePath = basePath + StrUtils.addSlashes(normalizedFolderPath);
                 }
             }
             else {
                 if (unformattedModuleFullPath.equals("/app")) {
-                    basePath = StrUtil.addSlashes(settingsState.getLaravelDirectoryPath())
-                        + StrUtil.addSlashes(defaultDestination);
+                    basePath = StrUtils.addSlashes(settingsState.getLaravelDirectoryPath())
+                        + StrUtils.addSlashes(defaultDestination);
                 }
                 else {
-                    basePath = StrUtil.addSlashes(settingsState.getLaravelDirectoryPath())
+                    basePath = StrUtils.addSlashes(settingsState.getLaravelDirectoryPath())
                         + unformattedModuleFullPath
-                        + StrUtil.addSlashes(defaultDestination);
+                        + StrUtils.addSlashes(defaultDestination);
                 }
 
                 if (!normalizedFolderPath.isEmpty()) {
-                    basePath = basePath + StrUtil.addSlashes(normalizedFolderPath);
+                    basePath = basePath + StrUtils.addSlashes(normalizedFolderPath);
                 }
             }
         }
         else {
             if (settingsState.isLaravelDirectoryEmpty()) {
-                basePath = unformattedModuleFullPath + StrUtil.addSlashes(defaultDestination);
+                basePath = unformattedModuleFullPath + StrUtils.addSlashes(defaultDestination);
 
                 if (!normalizedFolderPath.isEmpty()) {
                     basePath = basePath + normalizedFolderPath;
                 }
             }
             else {
-                basePath = StrUtil.removeDoubleSlashes(
-                    StrUtil.addSlashes(settingsState.getLaravelDirectoryPath())
+                basePath = StrUtils.removeDoubleForwardSlashes(
+                    StrUtils.addSlashes(settingsState.getLaravelDirectoryPath())
                         + unformattedModuleFullPath
-                        + StrUtil.addSlashes(defaultDestination)
+                        + StrUtils.addSlashes(defaultDestination)
                 );
 
                 if (!normalizedFolderPath.isEmpty()) {
-                    basePath = basePath + StrUtil.addSlashes(normalizedFolderPath);
+                    basePath = basePath + StrUtils.addSlashes(normalizedFolderPath);
                 }
             }
         }
 
-        return StrUtil.removeDoubleSlashes(basePath);
+        return StrUtils.removeDoubleForwardSlashes(basePath);
     }
 }

@@ -11,8 +11,9 @@ import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.ClassUtils;
 import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.LaravelPaths;
 import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.MethodUtils;
 import at.alirezamoh.whisperer_for_laravel.support.providers.ModelProvider;
-import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
@@ -76,7 +77,7 @@ public class MigrationManager {
             PhpClass modelClass = getModelByTableName(tableName);
             if (modelClass != null) {
                 LaravelModel laravelModel = new LaravelModel();
-                laravelModel.setNamespaceName(StrUtil.addBackSlashes(modelClass.getNamespaceName(), true, true));
+                laravelModel.setNamespaceName(StrUtils.addBackSlashes(modelClass.getNamespaceName(), true, true));
                 laravelModel.setModelName(modelClass.getName());
                 laravelModel.setTableName(tableName);
                 laravelModel.setFields(table.fields());
@@ -90,7 +91,7 @@ public class MigrationManager {
                                 method.getName(),
                                 methodNameAndRelatedModel.getKey(),
                                 "\\Illuminate\\Database\\Eloquent\\Relations\\"
-                                    + StrUtil.capitalizeFirstLetter(methodNameAndRelatedModel.getKey())
+                                    + StrUtils.ucFirst(methodNameAndRelatedModel.getKey())
                                     + "|"
                                     + methodNameAndRelatedModel.getValue().getName()
                             )
@@ -254,8 +255,8 @@ public class MigrationManager {
         for (Field field : laravelModel.getFields()) {
             if (!field.getName().isEmpty()) {
                 Method method = new Method(
-                    "where" + StrUtil.capitalizeFirstLetter(
-                        StrUtil.camel(field.getName())
+                    "where" + StrUtils.ucFirst(
+                        StrUtils.camel(field.getName(), '_')
                     )
                 );
                 method.setReturnType(ELOQUENT_BUILDER_NAMESPACE + "|" + laravelModel.getModelName());
@@ -279,12 +280,12 @@ public class MigrationManager {
                 public void visitElement(@NotNull PsiElement element) {
                     if (element instanceof PhpClass modelClass) {
                         String finalModelName = "";
-                        String modelNameWithoutExtension = StrUtil.removeExtension(modelClass.getName());
-                        if (StrUtil.isCamelCase(modelNameWithoutExtension)) {
-                            String[] parts = StrUtil.snake(modelNameWithoutExtension).split("_");
+                        String modelNameWithoutExtension = StrUtils.removePhpExtension(modelClass.getName());
+                        if (StrUtils.isCamelCase(modelNameWithoutExtension)) {
+                            String[] parts = StrUtils.snake(modelNameWithoutExtension, "_").split("_");
                             String lastWord = parts[parts.length - 1];
 
-                            parts[parts.length - 1] = StrUtil.plural(lastWord);
+                            parts[parts.length - 1] = StringUtil.pluralize(lastWord);
                             finalModelName = String.join("_", parts);
                         }
 

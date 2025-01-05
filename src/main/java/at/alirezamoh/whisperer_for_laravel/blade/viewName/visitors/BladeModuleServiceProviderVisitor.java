@@ -3,7 +3,7 @@ package at.alirezamoh.whisperer_for_laravel.blade.viewName.visitors;
 import at.alirezamoh.whisperer_for_laravel.blade.viewName.BladeModule;
 import at.alirezamoh.whisperer_for_laravel.support.applicationModules.visitors.BaseServiceProviderVisitor;
 import at.alirezamoh.whisperer_for_laravel.support.psiUtil.PsiUtil;
-import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
@@ -80,7 +80,7 @@ public class BladeModuleServiceProviderVisitor extends BaseServiceProviderVisito
                     if (rightOperand instanceof StringLiteralExpression relativePathViewDirPath && parentDir != null) {
 
                         VirtualFile resolvedVirtualFile = parentDir.findFileByRelativePath(
-                            StrUtil.removeQuotes(relativePathViewDirPath.getText())
+                            StrUtils.removeQuotes(relativePathViewDirPath.getText())
                         );
 
                         if (resolvedVirtualFile != null && resolvedVirtualFile.isDirectory()) {

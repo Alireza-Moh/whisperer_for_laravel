@@ -2,7 +2,7 @@ package at.alirezamoh.whisperer_for_laravel.actions.models;
 
 import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.whisperer_for_laravel.support.ProjectDefaultPaths;
-import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 
 /**
  * Model representing a Blade component view
@@ -31,7 +31,7 @@ public class BladeComponentViewModel extends BaseModel {
             ""
         );
 
-        this.name = StrUtil.snake(getName(), "-");
+        this.name = StrUtils.snake(getName(), "-");
 
         initFilePath();
     }

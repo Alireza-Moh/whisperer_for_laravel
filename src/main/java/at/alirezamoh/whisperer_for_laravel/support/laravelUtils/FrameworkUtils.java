@@ -2,7 +2,7 @@ package at.alirezamoh.whisperer_for_laravel.support.laravelUtils;
 
 import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
-import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.intellij.openapi.diagnostic.Logger;
@@ -73,7 +73,7 @@ public class FrameworkUtils {
         String defaultPath = project.getBasePath();
 
         if (!settingsState.isLaravelDirectoryEmpty()) {
-            defaultPath = defaultPath + StrUtil.addSlashes(
+            defaultPath = defaultPath + StrUtils.addSlashes(
                 settingsState.getLaravelDirectoryPath(),
                 false,
                 true

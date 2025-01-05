@@ -4,7 +4,7 @@ import at.alirezamoh.whisperer_for_laravel.gate.visitors.GateProcessor;
 import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
 import at.alirezamoh.whisperer_for_laravel.support.psiUtil.PsiUtil;
-import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
@@ -47,11 +47,11 @@ public class MiddlewareReference extends PsiReferenceBase<PsiElement> {
      */
     @Override
     public @Nullable PsiElement resolve() {
-        String targetMiddleware = StrUtil.removeQuotes(myElement.getText());
+        String targetMiddleware = StrUtils.removeQuotes(myElement.getText());
         PsiElement foundedElement = null;
 
         for (PsiElement element : collectAllMiddlewares()) {
-            if (StrUtil.removeQuotes(element.getText()).equals(targetMiddleware)) {
+            if (StrUtils.removeQuotes(element.getText()).equals(targetMiddleware)) {
                 foundedElement = element;
             }
         }
@@ -78,7 +78,7 @@ public class MiddlewareReference extends PsiReferenceBase<PsiElement> {
 
         for (PsiElement element : collectAllMiddlewares()) {
             variants.add(
-                PsiUtil.buildSimpleLookupElement(StrUtil.removeQuotes(element.getText()))
+                PsiUtil.buildSimpleLookupElement(StrUtils.removeQuotes(element.getText()))
             );
         }
 
@@ -97,7 +97,7 @@ public class MiddlewareReference extends PsiReferenceBase<PsiElement> {
         String baseMiddlewareFilePath = BASE_MIDDLEWARE_FILE_PATH;
 
         if (!settingsState.isLaravelDirectoryEmpty()) {
-            String laravelDir = StrUtil.addSlashes(settingsState.getLaravelDirectoryPath(), false, true);
+            String laravelDir = StrUtils.addSlashes(settingsState.getLaravelDirectoryPath(), false, true);
             filename = laravelDir + filename;
             baseMiddlewareFilePath = laravelDir + baseMiddlewareFilePath;
         }

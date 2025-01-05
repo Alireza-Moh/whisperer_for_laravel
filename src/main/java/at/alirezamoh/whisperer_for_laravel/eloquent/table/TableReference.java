@@ -2,7 +2,7 @@ package at.alirezamoh.whisperer_for_laravel.eloquent.table;
 
 import at.alirezamoh.whisperer_for_laravel.indexes.TableIndex;
 import at.alirezamoh.whisperer_for_laravel.support.psiUtil.PsiUtil;
-import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
@@ -40,7 +40,7 @@ public class TableReference extends PsiReferenceBase<PsiElement> implements PsiP
 
     @Override
     public ResolveResult @NotNull [] multiResolve(boolean b) {
-        String text = StrUtil.removeQuotes(myElement.getText());
+        String text = StrUtils.removeQuotes(myElement.getText());
 
 
         Collection<VirtualFile> paths = FileBasedIndex.getInstance().getContainingFiles(

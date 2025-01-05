@@ -10,7 +10,7 @@ import at.alirezamoh.whisperer_for_laravel.support.codeGeneration.vistors.ClassM
 import at.alirezamoh.whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
 import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.FrameworkUtils;
 import at.alirezamoh.whisperer_for_laravel.support.notification.Notify;
-import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import at.alirezamoh.whisperer_for_laravel.support.template.TemplateLoader;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
@@ -97,7 +97,7 @@ public class GenerateHelperMethodsAction extends BaseAction {
             String path = ProjectDefaultPaths.WHISPERER_FOR_LARAVEL_DIR_PATH;
 
             if (!settingsState.isLaravelDirectoryEmpty()) {
-                path = StrUtil.addSlashes(settingsState.getLaravelDirectoryPath(), false, true) + path;
+                path = StrUtils.addSlashes(settingsState.getLaravelDirectoryPath(), false, true) + path;
             }
 
             PsiDirectory pluginVendor = DirectoryPsiUtil.getDirectory(project, path);

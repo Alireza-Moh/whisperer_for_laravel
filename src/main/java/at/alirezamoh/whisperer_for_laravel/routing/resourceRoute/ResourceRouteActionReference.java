@@ -2,7 +2,7 @@ package at.alirezamoh.whisperer_for_laravel.routing.resourceRoute;
 
 import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.MethodUtils;
 import at.alirezamoh.whisperer_for_laravel.support.psiUtil.PsiUtil;
-import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
@@ -40,7 +40,7 @@ public class ResourceRouteActionReference extends PsiReferenceBase<PsiElement> {
      */
     @Override
     public @Nullable PsiElement resolve() {
-        String targetAction = StrUtil.removeQuotes(myElement.getText());
+        String targetAction = StrUtils.removeQuotes(myElement.getText());
 
         for (Method method : getAllControllerMethods())  {
             if (method.getName().equals(targetAction)){

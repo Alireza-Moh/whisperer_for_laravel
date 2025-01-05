@@ -3,7 +3,7 @@ package at.alirezamoh.whisperer_for_laravel.actions.views;
 import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
 import at.alirezamoh.whisperer_for_laravel.support.notification.Notify;
-import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DialogWrapper;
@@ -158,7 +158,7 @@ public abstract class BaseDialog extends DialogWrapper {
 
         isAModuleApplication = projectSettingState.isModuleApplication();
 
-        moduleRootPath = StrUtil.addSlashes(projectSettingState.getModulesDirectoryPath());
+        moduleRootPath = StrUtils.addSlashes(projectSettingState.getModulesDirectoryPath());
     }
 
     /**
@@ -193,7 +193,7 @@ public abstract class BaseDialog extends DialogWrapper {
     private void addRootApp() {
         String path = "app";
         if (projectSettingState.isLaravelDirectoryEmpty()) {
-            path = StrUtil.addSlashes(projectSettingState.getLaravelDirectoryPath()) + "app";
+            path = StrUtils.addSlashes(projectSettingState.getLaravelDirectoryPath()) + "app";
         }
         PsiDirectory rootApp = DirectoryPsiUtil.getDirectory(project, path);
         if (rootApp != null) {
@@ -207,7 +207,7 @@ public abstract class BaseDialog extends DialogWrapper {
      * @param modulePath The module path to format
      */
     private void formattedModulePath(String modulePath) {
-        String unformattedModuleFullPath = StrUtil.removeDoubleSlashes(moduleRootPath + modulePath);
+        String unformattedModuleFullPath = StrUtils.removeDoubleForwardSlashes(moduleRootPath + modulePath);
         String backSlashedModuleFullPath = unformattedModuleFullPath.replace("/", "\\");
 
         StringBuilder result = new StringBuilder();
