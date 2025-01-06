@@ -1,10 +1,6 @@
 package at.alirezamoh.whisperer_for_laravel.eloquent.table;
 
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.ClassUtils;
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.FrameworkUtils;
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.LaravelPaths;
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.MethodUtils;
-import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.*;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.patterns.PlatformPatterns;
@@ -16,6 +12,7 @@ import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import org.jetbrains.annotations.NotNull;
 
 public class TableReferenceContributor extends PsiReferenceContributor {
+    private final static String[] QUERY_BUILDERS = {"\\Illuminate\\Support\\Facades\\DB", "\\Illuminate\\Database\\Query\\Builder", "\\Illuminate\\Database\\Eloquent\\Builder"};
     @Override
     public void registerReferenceProviders(@NotNull PsiReferenceRegistrar psiReferenceRegistrar) {
         psiReferenceRegistrar.registerReferenceProvider(
@@ -26,7 +23,7 @@ public class TableReferenceContributor extends PsiReferenceContributor {
                 public PsiReference @NotNull [] getReferencesByElement(@NotNull PsiElement psiElement, @NotNull ProcessingContext processingContext) {
                     Project project = psiElement.getProject();
 
-                    if (!FrameworkUtils.isLaravelProject(project) && FrameworkUtils.isLaravelFrameworkNotInstalled(project)) {
+                    if (!PluginUtils.isLaravelProject(project) && PluginUtils.isLaravelFrameworkNotInstalled(project)) {
                         return PsiReference.EMPTY_ARRAY;
                     }
 
@@ -55,7 +52,7 @@ public class TableReferenceContributor extends PsiReferenceContributor {
     private boolean isInsideCorrectMethod(PsiElement psiElement) {
         MethodReference methodReference = MethodUtils.resolveMethodReference(psiElement, 10);
 
-        return methodReference != null && ClassUtils.isLaravelRelatedClass(methodReference, psiElement.getProject())
+        return methodReference != null && PhpClassUtils.isCorrectRelatedClass(methodReference, psiElement.getProject(), QUERY_BUILDERS)
             && isTableMethod(methodReference)
             && isTableParam(methodReference, psiElement);
     }

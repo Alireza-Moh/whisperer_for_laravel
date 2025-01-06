@@ -3,8 +3,10 @@ package at.alirezamoh.whisperer_for_laravel.actions;
 import at.alirezamoh.whisperer_for_laravel.actions.models.EloquentModel;
 import at.alirezamoh.whisperer_for_laravel.actions.models.FormRequestModel;
 import at.alirezamoh.whisperer_for_laravel.actions.views.FormRequestView;
-import at.alirezamoh.whisperer_for_laravel.support.eloquentUtil.EloquentUtil;
+import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
+import at.alirezamoh.whisperer_for_laravel.support.utils.EloquentUtils;
 import at.alirezamoh.whisperer_for_laravel.support.notification.Notify;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
@@ -28,9 +30,7 @@ public class FormRequestAction extends BaseAction {
     }
 
     private void addEloquentModel(Project project, FormRequestModel formRequestView) {
-        EloquentUtil eloquentUtil = new EloquentUtil(project);
-
-        if (eloquentUtil.getPluginVendor() == null) {
+        if (PluginUtils.getPluginVendor(project) == null) {
             Notify.notifyWarning(project, "Could not add eloquent attributes to the Form Request [Run 'Generate Helper Methods']");
         }
         else {
@@ -38,11 +38,11 @@ public class FormRequestAction extends BaseAction {
             String modelName = parts[parts.length - 1];
 
             EloquentModel eloquentModel = new EloquentModel(
-                eloquentUtil.getSettingsState(),
+                SettingsState.getInstance(project),
                 modelName,
                 formRequestView.getUnformattedModuleFullPath(),
                 formRequestView.getFormattedModuleFullPath(),
-                eloquentUtil.getFields(modelName, false)
+                EloquentUtils.getFields(modelName, false, project)
             );
 
             formRequestView.setModel(eloquentModel);

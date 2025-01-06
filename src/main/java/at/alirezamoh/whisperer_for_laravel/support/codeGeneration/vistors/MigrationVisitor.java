@@ -4,7 +4,7 @@ import at.alirezamoh.whisperer_for_laravel.actions.models.dataTables.Field;
 import at.alirezamoh.whisperer_for_laravel.actions.models.dataTables.RenameField;
 import at.alirezamoh.whisperer_for_laravel.actions.models.dataTables.Table;
 import at.alirezamoh.whisperer_for_laravel.support.codeGeneration.PhpTypeConverter;
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.ClassUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PhpClassUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
@@ -40,6 +40,8 @@ public class MigrationVisitor extends PsiRecursiveElementWalkingVisitor {
         "dropPrimary", "dropUnique", "dropIndex", "dropFullText", "dropSpatialIndex", "dropForeign"
     ));
 
+    private final String[] SCHEMA_NAMESPACES = {"\\Illuminate\\Support\\Facades\\Schema", "\\Schema"};
+
 
     private final List<Table> tables = new ArrayList<>();
 
@@ -61,7 +63,7 @@ public class MigrationVisitor extends PsiRecursiveElementWalkingVisitor {
         return element instanceof MethodReferenceImpl methodReference
             && isInsideUpMethod(methodReference)
             && isCreateOrTable(methodReference)
-            && ClassUtils.isLaravelRelatedClass(methodReference, methodReference.getProject());
+            && PhpClassUtils.isCorrectRelatedClass(methodReference, methodReference.getProject(), SCHEMA_NAMESPACES);
     }
 
     private void extractTableName(MethodReferenceImpl methodReference) {

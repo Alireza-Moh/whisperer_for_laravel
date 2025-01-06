@@ -1,6 +1,6 @@
 package at.alirezamoh.whisperer_for_laravel.request.requestField.util;
 
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.ClassUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PhpClassUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.codeInsight.completion.CompletionResultSet;
@@ -45,7 +45,7 @@ final public class RequestFieldUtils {
      * @return the resolved PhpClassImpl instance or null if not found
      */
     public static PhpClassImpl resolveRequestClass(Variable variable, Project project) {
-        PhpClassImpl phpClass = ClassUtils.getClassFromTypedElement(variable, project);
+        PhpClassImpl phpClass = PhpClassUtils.getClassFromTypedElement(variable, project);
 
         if (phpClass == null) {
             PsiReference reference = variable.getReference();
@@ -68,8 +68,8 @@ final public class RequestFieldUtils {
      * @return a collection of rules or null if not found
      */
     public static Collection<ArrayHashElement> getRules(PhpClassImpl phpClass, Project project) {
-        PhpClass baseFormRequest = ClassUtils.getClassByFQN(project, BASE_FORM_REQUEST);
-        if (baseFormRequest != null && ClassUtils.isChildOf(phpClass, baseFormRequest)) {
+        PhpClass baseFormRequest = PhpClassUtils.getClassByFQN(project, BASE_FORM_REQUEST);
+        if (baseFormRequest != null && PhpClassUtils.isChildOf(phpClass, baseFormRequest)) {
             Method rulesMethod = phpClass.findMethodByName("rules");
             if (rulesMethod != null) {
                 PhpReturn phpReturn = PsiTreeUtil.findChildOfType(rulesMethod, PhpReturn.class);

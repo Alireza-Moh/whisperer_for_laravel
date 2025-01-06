@@ -1,4 +1,4 @@
-package at.alirezamoh.whisperer_for_laravel.support.laravelUtils;
+package at.alirezamoh.whisperer_for_laravel.support.utils;
 
 import java.util.Arrays;
 import java.util.HashMap;

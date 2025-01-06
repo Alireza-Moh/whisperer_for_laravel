@@ -1,6 +1,6 @@
 package at.alirezamoh.whisperer_for_laravel.settings;
 
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.MethodUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.MethodUtils;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.ProjectActivity;
 import kotlin.Unit;

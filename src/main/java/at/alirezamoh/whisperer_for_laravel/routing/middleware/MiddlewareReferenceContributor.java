@@ -1,8 +1,8 @@
 package at.alirezamoh.whisperer_for_laravel.routing.middleware;
 
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.ClassUtils;
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.FrameworkUtils;
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.MethodUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.MethodUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PhpClassUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
@@ -34,11 +34,7 @@ public class MiddlewareReferenceContributor extends PsiReferenceContributor {
     /**
      * Route class
      */
-    private final List<String> ROUTE_NAMESPACES = new ArrayList<>() {{
-        add("\\Illuminate\\Routing\\Route");
-        add("\\Illuminate\\Support\\Facades\\Route");
-        add("\\Route");
-    }};
+    private final String[] ROUTE_NAMESPACES = {"\\Illuminate\\Routing\\Route", "\\Illuminate\\Support\\Facades\\Route", "\\Route"};
 
     @Override
     public void registerReferenceProviders(@NotNull PsiReferenceRegistrar psiReferenceRegistrar) {
@@ -52,7 +48,7 @@ public class MiddlewareReferenceContributor extends PsiReferenceContributor {
                 public PsiReference @NotNull [] getReferencesByElement(@NotNull PsiElement psiElement, @NotNull ProcessingContext processingContext) {
                     Project project = psiElement.getProject();
 
-                    if (!FrameworkUtils.isLaravelProject(project) && FrameworkUtils.isLaravelFrameworkNotInstalled(project)) {
+                    if (!PluginUtils.isLaravelProject(project) && PluginUtils.isLaravelFrameworkNotInstalled(project)) {
                         return PsiReference.EMPTY_ARRAY;
                     }
 
@@ -89,7 +85,7 @@ public class MiddlewareReferenceContributor extends PsiReferenceContributor {
 
         return method != null
             && isMiddlewareParam(method, psiElement)
-            && ClassUtils.isCorrectRelatedClass(method, project, ROUTE_NAMESPACES);
+            && PhpClassUtils.isCorrectRelatedClass(method, project, ROUTE_NAMESPACES);
     }
 
     /**

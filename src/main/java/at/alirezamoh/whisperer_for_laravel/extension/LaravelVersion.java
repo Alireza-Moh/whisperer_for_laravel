@@ -1,6 +1,6 @@
 package at.alirezamoh.whisperer_for_laravel.extension;
 
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.FrameworkUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.NlsContexts;
 import com.intellij.openapi.wm.StatusBar;
@@ -22,7 +22,7 @@ public class LaravelVersion implements StatusBarWidgetFactory {
 
     @Override
     public boolean isAvailable(@NotNull Project project) {
-        return FrameworkUtils.isLaravelProject(project) && FrameworkUtils.laravelVersion(project) != null;
+        return PluginUtils.isLaravelProject(project) && PluginUtils.laravelVersion(project) != null;
     }
 
     @Override

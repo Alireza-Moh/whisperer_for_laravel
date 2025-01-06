@@ -1,6 +1,6 @@
 package at.alirezamoh.whisperer_for_laravel.routing.resourceRoute;
 
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.MethodUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.MethodUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PhpClassUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;

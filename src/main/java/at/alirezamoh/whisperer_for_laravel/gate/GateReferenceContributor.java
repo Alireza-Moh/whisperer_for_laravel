@@ -1,8 +1,8 @@
 package at.alirezamoh.whisperer_for_laravel.gate;
 
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.ClassUtils;
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.FrameworkUtils;
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.MethodUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.MethodUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PhpClassUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
@@ -13,15 +13,11 @@ import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class GateReferenceContributor extends PsiReferenceContributor {
-    public static final List<String> GATE = new ArrayList<>() {{
-        add("\\Illuminate\\Support\\Facades\\Gate");
-    }};
+    public static final String GATE = "\\Illuminate\\Support\\Facades\\Gate";
 
     public static Map<String, Integer> GATE_METHODS = new HashMap<>() {{
         put("allows", 0);
@@ -44,7 +40,7 @@ public class GateReferenceContributor extends PsiReferenceContributor {
                 public PsiReference @NotNull [] getReferencesByElement(@NotNull PsiElement element, @NotNull ProcessingContext context) {
                     Project project = element.getProject();
 
-                    if (!FrameworkUtils.isLaravelProject(project) && FrameworkUtils.isLaravelFrameworkNotInstalled(project)) {
+                    if (!PluginUtils.isLaravelProject(project) && PluginUtils.isLaravelFrameworkNotInstalled(project)) {
                         return PsiReference.EMPTY_ARRAY;
                     }
 
@@ -74,7 +70,7 @@ public class GateReferenceContributor extends PsiReferenceContributor {
         MethodReference methodReference = MethodUtils.resolveMethodReference(psiElement, 10);
 
         return methodReference != null
-            && ClassUtils.isCorrectRelatedClass(methodReference, project, GATE)
+            && PhpClassUtils.isCorrectRelatedClass(methodReference, project, GATE)
             && isGateParam(methodReference, psiElement);
     }
 

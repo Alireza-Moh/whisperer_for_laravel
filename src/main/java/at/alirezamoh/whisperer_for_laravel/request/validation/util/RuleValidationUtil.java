@@ -1,8 +1,8 @@
 package at.alirezamoh.whisperer_for_laravel.request.validation.util;
 
 import at.alirezamoh.whisperer_for_laravel.request.requestField.util.RequestFieldUtils;
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.ClassUtils;
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.MethodUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.MethodUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PhpClassUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
@@ -65,14 +65,14 @@ public class RuleValidationUtil {
 
     private static boolean isInsideRequestMethod(PsiElement psiElement, MethodReference methodReference, Project project) {
 
-        return ClassUtils.isLaravelRelatedClass(methodReference, project)
+        return PhpClassUtils.isCorrectRelatedClass(methodReference, project, "\\Illuminate\\Http\\Request")
             && RequestFieldUtils.VALIDATION_METHODS.contains(methodReference.getName())
             && isRuleParam(methodReference, psiElement)
             && isInsideArrayValue(psiElement);
     }
 
     private static boolean isInsideValidatorMethod(PsiElement psiElement, MethodReference methodReference, Project project) {
-        return ClassUtils.isLaravelRelatedClass(methodReference, project)
+        return PhpClassUtils.isCorrectRelatedClass(methodReference, project, "\\Illuminate\\Support\\Facades\\Validator")
             && Objects.equals(methodReference.getName(), "make")
             && isRuleParam(methodReference, psiElement)
             && isInsideArrayValue(psiElement);

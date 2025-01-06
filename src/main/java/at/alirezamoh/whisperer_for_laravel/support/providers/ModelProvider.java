@@ -1,6 +1,6 @@
 package at.alirezamoh.whisperer_for_laravel.support.providers;
 
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.ClassUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PhpClassUtils;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.jetbrains.php.PhpIndex;
@@ -62,7 +62,7 @@ public class ModelProvider {
      * @return The list of model namespaces.
      */
     public List<String> getModels() {
-        PhpClass eloquentBaseModel = ClassUtils.getEloquentBaseModel(project);
+        PhpClass eloquentBaseModel = PhpClassUtils.getEloquentBaseModel(project);
         if (eloquentBaseModel != null) {
             PhpIndex phpIndex = PhpIndex.getInstance(project);
             processSubclasses(eloquentBaseModel.getFQN(), phpIndex);

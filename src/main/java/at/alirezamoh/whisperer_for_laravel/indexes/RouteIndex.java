@@ -1,6 +1,6 @@
 package at.alirezamoh.whisperer_for_laravel.indexes;
 
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.FrameworkUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
@@ -63,7 +63,7 @@ public class RouteIndex extends FileBasedIndexExtension<String, Void> {
         return inputData -> {
             Project project = inputData.getProject();
 
-            if (!FrameworkUtils.isLaravelProject(project) && FrameworkUtils.isLaravelFrameworkNotInstalled(project)) {
+            if (!PluginUtils.isLaravelProject(project) && PluginUtils.isLaravelFrameworkNotInstalled(project)) {
                 return Collections.emptyMap();
             }
 

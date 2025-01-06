@@ -1,8 +1,8 @@
 package at.alirezamoh.whisperer_for_laravel.routing.routeName;
 
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.ClassUtils;
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.FrameworkUtils;
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.MethodUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.MethodUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PhpClassUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
@@ -34,7 +34,7 @@ public class RouteReferenceContributor extends PsiReferenceContributor {
     /**
      * Classes to provide route names autocompletion
      */
-    private final List<String> ROUTE_CLASSES = List.of("\\Illuminate\\Support\\Facades\\Redirect", "\\Illuminate\\Support\\Facades\\URL");
+    private final String[] ROUTE_CLASSES = {"\\Illuminate\\Support\\Facades\\Redirect", "\\Illuminate\\Support\\Facades\\URL"};
 
     /**
      * Redirect and URL class methods
@@ -57,7 +57,7 @@ public class RouteReferenceContributor extends PsiReferenceContributor {
                 public PsiReference @NotNull [] getReferencesByElement(@NotNull PsiElement psiElement, @NotNull ProcessingContext processingContext) {
                     Project project = psiElement.getProject();
 
-                    if (!FrameworkUtils.isLaravelProject(project) && FrameworkUtils.isLaravelFrameworkNotInstalled(project)) {
+                    if (!PluginUtils.isLaravelProject(project) && PluginUtils.isLaravelFrameworkNotInstalled(project)) {
                         return PsiReference.EMPTY_ARRAY;
                     }
 
@@ -96,7 +96,7 @@ public class RouteReferenceContributor extends PsiReferenceContributor {
         return (
             method != null
                 && isRouteParam(method, psiElement)
-                && ClassUtils.isCorrectRelatedClass(method, project, ROUTE_CLASSES)
+                && PhpClassUtils.isCorrectRelatedClass(method, project, ROUTE_CLASSES)
             ) 
             || (function != null && isRouteParam(function, psiElement));
     }

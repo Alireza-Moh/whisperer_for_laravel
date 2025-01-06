@@ -1,8 +1,8 @@
 package at.alirezamoh.whisperer_for_laravel.packages.inertia;
 
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.ClassUtils;
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.FrameworkUtils;
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.MethodUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.MethodUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PhpClassUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
@@ -53,7 +53,7 @@ public class InertiaReferenceContributor extends PsiReferenceContributor {
                 public PsiReference @NotNull [] getReferencesByElement(@NotNull PsiElement psiElement, @NotNull ProcessingContext processingContext) {
                     Project project = psiElement.getProject();
 
-                    if (!FrameworkUtils.isLaravelProject(project) && FrameworkUtils.isLaravelFrameworkNotInstalled(project)) {
+                    if (!PluginUtils.isLaravelProject(project) && PluginUtils.isLaravelFrameworkNotInstalled(project)) {
                         return PsiReference.EMPTY_ARRAY;
                     }
 
@@ -142,10 +142,10 @@ public class InertiaReferenceContributor extends PsiReferenceContributor {
         }
 
         List<PhpClassImpl> resolvedClasses = getPhpClassesForMethod(methodReference, project);
-        PhpClass expectedClass = ClassUtils.getClassByFQN(project, expectedClassFQN);
+        PhpClass expectedClass = PhpClassUtils.getClassByFQN(project, expectedClassFQN);
 
         return expectedClass != null
-            && resolvedClasses.stream().anyMatch(clazz -> ClassUtils.isChildOf(clazz, expectedClass))
+            && resolvedClasses.stream().anyMatch(clazz -> PhpClassUtils.isChildOf(clazz, expectedClass))
             && expectedParamIndex == MethodUtils.findParamIndex(position, false);
     }
 

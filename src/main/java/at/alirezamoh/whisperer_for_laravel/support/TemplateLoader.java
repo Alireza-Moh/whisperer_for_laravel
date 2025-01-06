@@ -1,4 +1,4 @@
-package at.alirezamoh.whisperer_for_laravel.support.template;
+package at.alirezamoh.whisperer_for_laravel.support;
 
 import at.alirezamoh.whisperer_for_laravel.actions.models.BaseModel;
 import at.alirezamoh.whisperer_for_laravel.support.notification.Notify;

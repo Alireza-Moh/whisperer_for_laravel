@@ -1,7 +1,7 @@
 package at.alirezamoh.whisperer_for_laravel.request.requestField;
 
 import at.alirezamoh.whisperer_for_laravel.request.requestField.util.RequestFieldUtils;
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.FrameworkUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
 import com.intellij.codeInsight.completion.*;
 import com.intellij.openapi.project.Project;
 import com.intellij.patterns.PlatformPatterns;
@@ -44,7 +44,7 @@ public class RequestFieldCompletionContributor extends CompletionContributor {
                     PsiElement position = parameters.getPosition().getOriginalElement();
 
                     Project project = position.getProject();
-                    if (!FrameworkUtils.isLaravelProject(project) && FrameworkUtils.isLaravelFrameworkNotInstalled(project)) {
+                    if (!PluginUtils.isLaravelProject(project) && PluginUtils.isLaravelFrameworkNotInstalled(project)) {
                         return;
                     }
 

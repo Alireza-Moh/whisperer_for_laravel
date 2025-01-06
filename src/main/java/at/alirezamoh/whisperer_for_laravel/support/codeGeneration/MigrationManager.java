@@ -7,10 +7,10 @@ import at.alirezamoh.whisperer_for_laravel.actions.models.dataTables.Relation;
 import at.alirezamoh.whisperer_for_laravel.actions.models.dataTables.Table;
 import at.alirezamoh.whisperer_for_laravel.indexes.TableIndex;
 import at.alirezamoh.whisperer_for_laravel.support.codeGeneration.vistors.MigrationVisitor;
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.ClassUtils;
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.LaravelPaths;
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.MethodUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.LaravelPaths;
+import at.alirezamoh.whisperer_for_laravel.support.utils.MethodUtils;
 import at.alirezamoh.whisperer_for_laravel.support.providers.ModelProvider;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PhpClassUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
@@ -377,11 +377,11 @@ public class MigrationManager {
             .map(child2 -> (MethodReferenceImpl) child2)
             .anyMatch(methodReference -> {
                 List<PhpClassImpl> classes = MethodUtils.resolveMethodClasses(methodReference, project);
-                PhpClass relationClass = ClassUtils.getClassByFQN(project, LaravelPaths.LaravelClasses.Model);
+                PhpClass relationClass = PhpClassUtils.getClassByFQN(project, LaravelPaths.LaravelClasses.Model);
 
                 return RELATION_METHODS.containsKey(methodReference.getName())
                     && relationClass != null
-                    && classes.stream().anyMatch(clazz -> ClassUtils.isChildOf(clazz, relationClass));
+                    && classes.stream().anyMatch(clazz -> PhpClassUtils.isChildOf(clazz, relationClass));
             });
     }
 

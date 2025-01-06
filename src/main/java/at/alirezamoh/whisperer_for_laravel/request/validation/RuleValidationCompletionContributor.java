@@ -1,7 +1,7 @@
 package at.alirezamoh.whisperer_for_laravel.request.validation;
 
 import at.alirezamoh.whisperer_for_laravel.request.validation.util.RuleValidationUtil;
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.FrameworkUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
 import com.intellij.codeInsight.completion.*;
 import com.intellij.openapi.project.Project;
@@ -30,7 +30,7 @@ public class RuleValidationCompletionContributor extends CompletionContributor {
                     PsiElement psiElement = completionParameters.getPosition().getOriginalElement().getParent();
                     Project project = psiElement.getProject();
 
-                    if (!FrameworkUtils.isLaravelProject(project) && FrameworkUtils.isLaravelFrameworkNotInstalled(project)) {
+                    if (!PluginUtils.isLaravelProject(project) && PluginUtils.isLaravelFrameworkNotInstalled(project)) {
                         return;
                     }
 
