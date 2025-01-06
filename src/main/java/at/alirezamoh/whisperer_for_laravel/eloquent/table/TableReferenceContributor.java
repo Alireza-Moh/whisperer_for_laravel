@@ -12,7 +12,12 @@ import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import org.jetbrains.annotations.NotNull;
 
 public class TableReferenceContributor extends PsiReferenceContributor {
-    private final static String[] QUERY_BUILDERS = {"\\Illuminate\\Support\\Facades\\DB", "\\Illuminate\\Database\\Query\\Builder", "\\Illuminate\\Database\\Eloquent\\Builder"};
+    private final static String[] QUERY_BUILDERS = {
+        "\\Illuminate\\Support\\Facades\\DB",
+        "\\Illuminate\\Database\\Query\\Builder",
+        "\\Illuminate\\Database\\Eloquent\\Builder"
+    };
+
     @Override
     public void registerReferenceProviders(@NotNull PsiReferenceRegistrar psiReferenceRegistrar) {
         psiReferenceRegistrar.registerReferenceProvider(

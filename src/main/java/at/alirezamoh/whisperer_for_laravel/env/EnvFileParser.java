@@ -3,7 +3,6 @@ package at.alirezamoh.whisperer_for_laravel.env;
 import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 
@@ -12,8 +11,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class EnvFileParser {
-    private static final Logger LOG = Logger.getInstance(EnvFileParser.class);
-
     public static Map<String, String> parseEnvFile(Project project) {
         Map<String, String> envMap = new HashMap<>();
 
