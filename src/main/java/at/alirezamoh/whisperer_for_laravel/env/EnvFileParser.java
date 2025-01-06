@@ -1,6 +1,7 @@
 package at.alirezamoh.whisperer_for_laravel.env;
 
 import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
@@ -41,7 +42,7 @@ public class EnvFileParser {
                 envMap.put(key, value);
             }
         } catch (IOException e) {
-            LOG.error("Could not read .env file", e);
+            PluginUtils.getLOG().error("Could not read .env file", e);
             return envMap;
         }
 
