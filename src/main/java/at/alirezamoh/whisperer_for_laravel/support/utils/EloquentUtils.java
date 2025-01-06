@@ -27,16 +27,6 @@ public class EloquentUtils {
         "mixed"
     );
 
-    public static @Nullable PhpClass getPhpClassFromFile(PhpFile phpFile, String className) {
-        for (PhpNamedElement topLevelElement : phpFile.getTopLevelDefs().values()) {
-            if (topLevelElement instanceof PhpClass clazz && clazz.getName().equals(className)) {
-                return clazz;
-            }
-        }
-
-        return null;
-    }
-
     public static List<Field> getFields(String modelName, boolean withRelations, Project project) {
         List<Field> fields = new ArrayList<>();
 
@@ -48,7 +38,7 @@ public class EloquentUtils {
 
         for (PsiFile file : pluginVendor.getFiles()) {
             if (file instanceof PhpFile phpFile) {
-                PhpClass modelPhpClass = getPhpClassFromFile(phpFile, modelName);
+                PhpClass modelPhpClass = PhpClassUtils.getPhpClassFromFile(phpFile, modelName);
                 if (modelPhpClass != null) {
                     extractFieldsFromClass(modelPhpClass, withRelations, fields);
                 }

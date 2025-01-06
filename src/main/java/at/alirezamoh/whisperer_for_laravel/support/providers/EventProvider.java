@@ -3,12 +3,11 @@ package at.alirezamoh.whisperer_for_laravel.support.providers;
 import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.whisperer_for_laravel.support.ProjectDefaultPaths;
 import at.alirezamoh.whisperer_for_laravel.support.utils.DirectoryUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PhpClassUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.util.PsiTreeUtil;
 import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 
@@ -171,11 +170,9 @@ public class EventProvider {
      * @param file The PHP file representing the event
      */
     private void addModelToList(PsiFile file) {
-        if (file instanceof PhpFile) {
-            for (PsiElement element : PsiTreeUtil.findChildrenOfType(file, PhpClass.class)) {
-                if (element instanceof PhpClass phpClass) {
-                    events.add(phpClass.getPresentableFQN());
-                }
+        if (file instanceof PhpFile phpFile) {
+            for (PhpClass phpClass : PhpClassUtils.getPhpClassesFromFile(phpFile)) {
+                events.add(phpClass.getPresentableFQN());
             }
         }
     }

@@ -151,7 +151,7 @@ public class RouteActionReference extends PsiReferenceBase<PsiElement> {
             if (element instanceof PhpFile controllerFile) {
                 for (PhpClass phpClass : PsiTreeUtil.findChildrenOfType(controllerFile, PhpClass.class)) {
                     String fqn = phpClass.getPresentableFQN().replace("/", "\\");
-                    for (Method method : PhpClassUtils.getClassPublicMethod(phpClass)) {
+                    for (Method method : PhpClassUtils.getClassPublicMethods(phpClass, false)) {
                         String methodName = method.getName();
                         String methodString = fqn + "@" + methodName;
                         elements.put(methodString, method);

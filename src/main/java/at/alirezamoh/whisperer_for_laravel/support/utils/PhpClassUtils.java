@@ -2,15 +2,14 @@ package at.alirezamoh.whisperer_for_laravel.support.utils;
 
 import com.intellij.openapi.project.Project;
 import com.jetbrains.php.PhpIndex;
-import com.jetbrains.php.lang.psi.elements.Method;
-import com.jetbrains.php.lang.psi.elements.MethodReference;
-import com.jetbrains.php.lang.psi.elements.PhpClass;
-import com.jetbrains.php.lang.psi.elements.PhpTypedElement;
+import com.jetbrains.php.lang.psi.PhpFile;
+import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.elements.impl.PhpClassAliasImpl;
 import com.jetbrains.php.lang.psi.elements.impl.PhpClassImpl;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class PhpClassUtils {
@@ -20,10 +19,12 @@ public class PhpClassUtils {
      * @param phpClass The PhpClass instance to extract public methods from.
      * @return A list of public methods (non-magic) defined in the given class
      */
-    public static List<Method> getClassPublicMethod(PhpClass phpClass) {
+    public static List<Method> getClassPublicMethods(PhpClass phpClass, boolean ownMethods) {
         ArrayList<Method> methods = new ArrayList<>();
 
-        for(Method method: phpClass.getMethods()) {
+        Method[] foundedMethods = ownMethods ? phpClass.getOwnMethods() : phpClass.getMethods().toArray(new Method[0]);
+
+        for(Method method: foundedMethods) {
             if(method.getAccess().isPublic() && !method.getName().startsWith("__")) {
                 methods.add(method);
             }
@@ -134,5 +135,27 @@ public class PhpClassUtils {
             .map(clazz -> (PhpClassImpl) clazz)
             .findFirst()
             .orElse(null);
+    }
+
+    public static @Nullable PhpClass getPhpClassFromFile(PhpFile phpFile, String className) {
+        for (PhpNamedElement topLevelElement : phpFile.getTopLevelDefs().values()) {
+            if (topLevelElement instanceof PhpClass clazz && clazz.getName().equals(className)) {
+                return clazz;
+            }
+        }
+
+        return null;
+    }
+
+    public static Collection<PhpClass> getPhpClassesFromFile(PhpFile phpFile) {
+        Collection<PhpClass> classes = new ArrayList<>();
+
+        for (PhpNamedElement topLevelElement : phpFile.getTopLevelDefs().values()) {
+            if (topLevelElement instanceof PhpClass clazz) {
+                classes.add(clazz);
+            }
+        }
+
+        return classes;
     }
 }

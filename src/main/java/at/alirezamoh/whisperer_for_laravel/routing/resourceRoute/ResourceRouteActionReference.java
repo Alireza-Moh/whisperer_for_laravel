@@ -69,7 +69,7 @@ public class ResourceRouteActionReference extends PsiReferenceBase<PsiElement> {
 
         PhpClass controllerClass = resolveControllerClass();
         if (controllerClass != null) {
-            methods.addAll(PhpClassUtils.getClassPublicMethod(controllerClass));
+            methods.addAll(PhpClassUtils.getClassPublicMethods(controllerClass, false));
         }
 
         return methods;

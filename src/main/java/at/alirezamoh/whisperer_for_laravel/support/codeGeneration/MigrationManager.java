@@ -18,9 +18,9 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.indexing.FileBasedIndex;
+import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.impl.*;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -273,46 +273,30 @@ public class MigrationManager {
      * @return the matching PhpClass or null if not found
      */
     private @Nullable PhpClass getModelByTableName(String tableName) {
-        final PhpClass[] finalModel = {null};
-        for (PsiFile model : originalModels) {
-            model.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
-                @Override
-                public void visitElement(@NotNull PsiElement element) {
-                    if (element instanceof PhpClass modelClass) {
-                        String finalModelName = "";
-                        String modelNameWithoutExtension = StrUtils.removePhpExtension(modelClass.getName());
-                        if (StrUtils.isCamelCase(modelNameWithoutExtension)) {
-                            String[] parts = StrUtils.snake(modelNameWithoutExtension, "_").split("_");
-                            String lastWord = parts[parts.length - 1];
+        for (PsiFile modelFile : originalModels) {
+            if (!(modelFile instanceof PhpFile phpFile)) {
+                return null;
+            }
 
-                            parts[parts.length - 1] = StringUtil.pluralize(lastWord);
-                            finalModelName = String.join("_", parts);
-                        }
+            for (PhpClass phpClass : PhpClassUtils.getPhpClassesFromFile(phpFile)) {
+                String finalModelName = "";
+                String modelNameWithoutExtension = StrUtils.removePhpExtension(phpClass.getName());
 
-                        if (decapitalize(finalModelName).equals(tableName)) {
-                            finalModel[0] = modelClass;
-                        }
-                    }
-                    super.visitElement(element);
+                if (StrUtils.isCamelCase(modelNameWithoutExtension)) {
+                    String[] parts = StrUtils.snake(modelNameWithoutExtension, "_").split("_");
+
+                    parts[parts.length - 1] = StringUtil.pluralize(parts[parts.length - 1]);
+
+                    finalModelName = String.join("_", parts);
                 }
-            });
+
+                if (StrUtils.lcFirst(finalModelName).equals(tableName)) {
+                    return phpClass;
+                }
+            }
         }
 
-
-        return finalModel[0];
-    }
-
-    /**
-     * Decapitalizes the first character of a string
-     *
-     * @param str the input string.
-     * @return the decapitalized string.
-     */
-    private String decapitalize(String str) {
-        if (str == null || str.isEmpty()) {
-            return str;
-        }
-        return str.substring(0, 1).toLowerCase() + str.substring(1);
+        return null;
     }
 
     /**

@@ -21,7 +21,6 @@ import com.intellij.psi.PsiDirectory;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -29,7 +28,8 @@ import java.util.stream.Collectors;
 public class GenerateHelperMethodsAction extends BaseAction {
     private Project project;
 
-    List<String> ignoreMethods = Arrays.asList(
+    String[] ignoreMethods =
+    {
         "__call",
         "__construct",
         "afterQuery",
@@ -53,8 +53,7 @@ public class GenerateHelperMethodsAction extends BaseAction {
         "update",
         "upsert",
         "value"
-    );
-
+    };
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
@@ -134,7 +133,7 @@ public class GenerateHelperMethodsAction extends BaseAction {
         List<Method> baseQueryBuilderMethods = new ArrayList<>();
 
         baseQueryBuilderMethods.addAll(
-            methodLoader.loadMethodsWithIgnore(
+            methodLoader.loadMethods(
                 DirectoryUtils.getFileByName(project, ProjectDefaultPaths.LARAVEL_DB_QUERY_BUILDER_PATH),
                 ignoreMethods
             )
