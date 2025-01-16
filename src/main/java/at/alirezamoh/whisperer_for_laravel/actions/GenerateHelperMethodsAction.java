@@ -55,6 +55,8 @@ public class GenerateHelperMethodsAction extends BaseAction {
         "value"
     };
 
+    private List<LaravelModel> models = new ArrayList<>();
+
     @Override
     public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
         project = anActionEvent.getProject();
@@ -77,7 +79,7 @@ public class GenerateHelperMethodsAction extends BaseAction {
                             createBaseQueryBuilderMethods(indicator);
                         });
 
-                        Notify.notifySuccess(project, "Code generation successful");
+                        outputModelCreationResult();
                     } catch (Exception e) {
                         PluginUtils.getLOG().error("Could not create helper code", e);
                         Notify.notifyError(project, "Could not create helper code");
@@ -123,6 +125,8 @@ public class GenerateHelperMethodsAction extends BaseAction {
                 LaravelModelGeneration generation = new LaravelModelGeneration(namespace, modelsInNamespace, SettingsState.getInstance(project));
                 create(generation, "laravelModels.ftl");
             });
+
+            models = m;
         }
     }
 
@@ -152,7 +156,7 @@ public class GenerateHelperMethodsAction extends BaseAction {
         }
     }
 
-    protected void create(BaseModel model, String templateName) {
+    private void create(BaseModel model, String templateName) {
         TemplateLoader templateProcessor = new TemplateLoader(
             project,
             templateName,
@@ -162,5 +166,23 @@ public class GenerateHelperMethodsAction extends BaseAction {
         );
 
         templateProcessor.createTemplateWithDirectory(false);
+    }
+
+    private void outputModelCreationResult() {
+        Notify.notifySuccess(project, "Code generation successful");
+        StringBuilder notificationContent = new StringBuilder(models.size() + " Eloquent Models found:\n");
+
+        for (LaravelModel model : models) {
+            notificationContent.append(model.getModelName())
+                .append(" -> ")
+                .append(model.getTableName())
+                .append(",\n");
+        }
+
+        if (!notificationContent.isEmpty()) {
+            notificationContent.setLength(notificationContent.length() - 2);
+        }
+
+        Notify.notifySuccess(project, notificationContent.toString());
     }
 }
