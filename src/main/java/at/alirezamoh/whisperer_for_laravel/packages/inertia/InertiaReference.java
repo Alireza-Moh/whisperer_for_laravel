@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class InertiaReference extends PsiReferenceBase<PsiElement> {
@@ -76,6 +77,10 @@ public class InertiaReference extends PsiReferenceBase<PsiElement> {
         }
 
         String[] paths = settings.getInertiaPageComponentRootPath().split(";");
+        paths = Arrays.stream(paths)
+            .filter(path -> !path.isEmpty())
+            .toArray(String[]::new);
+
         for (String path : paths) {
             PsiDirectory potentialDir = DirectoryUtils.getDirectory(
                 project,

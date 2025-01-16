@@ -8,12 +8,8 @@ import com.intellij.psi.PsiFile;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.impl.PhpDocTypeImpl;
 import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
-import com.jetbrains.php.lang.psi.elements.PhpNamedElement;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class EloquentUtils {
     private final static List<String> PHP_DATA_TYPES = Arrays.asList(
