@@ -290,9 +290,12 @@ public class MigrationManager {
                     finalModelName = String.join("_", parts);
                 }
 
-                com.jetbrains.php.lang.psi.elements.Field tableField = phpClass.findFieldByName("table", true);
+                com.jetbrains.php.lang.psi.elements.Field tableField = phpClass.findFieldByName("table", false);
 
-                if (StrUtils.lcFirst(finalModelName).equals(tableName) || (tableField != null && tableField.getName().equals(tableName))) {
+                if (
+                    StrUtils.lcFirst(finalModelName).equals(tableName)
+                    || (tableField != null && StrUtils.removeQuotes(tableField.getDefaultValuePresentation()).equals(tableName))
+                ) {
                     return phpClass;
                 }
             }
