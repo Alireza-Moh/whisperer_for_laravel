@@ -1,6 +1,6 @@
 package at.alirezamoh.whisperer_for_laravel.extension;
 
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.FrameworkUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.StatusBarWidget;
 import org.jetbrains.annotations.NotNull;
@@ -23,7 +23,7 @@ public class LaravelVersionStatusBarWidget implements StatusBarWidget  {
         return new TextPresentation() {
             @Override
             public @NotNull String getText() {
-                return "Laravel: " + FrameworkUtils.laravelVersion(project);
+                return "Laravel: " + PluginUtils.laravelVersion(project);
             }
 
             @Override

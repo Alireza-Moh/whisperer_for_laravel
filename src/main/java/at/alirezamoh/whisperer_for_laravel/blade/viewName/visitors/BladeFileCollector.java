@@ -3,9 +3,9 @@ package at.alirezamoh.whisperer_for_laravel.blade.viewName.visitors;
 import at.alirezamoh.whisperer_for_laravel.indexes.ServiceProviderIndex;
 import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.whisperer_for_laravel.support.ProjectDefaultPaths;
-import at.alirezamoh.whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
-import at.alirezamoh.whisperer_for_laravel.support.psiUtil.PsiUtil;
-import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.DirectoryUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
@@ -48,18 +48,18 @@ public class BladeFileCollector {
     public BladeFileCollector startSearching() {
         String defaultViewPath = ProjectDefaultPaths.VIEW_PATH;
         if (!projectSettingState.isLaravelDirectoryEmpty()) {
-            defaultViewPath = StrUtil.addSlashes(
+            defaultViewPath = StrUtils.addSlashes(
                 projectSettingState.getLaravelDirectoryPath(),
                 false,
                 true
             ) + ProjectDefaultPaths.VIEW_PATH;
         }
 
-        PsiDirectory defaultResDir = DirectoryPsiUtil.getDirectory(project, defaultViewPath);
+        PsiDirectory defaultResDir = DirectoryUtils.getDirectory(project, defaultViewPath);
 
         if (defaultResDir != null) {
             collectBladeFiles(defaultResDir, "", null, (viewName, filePath) -> {
-                variants.add(PsiUtil.buildSimpleLookupElement(viewName));
+                variants.add(PsiElementUtils.buildSimpleLookupElement(viewName));
             });
         }
 
@@ -124,7 +124,7 @@ public class BladeFileCollector {
 
                     for (Map.Entry<String, String> entry : serviceProvider.getBladeFiles().entrySet()) {
                         variants.add(
-                            PsiUtil.buildSimpleLookupElement(entry.getKey())
+                            PsiElementUtils.buildSimpleLookupElement(entry.getKey())
                         );
                     }
 

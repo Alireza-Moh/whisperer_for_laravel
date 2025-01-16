@@ -8,8 +8,8 @@ import at.alirezamoh.whisperer_for_laravel.config.util.ConfigUtil;
 import at.alirezamoh.whisperer_for_laravel.config.visitors.ConfigModuleServiceProviderVisitor;
 import at.alirezamoh.whisperer_for_laravel.indexes.dataExternalizeres.ServiceProviderDataExternalizer;
 import at.alirezamoh.whisperer_for_laravel.indexes.dtos.ServiceProvider;
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.FrameworkUtils;
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.LaravelPaths;
+import at.alirezamoh.whisperer_for_laravel.support.utils.LaravelPaths;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
@@ -38,7 +38,7 @@ public class ServiceProviderIndex extends FileBasedIndexExtension<String, Servic
         return inputData -> {
             Project project = inputData.getProject();
 
-            if (!FrameworkUtils.isLaravelProject(project) && FrameworkUtils.isLaravelFrameworkNotInstalled(project)) {
+            if (!PluginUtils.isLaravelProject(project) && PluginUtils.isLaravelFrameworkNotInstalled(project)) {
                 return Collections.emptyMap();
             }
 

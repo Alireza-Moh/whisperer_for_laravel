@@ -3,7 +3,7 @@ package at.alirezamoh.whisperer_for_laravel.config.util;
 import at.alirezamoh.whisperer_for_laravel.indexes.ConfigIndex;
 import at.alirezamoh.whisperer_for_laravel.indexes.ServiceProviderIndex;
 import at.alirezamoh.whisperer_for_laravel.indexes.dtos.ServiceProvider;
-import at.alirezamoh.whisperer_for_laravel.support.psiUtil.PsiUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
@@ -193,18 +193,18 @@ public class ConfigKeyResolver {
             }
 
             if (!text.contains(".") && entry.getKey().equals(text)) {
-                VirtualFile virtualFile = PsiUtil.resolveFilePath(filePath);
+                VirtualFile virtualFile = PsiElementUtils.resolveFilePath(filePath);
                 if (virtualFile != null) {
-                    PsiFile psiFile = PsiUtil.resolvePsiFile(virtualFile, project);
+                    PsiFile psiFile = PsiElementUtils.resolvePsiFile(virtualFile, project);
                     foundElement.set(psiFile);
                     return false;
                 }
             }
 
             if (entry.getKey().equals(text)) {
-                VirtualFile virtualFile = PsiUtil.resolveFilePath(filePath);
+                VirtualFile virtualFile = PsiElementUtils.resolveFilePath(filePath);
                 if (virtualFile != null) {
-                    PsiFile psiFile = PsiUtil.resolvePsiFile(virtualFile, project);
+                    PsiFile psiFile = PsiElementUtils.resolvePsiFile(virtualFile, project);
                     if (psiFile != null) {
                         PsiElement element = findConfigKeyInFile(psiFile, text.substring(text.indexOf('.') + 1));
                         if (element != null) {

@@ -1,7 +1,7 @@
 package at.alirezamoh.whisperer_for_laravel.actions;
 
 import at.alirezamoh.whisperer_for_laravel.actions.models.BaseModel;
-import at.alirezamoh.whisperer_for_laravel.support.template.TemplateLoader;
+import at.alirezamoh.whisperer_for_laravel.support.TemplateLoader;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.project.Project;

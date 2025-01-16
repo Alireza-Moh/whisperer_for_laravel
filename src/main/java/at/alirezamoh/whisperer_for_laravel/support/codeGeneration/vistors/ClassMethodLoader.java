@@ -1,11 +1,11 @@
 package at.alirezamoh.whisperer_for_laravel.support.codeGeneration.vistors;
 
 import at.alirezamoh.whisperer_for_laravel.actions.models.dataTables.Method;
-import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PhpClassUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocComment;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.impl.PhpDocTypeImpl;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.impl.tags.PhpDocParamTagImpl;
@@ -13,13 +13,9 @@ import com.jetbrains.php.lang.documentation.phpdoc.psi.tags.PhpDocParamTag;
 import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.Parameter;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class ClassMethodLoader {
     private Project project;
@@ -28,77 +24,36 @@ public class ClassMethodLoader {
         this.project = project;
     }
 
-    public List<Method> loadMethods(PsiFile file) {
+    public List<Method> loadMethods(PsiFile file, String... methodsToBeIgnores) {
+        Set<String> ignoreSet = methodsToBeIgnores != null ? Set.of(methodsToBeIgnores) : Collections.emptySet();
+
         List<Method> methods = new ArrayList<>();
 
         if (file instanceof PhpFile phpFile) {
-            phpFile.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
-               @Override
-                public void visitElement(@NotNull PsiElement element) {
-                    if (element instanceof PhpClass phpClass) {
-                        for (com.jetbrains.php.lang.psi.elements.Method actualMethod : phpClass.getOwnMethods()) {
-                            Method method = extractMethodInfo(actualMethod);
-                            if (method.getName() != null) {
-                                methods.add(method);
-                            }
-                        }
-                        return;
+            for (PhpClass phpClass : PhpClassUtils.getPhpClassesFromFile(phpFile)) {
+                for (com.jetbrains.php.lang.psi.elements.Method actualMethod : PhpClassUtils.getClassPublicMethods(phpClass, true)) {
+                    Method method = extractMethodInfo(actualMethod, ignoreSet);
+                    if (method != null) {
+                        methods.add(method);
                     }
-                    super.visitElement(element);
                 }
-            });
+            }
         }
         return methods;
     }
 
-    public List<Method> loadMethodsWithIgnore(PsiFile file, List<String> ignoreList) {
-        List<Method> methods = new ArrayList<>();
-
-        if (file instanceof PhpFile phpFile) {
-            phpFile.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
-                @Override
-                public void visitElement(@NotNull PsiElement element) {
-                    if (element instanceof PhpClass phpClass) {
-                        for (com.jetbrains.php.lang.psi.elements.Method actualMethod : phpClass.getOwnMethods()) {
-                            Method method = extractMethodInfo(actualMethod, ignoreList);
-                            if (method != null && method.getName() != null) {
-                                methods.add(method);
-                            }
-                        }
-                        return;
-                    }
-                    super.visitElement(element);
-                }
-            });
-        }
-        return methods;
-    }
-
-    public @Nullable Method extractMethodInfo(com.jetbrains.php.lang.psi.elements.Method actualMethod, List<String> ignoreList) {
-        if (ignoreList.contains(actualMethod.getName())) {
+    public @Nullable Method extractMethodInfo(com.jetbrains.php.lang.psi.elements.Method actualMethod, Set<String> methodsTobeIgnored) {
+        String methodName = actualMethod.getName();
+        if (methodsTobeIgnored.contains(methodName)) {
             return null;
         }
 
-        Method method = new Method();
-        if (actualMethod.getAccess().isPublic()) {
-            method.setName(actualMethod.getName());
-            method.setSee(
-                Objects.requireNonNull(actualMethod.getContainingClass()).getFQN()
-            );
-            this.getMethodInfo(method, actualMethod);
-        }
-        return method;
-    }
+        Method method = new Method(methodName);
+        method.setSee(
+            Objects.requireNonNull(actualMethod.getContainingClass()).getFQN()
+        );
+        this.getMethodInfo(method, actualMethod);
 
-    public Method extractMethodInfo(com.jetbrains.php.lang.psi.elements.Method actualMethod) {
-        Method method = new Method();
-        if (actualMethod.getAccess().isPublic()) {
-            method.setName(actualMethod.getName());
-            method.setSee(
-                    Objects.requireNonNull(actualMethod.getContainingClass()).getFQN()
-            );
-            this.getMethodInfo(method, actualMethod);
-        }
         return method;
     }
 
@@ -139,7 +94,7 @@ public class ClassMethodLoader {
                             String[] parts = type.split("[\\s,<>|]+");
 
                             for (String part : parts) {
-                                String cleanedPart = StrUtil.removeExtension(part);
+                                String cleanedPart = StrUtils.removePhpExtension(part);
                                 if (phpTypes.contains(cleanedPart) && !tempType.toString().contains(cleanedPart)) {
                                     getParamType(part, tempType);
                                 }

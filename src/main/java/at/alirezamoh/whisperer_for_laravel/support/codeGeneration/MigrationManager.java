@@ -7,19 +7,20 @@ import at.alirezamoh.whisperer_for_laravel.actions.models.dataTables.Relation;
 import at.alirezamoh.whisperer_for_laravel.actions.models.dataTables.Table;
 import at.alirezamoh.whisperer_for_laravel.indexes.TableIndex;
 import at.alirezamoh.whisperer_for_laravel.support.codeGeneration.vistors.MigrationVisitor;
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.ClassUtils;
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.LaravelPaths;
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.MethodUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.LaravelPaths;
+import at.alirezamoh.whisperer_for_laravel.support.utils.MethodUtils;
 import at.alirezamoh.whisperer_for_laravel.support.providers.ModelProvider;
-import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PhpClassUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.indexing.FileBasedIndex;
+import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.impl.*;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -76,7 +77,7 @@ public class MigrationManager {
             PhpClass modelClass = getModelByTableName(tableName);
             if (modelClass != null) {
                 LaravelModel laravelModel = new LaravelModel();
-                laravelModel.setNamespaceName(StrUtil.addBackSlashes(modelClass.getNamespaceName(), true, true));
+                laravelModel.setNamespaceName(StrUtils.addBackSlashes(modelClass.getNamespaceName(), true, true));
                 laravelModel.setModelName(modelClass.getName());
                 laravelModel.setTableName(tableName);
                 laravelModel.setFields(table.fields());
@@ -90,7 +91,7 @@ public class MigrationManager {
                                 method.getName(),
                                 methodNameAndRelatedModel.getKey(),
                                 "\\Illuminate\\Database\\Eloquent\\Relations\\"
-                                    + StrUtil.capitalizeFirstLetter(methodNameAndRelatedModel.getKey())
+                                    + StrUtils.ucFirst(methodNameAndRelatedModel.getKey())
                                     + "|"
                                     + methodNameAndRelatedModel.getValue().getName()
                             )
@@ -254,8 +255,8 @@ public class MigrationManager {
         for (Field field : laravelModel.getFields()) {
             if (!field.getName().isEmpty()) {
                 Method method = new Method(
-                    "where" + StrUtil.capitalizeFirstLetter(
-                        StrUtil.camel(field.getName())
+                    "where" + StrUtils.ucFirst(
+                        StrUtils.camel(field.getName(), '_')
                     )
                 );
                 method.setReturnType(ELOQUENT_BUILDER_NAMESPACE + "|" + laravelModel.getModelName());
@@ -272,46 +273,30 @@ public class MigrationManager {
      * @return the matching PhpClass or null if not found
      */
     private @Nullable PhpClass getModelByTableName(String tableName) {
-        final PhpClass[] finalModel = {null};
-        for (PsiFile model : originalModels) {
-            model.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
-                @Override
-                public void visitElement(@NotNull PsiElement element) {
-                    if (element instanceof PhpClass modelClass) {
-                        String finalModelName = "";
-                        String modelNameWithoutExtension = StrUtil.removeExtension(modelClass.getName());
-                        if (StrUtil.isCamelCase(modelNameWithoutExtension)) {
-                            String[] parts = StrUtil.snake(modelNameWithoutExtension).split("_");
-                            String lastWord = parts[parts.length - 1];
+        for (PsiFile modelFile : originalModels) {
+            if (!(modelFile instanceof PhpFile phpFile)) {
+                return null;
+            }
 
-                            parts[parts.length - 1] = StrUtil.plural(lastWord);
-                            finalModelName = String.join("_", parts);
-                        }
+            for (PhpClass phpClass : PhpClassUtils.getPhpClassesFromFile(phpFile)) {
+                String finalModelName = "";
+                String modelNameWithoutExtension = StrUtils.removePhpExtension(phpClass.getName());
 
-                        if (decapitalize(finalModelName).equals(tableName)) {
-                            finalModel[0] = modelClass;
-                        }
-                    }
-                    super.visitElement(element);
+                if (StrUtils.isCamelCase(modelNameWithoutExtension)) {
+                    String[] parts = StrUtils.snake(modelNameWithoutExtension, "_").split("_");
+
+                    parts[parts.length - 1] = StringUtil.pluralize(parts[parts.length - 1]);
+
+                    finalModelName = String.join("_", parts);
                 }
-            });
+
+                if (StrUtils.lcFirst(finalModelName).equals(tableName)) {
+                    return phpClass;
+                }
+            }
         }
 
-
-        return finalModel[0];
-    }
-
-    /**
-     * Decapitalizes the first character of a string
-     *
-     * @param str the input string.
-     * @return the decapitalized string.
-     */
-    private String decapitalize(String str) {
-        if (str == null || str.isEmpty()) {
-            return str;
-        }
-        return str.substring(0, 1).toLowerCase() + str.substring(1);
+        return null;
     }
 
     /**
@@ -376,11 +361,11 @@ public class MigrationManager {
             .map(child2 -> (MethodReferenceImpl) child2)
             .anyMatch(methodReference -> {
                 List<PhpClassImpl> classes = MethodUtils.resolveMethodClasses(methodReference, project);
-                PhpClass relationClass = ClassUtils.getClassByFQN(project, LaravelPaths.LaravelClasses.Model);
+                PhpClass relationClass = PhpClassUtils.getClassByFQN(project, LaravelPaths.LaravelClasses.Model);
 
                 return RELATION_METHODS.containsKey(methodReference.getName())
                     && relationClass != null
-                    && classes.stream().anyMatch(clazz -> ClassUtils.isChildOf(clazz, relationClass));
+                    && classes.stream().anyMatch(clazz -> PhpClassUtils.isChildOf(clazz, relationClass));
             });
     }
 

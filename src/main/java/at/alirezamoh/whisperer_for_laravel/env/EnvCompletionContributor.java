@@ -1,9 +1,9 @@
 package at.alirezamoh.whisperer_for_laravel.env;
 
 import at.alirezamoh.whisperer_for_laravel.support.WhispererForLaravelIcon;
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.ClassUtils;
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.FrameworkUtils;
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.MethodUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.MethodUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PhpClassUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
 import com.intellij.codeInsight.completion.*;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
@@ -60,7 +60,7 @@ public class EnvCompletionContributor extends CompletionContributor {
                     PsiElement psiElement = completionParameters.getPosition().getOriginalElement().getParent();
                     Project project = psiElement.getProject();
 
-                    if (!FrameworkUtils.isLaravelProject(project) && FrameworkUtils.isLaravelFrameworkNotInstalled(project)) {
+                    if (!PluginUtils.isLaravelProject(project) && PluginUtils.isLaravelFrameworkNotInstalled(project)) {
                         return;
                     }
 
@@ -120,7 +120,7 @@ public class EnvCompletionContributor extends CompletionContributor {
         String methodName = methodReference.getName();
         List<PhpClassImpl> resolvedClasses = MethodUtils.resolveMethodClasses(methodReference, project);
 
-        PhpClass envClass = ClassUtils.getClassByFQN(project, ENV);
+        PhpClass envClass = PhpClassUtils.getClassByFQN(project, ENV);
 
         return isExpectedFacadeMethod(methodName, resolvedClasses, envClass, ENV_CLASS_METHODS);
     }
@@ -137,7 +137,7 @@ public class EnvCompletionContributor extends CompletionContributor {
     private boolean isExpectedFacadeMethod(String methodName, List<PhpClassImpl> resolvedClasses, PhpClass expectedClass, Map<String, Integer> methodMap) {
         return methodMap.containsKey(methodName)
             && expectedClass != null
-            && resolvedClasses.stream().anyMatch(clazz -> ClassUtils.isChildOf(clazz, expectedClass));
+            && resolvedClasses.stream().anyMatch(clazz -> PhpClassUtils.isChildOf(clazz, expectedClass));
     }
 
     /**

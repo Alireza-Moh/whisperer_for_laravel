@@ -1,8 +1,8 @@
 package at.alirezamoh.whisperer_for_laravel.gate.visitors;
 
 import at.alirezamoh.whisperer_for_laravel.gate.util.GateUtil;
-import at.alirezamoh.whisperer_for_laravel.support.psiUtil.PsiUtil;
-import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
@@ -32,9 +32,9 @@ public class GateAbilityFinder extends PsiRecursiveElementWalkingVisitor {
     }
 
     public void getAbility(MethodReference method) {
-        String ability = PsiUtil.getFirstParameterFromMethod(method);
+        String ability = PsiElementUtils.getMethodParameterAt(method, 0);
 
-        if (ability != null && ability.equals(StrUtil.removeQuotes(myElement.getText()))) {
+        if (ability != null && ability.equals(StrUtils.removeQuotes(myElement.getText()))) {
             foundedAbility = method;
         }
     }

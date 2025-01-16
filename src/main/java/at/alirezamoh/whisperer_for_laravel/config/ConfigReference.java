@@ -2,7 +2,7 @@ package at.alirezamoh.whisperer_for_laravel.config;
 
 import at.alirezamoh.whisperer_for_laravel.config.util.ConfigKeyCollector;
 import at.alirezamoh.whisperer_for_laravel.config.util.ConfigKeyResolver;
-import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
@@ -21,7 +21,7 @@ public class ConfigReference extends PsiReferenceBase<PsiElement> {
 
     @Override
     public @Nullable PsiElement resolve() {
-        String text = StrUtil.removeQuotes(myElement.getText());
+        String text = StrUtils.removeQuotes(myElement.getText());
 
         if (text.isEmpty()) {
             return null;

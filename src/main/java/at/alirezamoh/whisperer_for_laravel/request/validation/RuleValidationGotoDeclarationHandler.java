@@ -2,9 +2,9 @@ package at.alirezamoh.whisperer_for_laravel.request.validation;
 
 import at.alirezamoh.whisperer_for_laravel.request.validation.util.RuleValidationUtil;
 import at.alirezamoh.whisperer_for_laravel.support.ProjectDefaultPaths;
-import at.alirezamoh.whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.FrameworkUtils;
-import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.DirectoryUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.codeInsight.navigation.actions.GotoDeclarationHandler;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
@@ -42,7 +42,7 @@ public class RuleValidationGotoDeclarationHandler implements GotoDeclarationHand
         }
 
         Project project = sourceElement.getProject();
-        if (!FrameworkUtils.isLaravelProject(project) && FrameworkUtils.isLaravelFrameworkNotInstalled(project)) {
+        if (!PluginUtils.isLaravelProject(project) && PluginUtils.isLaravelFrameworkNotInstalled(project)) {
             return null;
         }
 
@@ -54,7 +54,7 @@ public class RuleValidationGotoDeclarationHandler implements GotoDeclarationHand
             return null;
         }
 
-        String originalRuleName = StrUtil.removeQuotes(stringLiteralExpression.getText());
+        String originalRuleName = StrUtils.removeQuotes(stringLiteralExpression.getText());
         List<PsiElement> resolvedRules = resolveRules(originalRuleName, project);
 
         return resolvedRules.isEmpty() ? null : resolvedRules.toArray(new PsiElement[0]);
@@ -118,9 +118,9 @@ public class RuleValidationGotoDeclarationHandler implements GotoDeclarationHand
      */
     private List<PsiElement> findMethodsForRule(String ruleName, Project project) {
         List<PsiElement> methodsList = new ArrayList<>();
-        String methodName = StrUtil.camel("validate_" + ruleName);
+        String methodName = StrUtils.camel("validate_" + ruleName, '_');
 
-        PsiFile validationAttributeFile = DirectoryPsiUtil.getFileByName(project, ProjectDefaultPaths.LARAVEL_VALIDATION_RULES);
+        PsiFile validationAttributeFile = DirectoryUtils.getFileByName(project, ProjectDefaultPaths.LARAVEL_VALIDATION_RULES);
         if (validationAttributeFile != null) {
             Collection<Method> methods = PsiTreeUtil.findChildrenOfType(validationAttributeFile, Method.class);
 

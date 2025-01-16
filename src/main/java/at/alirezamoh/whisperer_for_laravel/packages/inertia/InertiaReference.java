@@ -1,9 +1,9 @@
 package at.alirezamoh.whisperer_for_laravel.packages.inertia;
 
 import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
-import at.alirezamoh.whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
-import at.alirezamoh.whisperer_for_laravel.support.psiUtil.PsiUtil;
-import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.DirectoryUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
@@ -32,7 +32,7 @@ public class InertiaReference extends PsiReferenceBase<PsiElement> {
 
     @Override
     public @Nullable PsiElement resolve() {
-        String text = StrUtil.removeQuotes(myElement.getText());
+        String text = StrUtils.removeQuotes(myElement.getText());
         List<InertiaPage> pages = collectPages(true);
 
         for (InertiaPage page : pages) {
@@ -51,7 +51,7 @@ public class InertiaReference extends PsiReferenceBase<PsiElement> {
         List<LookupElementBuilder> variants = new ArrayList<>();
         for (InertiaPage page : pages) {
             variants.add(
-                PsiUtil.buildSimpleLookupElement(page.getPath())
+                PsiElementUtils.buildSimpleLookupElement(page.getPath())
             );
         }
 
@@ -70,18 +70,18 @@ public class InertiaReference extends PsiReferenceBase<PsiElement> {
 
         String defaultPath = "";
         if (!settings.isLaravelDirectoryEmpty()) {
-            defaultPath = StrUtil.removeDoubleSlashes(
-                StrUtil.addSlashes(settings.getLaravelDirectoryPath()) + defaultPath
+            defaultPath = StrUtils.removeDoubleForwardSlashes(
+                StrUtils.addSlashes(settings.getLaravelDirectoryPath()) + defaultPath
             );
         }
 
         String[] paths = settings.getInertiaPageComponentRootPath().split(";");
         for (String path : paths) {
-            PsiDirectory potentialDir = DirectoryPsiUtil.getDirectory(
+            PsiDirectory potentialDir = DirectoryUtils.getDirectory(
                 project,
-                StrUtil.removeDoubleSlashes(
+                StrUtils.removeDoubleForwardSlashes(
                     defaultPath +
-                        StrUtil.addSlashes(path.replace("\\", "/"))
+                        StrUtils.addSlashes(path.replace("\\", "/"))
                 )
             );
 

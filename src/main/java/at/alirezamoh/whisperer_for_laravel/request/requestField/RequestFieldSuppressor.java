@@ -1,7 +1,7 @@
 package at.alirezamoh.whisperer_for_laravel.request.requestField;
 
 import at.alirezamoh.whisperer_for_laravel.request.requestField.util.RequestFieldUtils;
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.FrameworkUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
 import com.intellij.codeInspection.InspectionSuppressor;
 import com.intellij.codeInspection.SuppressQuickFix;
 import com.intellij.openapi.project.Project;
@@ -33,7 +33,7 @@ public class RequestFieldSuppressor implements InspectionSuppressor {
     public boolean isSuppressedFor(@NotNull PsiElement psiElement, @NotNull String s) {
         Project project = psiElement.getProject();
         if (
-            (!FrameworkUtils.isLaravelProject(project) && FrameworkUtils.isLaravelFrameworkNotInstalled(project))
+            (!PluginUtils.isLaravelProject(project) && PluginUtils.isLaravelFrameworkNotInstalled(project))
             || !suppressedPhpInspections.contains(s)
         ) {
             return false;

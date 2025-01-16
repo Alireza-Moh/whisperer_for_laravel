@@ -1,8 +1,8 @@
 package at.alirezamoh.whisperer_for_laravel.request.requestField.util;
 
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.ClassUtils;
-import at.alirezamoh.whisperer_for_laravel.support.psiUtil.PsiUtil;
-import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PhpClassUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
@@ -45,7 +45,7 @@ final public class RequestFieldUtils {
      * @return the resolved PhpClassImpl instance or null if not found
      */
     public static PhpClassImpl resolveRequestClass(Variable variable, Project project) {
-        PhpClassImpl phpClass = ClassUtils.getClassFromTypedElement(variable, project);
+        PhpClassImpl phpClass = PhpClassUtils.getClassFromTypedElement(variable, project);
 
         if (phpClass == null) {
             PsiReference reference = variable.getReference();
@@ -68,8 +68,8 @@ final public class RequestFieldUtils {
      * @return a collection of rules or null if not found
      */
     public static Collection<ArrayHashElement> getRules(PhpClassImpl phpClass, Project project) {
-        PhpClass baseFormRequest = ClassUtils.getClassByFQN(project, BASE_FORM_REQUEST);
-        if (baseFormRequest != null && ClassUtils.isChildOf(phpClass, baseFormRequest)) {
+        PhpClass baseFormRequest = PhpClassUtils.getClassByFQN(project, BASE_FORM_REQUEST);
+        if (baseFormRequest != null && PhpClassUtils.isChildOf(phpClass, baseFormRequest)) {
             Method rulesMethod = phpClass.findMethodByName("rules");
             if (rulesMethod != null) {
                 PhpReturn phpReturn = PsiTreeUtil.findChildOfType(rulesMethod, PhpReturn.class);
@@ -133,18 +133,18 @@ final public class RequestFieldUtils {
             return false;
         }
 
-        String ruleName = StrUtil.removeQuotes(ruleAsString.getText());
+        String ruleName = StrUtils.removeQuotes(ruleAsString.getText());
 
         if (element instanceof StringLiteralExpression stringLiteralExpression) {
             return Objects.equals(
-                StrUtil.removeQuotes(stringLiteralExpression.getText()),
+                StrUtils.removeQuotes(stringLiteralExpression.getText()),
                 ruleName
             );
         }
 
         if (element instanceof FieldReferenceImpl fieldReference && fieldReference.getName() != null) {
             return Objects.equals(
-                StrUtil.removeQuotes(fieldReference.getName()),
+                StrUtils.removeQuotes(fieldReference.getName()),
                 ruleName
             );
         }
@@ -176,7 +176,7 @@ final public class RequestFieldUtils {
             PsiElement key = rule.getKey();
             if (key instanceof StringLiteralExpression stringLiteral) {
                 resultSet.addElement(
-                    PsiUtil.buildSimpleLookupElement(StrUtil.removeQuotes(stringLiteral.getText()))
+                    PsiElementUtils.buildSimpleLookupElement(StrUtils.removeQuotes(stringLiteral.getText()))
                 );
             }
         });

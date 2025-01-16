@@ -1,7 +1,7 @@
 package at.alirezamoh.whisperer_for_laravel.indexes;
 
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.FrameworkUtils;
-import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
@@ -63,7 +63,7 @@ public class RouteIndex extends FileBasedIndexExtension<String, Void> {
         return inputData -> {
             Project project = inputData.getProject();
 
-            if (!FrameworkUtils.isLaravelProject(project) && FrameworkUtils.isLaravelFrameworkNotInstalled(project)) {
+            if (!PluginUtils.isLaravelProject(project) && PluginUtils.isLaravelFrameworkNotInstalled(project)) {
                 return Collections.emptyMap();
             }
 
@@ -131,7 +131,7 @@ public class RouteIndex extends FileBasedIndexExtension<String, Void> {
             return null;
         }
 
-        String routeName = StrUtil.removeQuotes(routeNameParameter.getText());
+        String routeName = StrUtils.removeQuotes(routeNameParameter.getText());
         PsiElement uriParameter = methodReference.getParameter(0);
 
         if (uriParameter == null) {
@@ -158,7 +158,7 @@ public class RouteIndex extends FileBasedIndexExtension<String, Void> {
     }
 
     private String createRouteData(String routeName, PsiElement uriParameter, MethodReference methodReference) {
-        String uri = StrUtil.removeQuotes(uriParameter.getText());
+        String uri = StrUtils.removeQuotes(uriParameter.getText());
         int offset = methodReference.getTextOffset();
 
         return uri + " | " + routeName + " | " + offset;

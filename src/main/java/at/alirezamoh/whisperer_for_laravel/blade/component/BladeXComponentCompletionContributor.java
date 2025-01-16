@@ -1,7 +1,7 @@
 package at.alirezamoh.whisperer_for_laravel.blade.component;
 
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.FrameworkUtils;
-import at.alirezamoh.whisperer_for_laravel.support.psiUtil.PsiUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
 import com.intellij.codeInsight.completion.*;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
@@ -43,7 +43,7 @@ public class BladeXComponentCompletionContributor extends CompletionContributor 
                     PsiElement element = completionParameters.getPosition();
                     Project project = element.getProject();
 
-                    if (!FrameworkUtils.isLaravelProject(project) && FrameworkUtils.isLaravelFrameworkNotInstalled(project)) {
+                    if (!PluginUtils.isLaravelProject(project) && PluginUtils.isLaravelFrameworkNotInstalled(project)) {
                         return;
                     }
 
@@ -78,7 +78,7 @@ public class BladeXComponentCompletionContributor extends CompletionContributor 
                     String componentName = relativePath.replace('/', '.');
 
                     variants.add(
-                        PsiUtil.buildSimpleLookupElement("x-" + componentName)
+                        PsiElementUtils.buildSimpleLookupElement("x-" + componentName)
                     );
                 }
             }
