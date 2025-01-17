@@ -51,6 +51,8 @@ public class RequestFieldCompletionContributor extends CompletionContributor {
                     PsiElement targetElement = getTargetElement(position);
                     if (targetElement instanceof VariableImpl variable) {
                         handleVariableCompletions(variable, project, resultSet, position);
+                    } else if (targetElement instanceof MethodReference methodRef) {
+                        handleVariableCompletions(methodRef, project, resultSet, position);
                     }
                 }
             }
@@ -69,17 +71,18 @@ public class RequestFieldCompletionContributor extends CompletionContributor {
     }
 
     private void handleVariableCompletions(
-        VariableImpl variable,
+        PsiElement element,
         Project project,
         CompletionResultSet resultSet,
         PsiElement contextElement
     ) {
-        PhpClassImpl phpClass = RequestFieldUtils.resolveRequestClass(variable, project);
+        PhpClassImpl phpClass = RequestFieldUtils.resolvePhpClass(element, project);
+
         if (phpClass == null) {
             return;
         }
 
-        Collection<ArrayHashElement> rules = RequestFieldUtils.resolveRulesFromVariable(variable, project, contextElement);
+        Collection<ArrayHashElement> rules = RequestFieldUtils.resolveRulesFromVariable(phpClass, project, contextElement);
         RequestFieldUtils.processRules(rules, resultSet);
     }
 }

@@ -7,7 +7,10 @@ import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
+import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.util.Query;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.elements.impl.FieldReferenceImpl;
 import com.jetbrains.php.lang.psi.elements.impl.MethodImpl;
@@ -152,13 +155,12 @@ final public class RequestFieldUtils {
         return false;
     }
 
-    public static Collection<ArrayHashElement> resolveRulesFromVariable(VariableImpl variable, Project project, PsiElement contextElement) {
-        PhpClassImpl phpClass = resolveRequestClass(variable, project);
-        if (phpClass == null) {
-            return null;
+    public static Collection<ArrayHashElement> resolveRulesFromVariable(PhpClass phpClass, Project project, PsiElement contextElement) {
+        if (!(phpClass instanceof PhpClassImpl phpClassImpl)) {
+            return List.of();
         }
 
-        Collection<ArrayHashElement> rules = getRules(phpClass, project);
+        Collection<ArrayHashElement> rules = getRules(phpClassImpl, project);
         if (rules == null && REQUEST.equals(phpClass.getFQN())) {
             MethodImpl method = PsiTreeUtil.getParentOfType(contextElement, MethodImpl.class);
             if (method != null) {
@@ -180,5 +182,34 @@ final public class RequestFieldUtils {
                 );
             }
         });
+    }
+
+    public static @Nullable PhpClassImpl resolvePhpClass(PsiElement element, Project project) {
+        if (element instanceof VariableImpl variable) {
+            PhpClassImpl phpClass = RequestFieldUtils.resolveRequestClass(variable, project);
+
+            if (phpClass == null) {
+                Query<PsiReference> references = ReferencesSearch.search(variable.getOriginalElement(), GlobalSearchScope.projectScope(project), false);
+
+                for (PsiReference reference : references) {
+                    PsiElement parent = reference.getElement().getParent();
+                    if (parent instanceof AssignmentExpression assignmentExpression) {
+                        PsiElement expression = assignmentExpression.getValue();
+
+                        if (expression instanceof NewExpression newExpression) {
+                            return PhpClassUtils.getClassFromTypedElement(newExpression.getClassReference(), project);
+                        } else if (expression instanceof MethodReference methodReference) {
+                            return PhpClassUtils.getClassFromTypedElement(methodReference.getClassReference(), project);
+                        }
+                    }
+                }
+            }
+
+            return phpClass;
+        } else if (element instanceof MethodReference methodRef) {
+            return PhpClassUtils.getClassFromTypedElement(methodRef.getClassReference(), project);
+        }
+
+        return null;
     }
 }

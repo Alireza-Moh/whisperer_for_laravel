@@ -35,6 +35,9 @@ public class RequestFieldGotoDeclarationHandler implements GotoDeclarationHandle
         if (parentElement instanceof VariableImpl variable) {
             return findDeclarationTargets(variable, project, sourceElement.getParent());
         }
+        else if (parentElement instanceof MethodReference methodRef) {
+            return findDeclarationTargets(methodRef, project, sourceElement.getParent());
+        }
 
         return null;
     }
@@ -54,13 +57,14 @@ public class RequestFieldGotoDeclarationHandler implements GotoDeclarationHandle
         return parent instanceof FieldReferenceImpl fieldReference ? fieldReference.getClassReference() : null;
     }
 
-    private PsiElement[] findDeclarationTargets(VariableImpl variable, Project project, PsiElement contextElement) {
-        PhpClassImpl phpClass = RequestFieldUtils.resolveRequestClass(variable, project);
+    private @Nullable PsiElement[] findDeclarationTargets(PsiElement element, Project project, PsiElement contextElement) {
+        PhpClassImpl phpClass = RequestFieldUtils.resolvePhpClass(element, project);
+
         if (phpClass == null) {
             return null;
         }
 
-        Collection<ArrayHashElement> rules = RequestFieldUtils.resolveRulesFromVariable(variable, project, contextElement);
+        Collection<ArrayHashElement> rules = RequestFieldUtils.resolveRulesFromVariable(phpClass, project, contextElement);
 
         return rules == null
             ? null
