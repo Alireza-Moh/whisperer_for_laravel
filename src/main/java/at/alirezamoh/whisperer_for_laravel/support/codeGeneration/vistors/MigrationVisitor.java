@@ -4,8 +4,8 @@ import at.alirezamoh.whisperer_for_laravel.actions.models.dataTables.Field;
 import at.alirezamoh.whisperer_for_laravel.actions.models.dataTables.RenameField;
 import at.alirezamoh.whisperer_for_laravel.actions.models.dataTables.Table;
 import at.alirezamoh.whisperer_for_laravel.support.codeGeneration.PhpTypeConverter;
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.ClassUtils;
-import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PhpClassUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
@@ -40,6 +40,8 @@ public class MigrationVisitor extends PsiRecursiveElementWalkingVisitor {
         "dropPrimary", "dropUnique", "dropIndex", "dropFullText", "dropSpatialIndex", "dropForeign"
     ));
 
+    private final String[] SCHEMA_NAMESPACES = {"\\Illuminate\\Support\\Facades\\Schema", "\\Schema"};
+
 
     private final List<Table> tables = new ArrayList<>();
 
@@ -61,14 +63,14 @@ public class MigrationVisitor extends PsiRecursiveElementWalkingVisitor {
         return element instanceof MethodReferenceImpl methodReference
             && isInsideUpMethod(methodReference)
             && isCreateOrTable(methodReference)
-            && ClassUtils.isLaravelRelatedClass(methodReference, methodReference.getProject());
+            && PhpClassUtils.isCorrectRelatedClass(methodReference, methodReference.getProject(), SCHEMA_NAMESPACES);
     }
 
     private void extractTableName(MethodReferenceImpl methodReference) {
         PsiElement parameterTableName = methodReference.getParameter(0);
 
         if (parameterTableName instanceof StringLiteralExpression) {
-            String tableName = StrUtil.removeQuotes(parameterTableName.getText());
+            String tableName = StrUtils.removeQuotes(parameterTableName.getText());
 
             if (tableName.isEmpty()) {
                 return;
@@ -194,8 +196,8 @@ public class MigrationVisitor extends PsiRecursiveElementWalkingVisitor {
 
         if (isRenameDefinition && parameter instanceof StringLiteralExpression && secParameter instanceof StringLiteralExpression) {
             renameField = new RenameField(
-                StrUtil.removeQuotes(parameter.getText()),
-                StrUtil.removeQuotes(secParameter.getText())
+                StrUtils.removeQuotes(parameter.getText()),
+                StrUtils.removeQuotes(secParameter.getText())
             );
         }
 
@@ -205,7 +207,7 @@ public class MigrationVisitor extends PsiRecursiveElementWalkingVisitor {
                     fields.add(
                         new Field(
                             PhpTypeConverter.convert(method.getName()),
-                            StrUtil.removeQuotes(phpPsiElement.getText()),
+                            StrUtils.removeQuotes(phpPsiElement.getText()),
                             false,
                             AVOIDABLE_TYPES.contains(method.getName()),
                             isRenameDefinition,
@@ -218,7 +220,7 @@ public class MigrationVisitor extends PsiRecursiveElementWalkingVisitor {
             fields.add(
                 new Field(
                     PhpTypeConverter.convert(method.getName()),
-                    StrUtil.removeQuotes(parameter.getText()),
+                    StrUtils.removeQuotes(parameter.getText()),
                     false,
                     AVOIDABLE_TYPES.contains(method.getName()),
                     isRenameDefinition,

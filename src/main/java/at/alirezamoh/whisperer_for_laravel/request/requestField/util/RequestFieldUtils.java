@@ -1,13 +1,17 @@
 package at.alirezamoh.whisperer_for_laravel.request.requestField.util;
 
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.ClassUtils;
-import at.alirezamoh.whisperer_for_laravel.support.psiUtil.PsiUtil;
-import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.MethodUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PhpClassUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
+import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.util.Query;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.elements.impl.FieldReferenceImpl;
 import com.jetbrains.php.lang.psi.elements.impl.MethodImpl;
@@ -15,9 +19,7 @@ import com.jetbrains.php.lang.psi.elements.impl.PhpClassImpl;
 import com.jetbrains.php.lang.psi.elements.impl.VariableImpl;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -37,6 +39,19 @@ final public class RequestFieldUtils {
      */
     private static String BASE_FORM_REQUEST = "Illuminate\\Foundation\\Http\\FormRequest";
 
+    public static Map<String, Integer> REQUEST_METHODS = new HashMap<>() {{
+        put("input", 0);
+        put("string", 0);
+        put("integer", 0);
+        put("boolean", 0);
+        put("float", 0);
+    }};
+
+    private final static String[] REQUEST_CLASSES = {
+        "\\Illuminate\\Http\\Request",
+        "\\Illuminate\\Support\\ValidatedInput"
+    };
+
     /**
      * Resolves $this
      *
@@ -45,7 +60,7 @@ final public class RequestFieldUtils {
      * @return the resolved PhpClassImpl instance or null if not found
      */
     public static PhpClassImpl resolveRequestClass(Variable variable, Project project) {
-        PhpClassImpl phpClass = ClassUtils.getClassFromTypedElement(variable, project);
+        PhpClassImpl phpClass = PhpClassUtils.getClassFromTypedElement(variable, project);
 
         if (phpClass == null) {
             PsiReference reference = variable.getReference();
@@ -68,8 +83,8 @@ final public class RequestFieldUtils {
      * @return a collection of rules or null if not found
      */
     public static Collection<ArrayHashElement> getRules(PhpClassImpl phpClass, Project project) {
-        PhpClass baseFormRequest = ClassUtils.getClassByFQN(project, BASE_FORM_REQUEST);
-        if (baseFormRequest != null && ClassUtils.isChildOf(phpClass, baseFormRequest)) {
+        PhpClass baseFormRequest = PhpClassUtils.getClassByFQN(project, BASE_FORM_REQUEST);
+        if (baseFormRequest != null && PhpClassUtils.isChildOf(phpClass, baseFormRequest)) {
             Method rulesMethod = phpClass.findMethodByName("rules");
             if (rulesMethod != null) {
                 PhpReturn phpReturn = PsiTreeUtil.findChildOfType(rulesMethod, PhpReturn.class);
@@ -133,18 +148,18 @@ final public class RequestFieldUtils {
             return false;
         }
 
-        String ruleName = StrUtil.removeQuotes(ruleAsString.getText());
+        String ruleName = StrUtils.removeQuotes(ruleAsString.getText());
 
         if (element instanceof StringLiteralExpression stringLiteralExpression) {
             return Objects.equals(
-                StrUtil.removeQuotes(stringLiteralExpression.getText()),
+                StrUtils.removeQuotes(stringLiteralExpression.getText()),
                 ruleName
             );
         }
 
         if (element instanceof FieldReferenceImpl fieldReference && fieldReference.getName() != null) {
             return Objects.equals(
-                StrUtil.removeQuotes(fieldReference.getName()),
+                StrUtils.removeQuotes(fieldReference.getName()),
                 ruleName
             );
         }
@@ -152,13 +167,12 @@ final public class RequestFieldUtils {
         return false;
     }
 
-    public static Collection<ArrayHashElement> resolveRulesFromVariable(VariableImpl variable, Project project, PsiElement contextElement) {
-        PhpClassImpl phpClass = resolveRequestClass(variable, project);
-        if (phpClass == null) {
-            return null;
+    public static Collection<ArrayHashElement> resolveRulesFromVariable(PhpClass phpClass, Project project, PsiElement contextElement) {
+        if (!(phpClass instanceof PhpClassImpl phpClassImpl)) {
+            return List.of();
         }
 
-        Collection<ArrayHashElement> rules = getRules(phpClass, project);
+        Collection<ArrayHashElement> rules = getRules(phpClassImpl, project);
         if (rules == null && REQUEST.equals(phpClass.getFQN())) {
             MethodImpl method = PsiTreeUtil.getParentOfType(contextElement, MethodImpl.class);
             if (method != null) {
@@ -176,9 +190,63 @@ final public class RequestFieldUtils {
             PsiElement key = rule.getKey();
             if (key instanceof StringLiteralExpression stringLiteral) {
                 resultSet.addElement(
-                    PsiUtil.buildSimpleLookupElement(StrUtil.removeQuotes(stringLiteral.getText()))
+                    PsiElementUtils.buildSimpleLookupElement(StrUtils.removeQuotes(stringLiteral.getText()))
                 );
             }
         });
+    }
+
+    public static @Nullable PhpClassImpl resolvePhpClass(PsiElement element, Project project) {
+        if (element instanceof VariableImpl variable) {
+            PhpClassImpl phpClass = resolveRequestClass(variable, project);
+
+            if (phpClass == null) {
+                Query<PsiReference> references = ReferencesSearch.search(variable.getOriginalElement(), GlobalSearchScope.projectScope(project), false);
+
+                for (PsiReference reference : references) {
+                    PsiElement parent = reference.getElement().getParent();
+                    if (parent instanceof AssignmentExpression assignmentExpression) {
+                        PsiElement expression = assignmentExpression.getValue();
+
+                        if (expression instanceof NewExpression newExpression) {
+                            return PhpClassUtils.getClassFromTypedElement(newExpression.getClassReference(), project);
+                        } else if (expression instanceof MethodReference methodReference) {
+                            return PhpClassUtils.getClassFromTypedElement(methodReference.getClassReference(), project);
+                        }
+                    }
+                }
+            }
+
+            return phpClass;
+        } else if (element instanceof MethodReference methodRef) {
+            return PhpClassUtils.getClassFromTypedElement(methodRef.getClassReference(), project);
+        }
+
+        return null;
+    }
+
+    /**
+     * Checks if the current context is valid for suggesting request fields
+     *
+     * @param psiElement The current PSI element
+     * @return True if the context is valid, false otherwise
+     */
+    public static boolean isInsideCorrectMethod(PsiElement psiElement, Project project) {
+        MethodReference methodReference = MethodUtils.resolveMethodReference(psiElement, 10);
+
+        return methodReference != null
+            && PhpClassUtils.isCorrectRelatedClass(methodReference, project, REQUEST_CLASSES)
+            && REQUEST_METHODS.containsKey(methodReference.getName())
+            && isFieldParam(methodReference, psiElement);
+    }
+
+    public static boolean isFieldParam(MethodReference method, PsiElement position) {
+        Integer paramPositions = REQUEST_METHODS.get(method.getName());
+
+        if (paramPositions == null) {
+            return false;
+        }
+
+        return MethodUtils.findParamIndex(position, false) == paramPositions;
     }
 }

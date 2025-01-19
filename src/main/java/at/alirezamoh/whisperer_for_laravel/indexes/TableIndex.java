@@ -1,7 +1,7 @@
 package at.alirezamoh.whisperer_for_laravel.indexes;
 
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.FrameworkUtils;
-import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
@@ -39,7 +39,7 @@ public class TableIndex extends FileBasedIndexExtension<String, Void> {
         return inputData -> {
             Project project = inputData.getProject();
 
-            if (!FrameworkUtils.isLaravelProject(project) && FrameworkUtils.isLaravelFrameworkNotInstalled(project)) {
+            if (!PluginUtils.isLaravelProject(project) && PluginUtils.isLaravelFrameworkNotInstalled(project)) {
                 return Collections.emptyMap();
             }
 
@@ -112,7 +112,7 @@ public class TableIndex extends FileBasedIndexExtension<String, Void> {
         PsiElement parameterTableName = methodReference.getParameter(0);
 
         if (parameterTableName instanceof StringLiteralExpression) {
-             return StrUtil.removeQuotes(parameterTableName.getText());
+             return StrUtils.removeQuotes(parameterTableName.getText());
         }
 
         return null;

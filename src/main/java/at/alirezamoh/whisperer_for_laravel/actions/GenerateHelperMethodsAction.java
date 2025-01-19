@@ -7,14 +7,13 @@ import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.whisperer_for_laravel.support.ProjectDefaultPaths;
 import at.alirezamoh.whisperer_for_laravel.support.codeGeneration.MigrationManager;
 import at.alirezamoh.whisperer_for_laravel.support.codeGeneration.vistors.ClassMethodLoader;
-import at.alirezamoh.whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.FrameworkUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.DirectoryUtils;
 import at.alirezamoh.whisperer_for_laravel.support.notification.Notify;
-import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
-import at.alirezamoh.whisperer_for_laravel.support.template.TemplateLoader;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
+import at.alirezamoh.whisperer_for_laravel.support.TemplateLoader;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
@@ -22,7 +21,6 @@ import com.intellij.psi.PsiDirectory;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -30,9 +28,8 @@ import java.util.stream.Collectors;
 public class GenerateHelperMethodsAction extends BaseAction {
     private Project project;
 
-    private static final Logger LOG = Logger.getInstance(GenerateHelperMethodsAction.class);
-
-    List<String> ignoreMethods = Arrays.asList(
+    String[] ignoreMethods =
+    {
         "__call",
         "__construct",
         "afterQuery",
@@ -56,14 +53,15 @@ public class GenerateHelperMethodsAction extends BaseAction {
         "update",
         "upsert",
         "value"
-    );
+    };
 
+    private List<LaravelModel> models = new ArrayList<>();
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
         project = anActionEvent.getProject();
 
-        if (FrameworkUtils.isLaravelFrameworkNotInstalled(project)) {
+        if (PluginUtils.isLaravelFrameworkNotInstalled(project)) {
             Notify.notifyWarning(project, "Laravel Framework is not installed");
             return;
         }
@@ -81,9 +79,9 @@ public class GenerateHelperMethodsAction extends BaseAction {
                             createBaseQueryBuilderMethods(indicator);
                         });
 
-                        Notify.notifySuccess(project, "Code generation successful");
+                        outputModelCreationResult();
                     } catch (Exception e) {
-                        LOG.error("Could not create helper code", e);
+                        PluginUtils.getLOG().error("Could not create helper code", e);
                         Notify.notifyError(project, "Could not create helper code");
                     }
                 }
@@ -97,16 +95,16 @@ public class GenerateHelperMethodsAction extends BaseAction {
             String path = ProjectDefaultPaths.WHISPERER_FOR_LARAVEL_DIR_PATH;
 
             if (!settingsState.isLaravelDirectoryEmpty()) {
-                path = StrUtil.addSlashes(settingsState.getLaravelDirectoryPath(), false, true) + path;
+                path = StrUtils.addSlashes(settingsState.getLaravelDirectoryPath(), false, true) + path;
             }
 
-            PsiDirectory pluginVendor = DirectoryPsiUtil.getDirectory(project, path);
+            PsiDirectory pluginVendor = DirectoryUtils.getDirectory(project, path);
 
             if (pluginVendor != null) {
                 try {
                     pluginVendor.delete();
                 } catch (Exception e) {
-                    LOG.error("Could not delete the plugin vendor directory", e);
+                    PluginUtils.getLOG().error("Could not delete the plugin vendor directory", e);
                     Notify.notifyError(project, "Could not delete the plugin vendor directory");
                 }
             }
@@ -127,6 +125,8 @@ public class GenerateHelperMethodsAction extends BaseAction {
                 LaravelModelGeneration generation = new LaravelModelGeneration(namespace, modelsInNamespace, SettingsState.getInstance(project));
                 create(generation, "laravelModels.ftl");
             });
+
+            models = m;
         }
     }
 
@@ -137,14 +137,14 @@ public class GenerateHelperMethodsAction extends BaseAction {
         List<Method> baseQueryBuilderMethods = new ArrayList<>();
 
         baseQueryBuilderMethods.addAll(
-            methodLoader.loadMethodsWithIgnore(
-                DirectoryPsiUtil.getFileByName(project, ProjectDefaultPaths.LARAVEL_DB_QUERY_BUILDER_PATH),
+            methodLoader.loadMethods(
+                DirectoryUtils.getFileByName(project, ProjectDefaultPaths.LARAVEL_DB_QUERY_BUILDER_PATH),
                 ignoreMethods
             )
         );
         baseQueryBuilderMethods.addAll(
             methodLoader.loadMethods(
-                DirectoryPsiUtil.getFileByName(project, ProjectDefaultPaths.LARAVEL_DB_QUERY_RELATIONSHIPS_PATH)
+                DirectoryUtils.getFileByName(project, ProjectDefaultPaths.LARAVEL_DB_QUERY_RELATIONSHIPS_PATH)
             )
         );
 
@@ -156,7 +156,7 @@ public class GenerateHelperMethodsAction extends BaseAction {
         }
     }
 
-    protected void create(BaseModel model, String templateName) {
+    private void create(BaseModel model, String templateName) {
         TemplateLoader templateProcessor = new TemplateLoader(
             project,
             templateName,
@@ -166,5 +166,23 @@ public class GenerateHelperMethodsAction extends BaseAction {
         );
 
         templateProcessor.createTemplateWithDirectory(false);
+    }
+
+    private void outputModelCreationResult() {
+        Notify.notifySuccess(project, "Code generation successful");
+        StringBuilder notificationContent = new StringBuilder(models.size() + " Eloquent Models found:\n");
+
+        for (LaravelModel model : models) {
+            notificationContent.append(model.getModelName())
+                .append(" -> ")
+                .append(model.getTableName())
+                .append(",\n");
+        }
+
+        if (!notificationContent.isEmpty()) {
+            notificationContent.setLength(notificationContent.length() - 2);
+        }
+
+        Notify.notifySuccess(project, notificationContent.toString());
     }
 }

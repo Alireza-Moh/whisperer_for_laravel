@@ -3,10 +3,11 @@ package at.alirezamoh.whisperer_for_laravel.actions.views;
 import at.alirezamoh.whisperer_for_laravel.actions.models.EloquentModel;
 import at.alirezamoh.whisperer_for_laravel.actions.models.dataTables.Field;
 import at.alirezamoh.whisperer_for_laravel.support.codeGeneration.ComponentEditor;
-import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.ValidationInfo;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.ui.table.JBTable;
@@ -310,13 +311,13 @@ public class EloquentView extends BaseDialog {
 
     private void setOptionsText() {
         String realModelName = this.getRealModelName();
-        tableName = StrUtil.plural(StrUtil.snake(realModelName));
+        tableName = StringUtil.pluralize(StrUtils.snake(realModelName, "_"));
 
         controllerNameTextField.setText(capitalizeFirstLetter(realModelName) + "Controller");
         migrationFileNameTextField.setText(
-            StrUtil.getCurrentDate()
+            StrUtils.getCurrentDate()
                 + "_"
-                + StrUtil.generateRandomId()
+                + StrUtils.generateRandomId()
                 + "create_"
                 + tableName
                 + "_table"

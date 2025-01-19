@@ -1,6 +1,6 @@
 package at.alirezamoh.whisperer_for_laravel.config.visitors;
 
-import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -132,7 +132,7 @@ public class ArrayReturnPsiRecursiveVisitor extends PsiRecursiveElementWalkingVi
     private String generateFullKey(String parentKey, String key) {
         String prefixedKey = parentKey.isEmpty() ? "" : parentKey + ".";
 
-        return StrUtil.removeQuotes(prefixedKey + key);
+        return StrUtils.removeQuotes(prefixedKey + key);
     }
 
     /**
@@ -182,7 +182,7 @@ public class ArrayReturnPsiRecursiveVisitor extends PsiRecursiveElementWalkingVi
 
         String value = valueElement.getText();
         if (!value.isEmpty()) {
-            value = StrUtil.removeQuotes(value);
+            value = StrUtils.removeQuotes(value);
         }
         return value;
     }

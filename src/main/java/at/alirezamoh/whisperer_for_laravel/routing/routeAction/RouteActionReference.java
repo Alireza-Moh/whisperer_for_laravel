@@ -1,9 +1,10 @@
 package at.alirezamoh.whisperer_for_laravel.routing.routeAction;
 
 import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
-import at.alirezamoh.whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
-import at.alirezamoh.whisperer_for_laravel.support.psiUtil.PsiUtil;
-import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.DirectoryUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PhpClassUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
@@ -41,15 +42,6 @@ public class RouteActionReference extends PsiReferenceBase<PsiElement> {
      */
     private final String DEFAULT_CONTROLLER_PATH = "app/Http/Controllers/";
 
-    /**
-     * List of method names to ignore when processing controller methods.
-     */
-    private final List<String> IGNORE_LIST = new ArrayList<>() {{
-        add("__construct");
-        add("__index");
-        add("__invoke");
-    }};
-
     public RouteActionReference(@NotNull PsiElement element, TextRange rangeInElement) {
         super(element, rangeInElement);
 
@@ -63,7 +55,7 @@ public class RouteActionReference extends PsiReferenceBase<PsiElement> {
      */
     @Override
     public @Nullable PsiElement resolve() {
-        String targetAction = StrUtil.removeQuotes(myElement.getText());
+        String targetAction = StrUtils.removeQuotes(myElement.getText());
 
         for (Map.Entry<String, PsiElement> entry : getAllControllersWithActions().entrySet()) {
             if (entry.getKey().equals(targetAction)) {
@@ -84,7 +76,7 @@ public class RouteActionReference extends PsiReferenceBase<PsiElement> {
 
         for (Map.Entry<String, PsiElement> entry : getAllControllersWithActions().entrySet()) {
             variants.add(
-                PsiUtil.buildSimpleLookupElement(entry.getKey())
+                PsiElementUtils.buildSimpleLookupElement(entry.getKey())
             );
         }
 
@@ -101,12 +93,12 @@ public class RouteActionReference extends PsiReferenceBase<PsiElement> {
         String path = DEFAULT_CONTROLLER_PATH;
 
         if (!settingsState.isLaravelDirectoryEmpty()) {
-            String laravelDir = StrUtil.addSlashes(settingsState.getLaravelDirectoryPath());
+            String laravelDir = StrUtils.addSlashes(settingsState.getLaravelDirectoryPath());
             path = laravelDir + path;
         }
 
 
-        PsiDirectory controllerDir = DirectoryPsiUtil.getDirectory(project, path);
+        PsiDirectory controllerDir = DirectoryUtils.getDirectory(project, path);
 
         if (controllerDir != null) {
             collectPhpClasses(controllerDir, elements);
@@ -126,18 +118,18 @@ public class RouteActionReference extends PsiReferenceBase<PsiElement> {
         if (settingsState.isModuleApplication()) {
             String modulesPath = settingsState.getModulesDirectoryPath();
             if (!settingsState.isLaravelDirectoryEmpty()) {
-                modulesPath = StrUtil.addSlashes(settingsState.getLaravelDirectoryPath())
-                    + StrUtil.addSlashes(modulesPath, true, false);
+                modulesPath = StrUtils.addSlashes(settingsState.getLaravelDirectoryPath())
+                    + StrUtils.addSlashes(modulesPath, true, false);
             }
 
-            PsiDirectory modulesDir = DirectoryPsiUtil.getDirectory(project, modulesPath);
+            PsiDirectory modulesDir = DirectoryUtils.getDirectory(project, modulesPath);
 
             if (modulesDir != null) {
-                String moduleSrc = StrUtil.addSlashes(settingsState.getModuleSrcDirectoryPath()) + "Http/Controllers/";
+                String moduleSrc = StrUtils.addSlashes(settingsState.getModuleSrcDirectoryPath()) + "Http/Controllers/";
                 for (PsiDirectory module : modulesDir.getSubdirectories()) {
-                    PsiDirectory controllerDirInModule =DirectoryPsiUtil.getDirectory(
+                    PsiDirectory controllerDirInModule = DirectoryUtils.getDirectory(
                         project,
-                        StrUtil.removeDoubleSlashes(modulesPath + "/" + module.getName() + moduleSrc)
+                        StrUtils.removeDoubleForwardSlashes(modulesPath + "/" + module.getName() + moduleSrc)
                     );
 
                     if (controllerDirInModule != null) {
@@ -159,12 +151,10 @@ public class RouteActionReference extends PsiReferenceBase<PsiElement> {
             if (element instanceof PhpFile controllerFile) {
                 for (PhpClass phpClass : PsiTreeUtil.findChildrenOfType(controllerFile, PhpClass.class)) {
                     String fqn = phpClass.getPresentableFQN().replace("/", "\\");
-                    for (Method method : phpClass.getMethods()) {
+                    for (Method method : PhpClassUtils.getClassPublicMethods(phpClass, false)) {
                         String methodName = method.getName();
-                        if (method.getModifier().isPublic() && !method.isAbstract() && !IGNORE_LIST.contains(methodName)) {
-                            String methodString = fqn + "@" + methodName;
-                            elements.put(methodString, method);
-                        }
+                        String methodString = fqn + "@" + methodName;
+                        elements.put(methodString, method);
                     }
                 }
             } else if (element instanceof PsiDirectory) {

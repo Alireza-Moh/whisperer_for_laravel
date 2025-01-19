@@ -1,6 +1,6 @@
 package at.alirezamoh.whisperer_for_laravel.routing.middleware;
 
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.ClassUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PhpClassUtils;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
 import com.jetbrains.php.lang.psi.elements.*;
@@ -25,7 +25,7 @@ public class AppFileVisitor extends PsiRecursiveElementWalkingVisitor {
     }
 
     private void getProjectGroupMiddlewares(@NotNull PsiElement element) {
-        if (element instanceof MethodReference methodReference && Objects.equals(methodReference.getName(), "appendToGroup") && ClassUtils.isCorrectRelatedClass(methodReference, element.getProject(), "\\Illuminate\\Foundation\\Configuration\\Middleware")) {
+        if (element instanceof MethodReference methodReference && Objects.equals(methodReference.getName(), "appendToGroup") && PhpClassUtils.isCorrectRelatedClass(methodReference, element.getProject(), "\\Illuminate\\Foundation\\Configuration\\Middleware")) {
             PsiElement parameter = methodReference.getParameter(0);
 
             if (parameter instanceof StringLiteralExpression) {
@@ -35,7 +35,7 @@ public class AppFileVisitor extends PsiRecursiveElementWalkingVisitor {
     }
 
     private void getProjectMiddlewareAliases(@NotNull PsiElement element) {
-        if (element instanceof MethodReference methodReference && Objects.equals(methodReference.getName(), "alias") && ClassUtils.isCorrectRelatedClass(methodReference, element.getProject(), "\\Illuminate\\Foundation\\Configuration\\Middleware")) {
+        if (element instanceof MethodReference methodReference && Objects.equals(methodReference.getName(), "alias") && PhpClassUtils.isCorrectRelatedClass(methodReference, element.getProject(), "\\Illuminate\\Foundation\\Configuration\\Middleware")) {
             PsiElement parameter = methodReference.getParameter(0);
 
             if (parameter instanceof ArrayCreationExpression arrayCreationExpression) {

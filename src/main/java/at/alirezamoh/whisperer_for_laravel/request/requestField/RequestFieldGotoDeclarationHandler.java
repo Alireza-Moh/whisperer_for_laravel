@@ -1,7 +1,8 @@
 package at.alirezamoh.whisperer_for_laravel.request.requestField;
 
 import at.alirezamoh.whisperer_for_laravel.request.requestField.util.RequestFieldUtils;
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.FrameworkUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.MethodUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
 import com.intellij.codeInsight.navigation.actions.GotoDeclarationHandler;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
@@ -27,13 +28,16 @@ public class RequestFieldGotoDeclarationHandler implements GotoDeclarationHandle
         }
 
         Project project = sourceElement.getProject();
-        if (!FrameworkUtils.isLaravelProject(project) && FrameworkUtils.isLaravelFrameworkNotInstalled(project)) {
+        if (!PluginUtils.isLaravelProject(project) && PluginUtils.isLaravelFrameworkNotInstalled(project)) {
             return null;
         }
 
         PsiElement parentElement = resolveParentElement(sourceElement);
         if (parentElement instanceof VariableImpl variable) {
             return findDeclarationTargets(variable, project, sourceElement.getParent());
+        }
+        else if (parentElement instanceof MethodReference methodRef) {
+            return findDeclarationTargets(methodRef, project, sourceElement.getParent());
         }
 
         return null;
@@ -51,16 +55,30 @@ public class RequestFieldGotoDeclarationHandler implements GotoDeclarationHandle
         }
 
         parent = sourceElement.getParent();
-        return parent instanceof FieldReferenceImpl fieldReference ? fieldReference.getClassReference() : null;
+        if (parent instanceof FieldReferenceImpl fieldReference) {
+            return fieldReference.getClassReference();
+        }
+
+        if (RequestFieldUtils.isInsideCorrectMethod(sourceElement, parent.getProject())) {
+            MethodReference methodReference = MethodUtils.resolveMethodReference(sourceElement, 10);
+
+            if (methodReference != null) {
+                return methodReference.getClassReference();
+            }
+            return null;
+        }
+
+        return null;
     }
 
-    private PsiElement[] findDeclarationTargets(VariableImpl variable, Project project, PsiElement contextElement) {
-        PhpClassImpl phpClass = RequestFieldUtils.resolveRequestClass(variable, project);
+    private @Nullable PsiElement[] findDeclarationTargets(PsiElement element, Project project, PsiElement contextElement) {
+        PhpClassImpl phpClass = RequestFieldUtils.resolvePhpClass(element, project);
+
         if (phpClass == null) {
             return null;
         }
 
-        Collection<ArrayHashElement> rules = RequestFieldUtils.resolveRulesFromVariable(variable, project, contextElement);
+        Collection<ArrayHashElement> rules = RequestFieldUtils.resolveRulesFromVariable(phpClass, project, contextElement);
 
         return rules == null
             ? null

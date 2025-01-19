@@ -1,7 +1,8 @@
 package at.alirezamoh.whisperer_for_laravel.blade.component;
 
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.FrameworkUtils;
-import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PhpIndexUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.codeInsight.navigation.actions.GotoDeclarationHandler;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
@@ -12,7 +13,6 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
-import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.blade.BladeFileType;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import org.jetbrains.annotations.NotNull;
@@ -20,7 +20,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 /**
  * A GotoDeclarationHandler that navigates to the Blade component
@@ -36,7 +35,7 @@ public class BladeXComponentGotoDeclarationHandler implements GotoDeclarationHan
 
         Project project = sourceElement.getProject();
 
-        if (!FrameworkUtils.isLaravelProject(project) && FrameworkUtils.isLaravelFrameworkNotInstalled(project)) {
+        if (!PluginUtils.isLaravelProject(project) && PluginUtils.isLaravelFrameworkNotInstalled(project)) {
             return null;
         }
 
@@ -80,8 +79,8 @@ public class BladeXComponentGotoDeclarationHandler implements GotoDeclarationHan
     }
 
     private Collection<PhpClass> findComponentPhpClass(String componentName, Project project) {
-        String componentNameInCamelCase = StrUtil.camel(componentName);
+        String componentNameInCamelCase = StrUtils.ucFirst(StrUtils.camel(componentName, '-'));
 
-        return PhpIndex.getInstance(project).getClassesByName(componentNameInCamelCase);
+        return PhpIndexUtils.getPhpClassesByName(componentNameInCamelCase, project);
     }
 }

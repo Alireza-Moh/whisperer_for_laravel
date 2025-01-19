@@ -1,9 +1,9 @@
 package at.alirezamoh.whisperer_for_laravel.routing.namespace;
 
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.ClassUtils;
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.MethodUtils;
-import at.alirezamoh.whisperer_for_laravel.support.psiUtil.PsiUtil;
-import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.MethodUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PhpClassUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.codeInsight.completion.*;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiElement;
@@ -19,12 +19,7 @@ public class RouteNamespaceCompletionContributor extends CompletionContributor {
     /**
      * The namespaces of the `Route` facade and class
      */
-    private final List<String> ROUTE_NAMESPACES = new ArrayList<>() {{
-        add("\\Illuminate\\Routing\\Route");
-        add("\\Illuminate\\Support\\Facades\\Route");
-        add("\\Route");
-        add("\\Illuminate\\Routing\\RouteRegistrar");
-    }};
+    private final String[] ROUTE_NAMESPACES = {"\\Illuminate\\Routing\\Route", "\\Illuminate\\Support\\Facades\\Route", "\\Route", "\\Illuminate\\Routing\\RouteRegistrar"};
 
     /**
      * The names of the methods for autocompletion
@@ -51,12 +46,12 @@ public class RouteNamespaceCompletionContributor extends CompletionContributor {
                     if (
                         method != null
                         && isNamespaceParam(method, element)
-                        && ClassUtils.isCorrectRelatedClass(method, element.getProject(), ROUTE_NAMESPACES)
+                        && PhpClassUtils.isCorrectRelatedClass(method, element.getProject(), ROUTE_NAMESPACES)
                     )
                     {
                         for (String namespace : getAllNamespaces(completionResultSet, element)) {
                             completionResultSet.addElement(
-                                PsiUtil.buildSimpleLookupElement(namespace)
+                                PsiElementUtils.buildSimpleLookupElement(namespace)
                             );
                         }
                     }
@@ -72,7 +67,7 @@ public class RouteNamespaceCompletionContributor extends CompletionContributor {
                 int lastBackslashIndex = fqn.lastIndexOf("\\");
 
                 if (lastBackslashIndex > 0) {
-                    String namespace = StrUtil.addSlashes(
+                    String namespace = StrUtils.addSlashes(
                         fqn.substring(0, lastBackslashIndex),
                         true,
                         true

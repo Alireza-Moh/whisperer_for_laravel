@@ -1,8 +1,9 @@
 package at.alirezamoh.whisperer_for_laravel.routing.resourceRoute;
 
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.MethodUtils;
-import at.alirezamoh.whisperer_for_laravel.support.psiUtil.PsiUtil;
-import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.MethodUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PhpClassUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
@@ -20,16 +21,6 @@ import java.util.List;
  * This class resolves references controller actions and provides completion
  */
 public class ResourceRouteActionReference extends PsiReferenceBase<PsiElement> {
-
-    /**
-     * List of method names to ignore when processing controller methods.
-     */
-    private final List<String> IGNORE_LIST = new ArrayList<>() {{
-        add("__construct");
-        add("__index");
-        add("__invoke");
-    }};
-
     public ResourceRouteActionReference(@NotNull PsiElement element, TextRange rangeInElement) {
         super(element, rangeInElement);
     }
@@ -40,7 +31,7 @@ public class ResourceRouteActionReference extends PsiReferenceBase<PsiElement> {
      */
     @Override
     public @Nullable PsiElement resolve() {
-        String targetAction = StrUtil.removeQuotes(myElement.getText());
+        String targetAction = StrUtils.removeQuotes(myElement.getText());
 
         for (Method method : getAllControllerMethods())  {
             if (method.getName().equals(targetAction)){
@@ -61,7 +52,7 @@ public class ResourceRouteActionReference extends PsiReferenceBase<PsiElement> {
 
         for (Method method : getAllControllerMethods()) {
             variants.add(
-                PsiUtil.buildSimpleLookupElement(method.getName())
+                PsiElementUtils.buildSimpleLookupElement(method.getName())
             );
         }
 
@@ -78,7 +69,7 @@ public class ResourceRouteActionReference extends PsiReferenceBase<PsiElement> {
 
         PhpClass controllerClass = resolveControllerClass();
         if (controllerClass != null) {
-            methods.addAll(getPublicMethods(controllerClass));
+            methods.addAll(PhpClassUtils.getClassPublicMethods(controllerClass, false));
         }
 
         return methods;
@@ -121,36 +112,5 @@ public class ResourceRouteActionReference extends PsiReferenceBase<PsiElement> {
         }
 
         return null;
-    }
-
-    /**
-     * Retrieves all public methods from the given controller excluding ignored methods
-     *
-     * @param phpClass the controller to extract methods from
-     * @return a list of public methods
-     */
-    private List<Method> getPublicMethods(PhpClass phpClass) {
-        List<Method> publicMethods = new ArrayList<>();
-
-        for (Method method : phpClass.getMethods()) {
-            if (isEligibleMethod(method)) {
-                publicMethods.add(method);
-            }
-        }
-
-        return publicMethods;
-    }
-
-    /**
-     * Checks if a method is eligible to be included in the results
-     *
-     * @param method the method to check
-     * @return true or false
-     */
-    private boolean isEligibleMethod(Method method) {
-        String methodName = method.getName();
-        return method.getModifier().isPublic() &&
-            !method.isAbstract() &&
-            !IGNORE_LIST.contains(methodName);
     }
 }

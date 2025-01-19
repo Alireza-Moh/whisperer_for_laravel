@@ -1,11 +1,11 @@
-package at.alirezamoh.whisperer_for_laravel.support.template;
+package at.alirezamoh.whisperer_for_laravel.support;
 
 import at.alirezamoh.whisperer_for_laravel.actions.models.BaseModel;
 import at.alirezamoh.whisperer_for_laravel.support.notification.Notify;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.command.WriteCommandAction;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
@@ -53,8 +53,6 @@ public class TemplateLoader {
     private boolean showSuccessMessage = true;
 
     private boolean overwriteFile = false;
-
-    private static final Logger LOG = Logger.getInstance(TemplateLoader.class);
 
     /**
      * @param project  The current project
@@ -111,7 +109,7 @@ public class TemplateLoader {
                         );
                     }
                     else {
-                        LOG.error("Could not create " + object.getDestination() + " directory", e);
+                        PluginUtils.getLOG().error("Could not create " + object.getDestination() + " directory", e);
                         Notify.notifyError(
                             project,
                             "Could not create " + object.getDestination() + " directory"
@@ -162,7 +160,7 @@ public class TemplateLoader {
                 );
             }
         } catch (IOException | TemplateException ex) {
-            LOG.error("Could not create " + object.getName() + " file", ex);
+            PluginUtils.getLOG().error("Could not create " + object.getName() + " file", ex);
             Notify.notifyError(
                 project,
                 "Could not create " + object.getName() + " file"

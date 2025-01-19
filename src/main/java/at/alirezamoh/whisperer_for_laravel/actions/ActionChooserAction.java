@@ -2,19 +2,17 @@ package at.alirezamoh.whisperer_for_laravel.actions;
 
 import at.alirezamoh.whisperer_for_laravel.actions.provider.ChooseActionModel;
 import at.alirezamoh.whisperer_for_laravel.support.notification.Notify;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
 import com.intellij.ide.util.gotoByName.ChooseByNameModel;
 import com.intellij.ide.util.gotoByName.ChooseByNamePopup;
 import com.intellij.ide.util.gotoByName.ChooseByNamePopupComponent;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.ModalityState;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 
 public class ActionChooserAction extends BaseAction {
-    private static final Logger LOG = Logger.getInstance(ActionChooserAction.class);
-
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
         Project project = e.getProject();
@@ -42,7 +40,7 @@ public class ActionChooserAction extends BaseAction {
                             true
                         );
                     } catch (Exception ex) {
-                        LOG.error("Could not execute action", ex);
+                        PluginUtils.getLOG().error("Could not execute action", ex);
                         Notify.notifyError(project, "Could not execute action");
                     }
                 }

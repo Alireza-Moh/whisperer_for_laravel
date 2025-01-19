@@ -1,7 +1,8 @@
 package at.alirezamoh.whisperer_for_laravel.request.requestField;
 
 import at.alirezamoh.whisperer_for_laravel.request.requestField.util.RequestFieldUtils;
-import at.alirezamoh.whisperer_for_laravel.support.laravelUtils.FrameworkUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.MethodUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
 import com.intellij.codeInsight.completion.*;
 import com.intellij.openapi.project.Project;
 import com.intellij.patterns.PlatformPatterns;
@@ -44,13 +45,38 @@ public class RequestFieldCompletionContributor extends CompletionContributor {
                     PsiElement position = parameters.getPosition().getOriginalElement();
 
                     Project project = position.getProject();
-                    if (!FrameworkUtils.isLaravelProject(project) && FrameworkUtils.isLaravelFrameworkNotInstalled(project)) {
+                    if (!PluginUtils.isLaravelProject(project) && PluginUtils.isLaravelFrameworkNotInstalled(project)) {
                         return;
                     }
 
                     PsiElement targetElement = getTargetElement(position);
                     if (targetElement instanceof VariableImpl variable) {
                         handleVariableCompletions(variable, project, resultSet, position);
+                    } else if (targetElement instanceof MethodReference methodRef) {
+                        handleVariableCompletions(methodRef, project, resultSet, position);
+                    }
+                }
+            }
+        );
+        extend(
+            CompletionType.BASIC,
+            PlatformPatterns.or(
+                PlatformPatterns.psiElement(PhpTokenTypes.STRING_LITERAL),
+                PlatformPatterns.psiElement(PhpTokenTypes.STRING_LITERAL_SINGLE_QUOTE)
+            ),
+            new CompletionProvider<>() {
+                @Override
+                protected void addCompletions(@NotNull CompletionParameters parameters, @NotNull ProcessingContext context, @NotNull CompletionResultSet resultSet) {
+                    PsiElement position = parameters.getPosition().getOriginalElement();
+
+                    Project project = position.getProject();
+                    if (!PluginUtils.isLaravelProject(project) && PluginUtils.isLaravelFrameworkNotInstalled(project)) {
+                        return;
+                    }
+
+                    if (RequestFieldUtils.isInsideCorrectMethod(position, project)) {
+                        MethodReference methodReference = MethodUtils.resolveMethodReference(position, 10);
+                        handleVariableCompletions(methodReference, project, resultSet, position);
                     }
                 }
             }
@@ -69,17 +95,18 @@ public class RequestFieldCompletionContributor extends CompletionContributor {
     }
 
     private void handleVariableCompletions(
-        VariableImpl variable,
+        PsiElement element,
         Project project,
         CompletionResultSet resultSet,
         PsiElement contextElement
     ) {
-        PhpClassImpl phpClass = RequestFieldUtils.resolveRequestClass(variable, project);
+        PhpClassImpl phpClass = RequestFieldUtils.resolvePhpClass(element, project);
+
         if (phpClass == null) {
             return;
         }
 
-        Collection<ArrayHashElement> rules = RequestFieldUtils.resolveRulesFromVariable(variable, project, contextElement);
+        Collection<ArrayHashElement> rules = RequestFieldUtils.resolveRulesFromVariable(phpClass, project, contextElement);
         RequestFieldUtils.processRules(rules, resultSet);
     }
 }

@@ -3,7 +3,7 @@ package at.alirezamoh.whisperer_for_laravel.actions.models;
 import at.alirezamoh.whisperer_for_laravel.actions.models.dataTables.Field;
 import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.whisperer_for_laravel.support.ProjectDefaultPaths;
-import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -99,10 +99,10 @@ public class MigrationModel extends BaseModel {
     }
 
     private String getRealFileName() {
-        return StrUtil.getCurrentDate()
+        return StrUtils.getCurrentDate()
             + "_"
-            + StrUtil.generateRandomId()
-            + StrUtil.snake(getName())
+            + StrUtils.generateRandomId()
+            + StrUtils.snake(getName(), "_")
             + extension;
     }
 

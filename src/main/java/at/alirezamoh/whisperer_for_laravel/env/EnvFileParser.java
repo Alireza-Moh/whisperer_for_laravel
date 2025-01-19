@@ -1,8 +1,8 @@
 package at.alirezamoh.whisperer_for_laravel.env;
 
 import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
-import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
-import com.intellij.openapi.diagnostic.Logger;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 
@@ -11,8 +11,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class EnvFileParser {
-    private static final Logger LOG = Logger.getInstance(EnvFileParser.class);
-
     public static Map<String, String> parseEnvFile(Project project) {
         Map<String, String> envMap = new HashMap<>();
 
@@ -41,7 +39,7 @@ public class EnvFileParser {
                 envMap.put(key, value);
             }
         } catch (IOException e) {
-            LOG.error("Could not read .env file", e);
+            PluginUtils.getLOG().error("Could not read .env file", e);
             return envMap;
         }
 
@@ -62,9 +60,9 @@ public class EnvFileParser {
         String filePath = project.getBasePath() + "/.env";
         SettingsState settings = SettingsState.getInstance(project);
         if (!settings.isLaravelDirectoryEmpty()) {
-            filePath = project.getBasePath() + StrUtil.addSlashes(settings.getLaravelDirectoryPath()) + ".env";
+            filePath = project.getBasePath() + StrUtils.addSlashes(settings.getLaravelDirectoryPath()) + ".env";
         }
 
-        return new File(StrUtil.removeDoubleSlashes(filePath));
+        return new File(StrUtils.removeDoubleForwardSlashes(filePath));
     }
 }

@@ -1,8 +1,7 @@
-package at.alirezamoh.whisperer_for_laravel.support.laravelUtils;
+package at.alirezamoh.whisperer_for_laravel.support.utils;
 
 import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
-import at.alirezamoh.whisperer_for_laravel.support.directoryUtil.DirectoryPsiUtil;
-import at.alirezamoh.whisperer_for_laravel.support.strUtil.StrUtil;
+import at.alirezamoh.whisperer_for_laravel.support.ProjectDefaultPaths;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.intellij.openapi.diagnostic.Logger;
@@ -13,13 +12,26 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.io.FileReader;
 
-public class FrameworkUtils {
-    private static final Logger LOG = Logger.getInstance(FrameworkUtils.class);
+public class PluginUtils {
+    private final static Logger LOG = Logger.getInstance("Whisper-For-Laravel-Plugin");
 
-    private FrameworkUtils() {}
+    public static @Nullable PsiDirectory getPluginVendor(Project project) {
+        SettingsState settingsState = SettingsState.getInstance(project);
+        String path = ProjectDefaultPaths.WHISPERER_FOR_LARAVEL_DIR_PATH;
+
+        if (!settingsState.isLaravelDirectoryEmpty()) {
+            path = StrUtils.addSlashes(settingsState.getLaravelDirectoryPath(), false, true) + path;
+        }
+
+        return DirectoryUtils.getDirectory(project, path);
+    }
+
+    public static Logger getLOG() {
+        return LOG;
+    }
 
     public static boolean isLaravelFrameworkNotInstalled(Project project) {
-        PsiDirectory psiDirectory = DirectoryPsiUtil.getDirectory(project, "/vendor/laravel/framework/");
+        PsiDirectory psiDirectory = DirectoryUtils.getDirectory(project, "/vendor/laravel/framework/");
 
         return psiDirectory == null;
     }
@@ -73,7 +85,7 @@ public class FrameworkUtils {
         String defaultPath = project.getBasePath();
 
         if (!settingsState.isLaravelDirectoryEmpty()) {
-            defaultPath = defaultPath + StrUtil.addSlashes(
+            defaultPath = defaultPath + StrUtils.addSlashes(
                 settingsState.getLaravelDirectoryPath(),
                 false,
                 true
