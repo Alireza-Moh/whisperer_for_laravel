@@ -1,5 +1,6 @@
 package at.alirezamoh.whisperer_for_laravel.request.requestField.util;
 
+import at.alirezamoh.whisperer_for_laravel.support.utils.MethodUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PhpClassUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
@@ -18,9 +19,7 @@ import com.jetbrains.php.lang.psi.elements.impl.PhpClassImpl;
 import com.jetbrains.php.lang.psi.elements.impl.VariableImpl;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -39,6 +38,19 @@ final public class RequestFieldUtils {
      * Base FormRequest class fqn
      */
     private static String BASE_FORM_REQUEST = "Illuminate\\Foundation\\Http\\FormRequest";
+
+    public static Map<String, Integer> REQUEST_METHODS = new HashMap<>() {{
+        put("input", 0);
+        put("string", 0);
+        put("integer", 0);
+        put("boolean", 0);
+        put("float", 0);
+    }};
+
+    private final static String[] REQUEST_CLASSES = {
+        "\\Illuminate\\Http\\Request",
+        "\\Illuminate\\Support\\ValidatedInput"
+    };
 
     /**
      * Resolves $this
@@ -186,7 +198,7 @@ final public class RequestFieldUtils {
 
     public static @Nullable PhpClassImpl resolvePhpClass(PsiElement element, Project project) {
         if (element instanceof VariableImpl variable) {
-            PhpClassImpl phpClass = RequestFieldUtils.resolveRequestClass(variable, project);
+            PhpClassImpl phpClass = resolveRequestClass(variable, project);
 
             if (phpClass == null) {
                 Query<PsiReference> references = ReferencesSearch.search(variable.getOriginalElement(), GlobalSearchScope.projectScope(project), false);
@@ -211,5 +223,30 @@ final public class RequestFieldUtils {
         }
 
         return null;
+    }
+
+    /**
+     * Checks if the current context is valid for suggesting request fields
+     *
+     * @param psiElement The current PSI element
+     * @return True if the context is valid, false otherwise
+     */
+    public static boolean isInsideCorrectMethod(PsiElement psiElement, Project project) {
+        MethodReference methodReference = MethodUtils.resolveMethodReference(psiElement, 10);
+
+        return methodReference != null
+            && PhpClassUtils.isCorrectRelatedClass(methodReference, project, REQUEST_CLASSES)
+            && REQUEST_METHODS.containsKey(methodReference.getName())
+            && isFieldParam(methodReference, psiElement);
+    }
+
+    public static boolean isFieldParam(MethodReference method, PsiElement position) {
+        Integer paramPositions = REQUEST_METHODS.get(method.getName());
+
+        if (paramPositions == null) {
+            return false;
+        }
+
+        return MethodUtils.findParamIndex(position, false) == paramPositions;
     }
 }

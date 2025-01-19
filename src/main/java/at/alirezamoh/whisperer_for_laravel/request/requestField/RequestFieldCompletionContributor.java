@@ -1,6 +1,7 @@
 package at.alirezamoh.whisperer_for_laravel.request.requestField;
 
 import at.alirezamoh.whisperer_for_laravel.request.requestField.util.RequestFieldUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.MethodUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
 import com.intellij.codeInsight.completion.*;
 import com.intellij.openapi.project.Project;
@@ -53,6 +54,29 @@ public class RequestFieldCompletionContributor extends CompletionContributor {
                         handleVariableCompletions(variable, project, resultSet, position);
                     } else if (targetElement instanceof MethodReference methodRef) {
                         handleVariableCompletions(methodRef, project, resultSet, position);
+                    }
+                }
+            }
+        );
+        extend(
+            CompletionType.BASIC,
+            PlatformPatterns.or(
+                PlatformPatterns.psiElement(PhpTokenTypes.STRING_LITERAL),
+                PlatformPatterns.psiElement(PhpTokenTypes.STRING_LITERAL_SINGLE_QUOTE)
+            ),
+            new CompletionProvider<>() {
+                @Override
+                protected void addCompletions(@NotNull CompletionParameters parameters, @NotNull ProcessingContext context, @NotNull CompletionResultSet resultSet) {
+                    PsiElement position = parameters.getPosition().getOriginalElement();
+
+                    Project project = position.getProject();
+                    if (!PluginUtils.isLaravelProject(project) && PluginUtils.isLaravelFrameworkNotInstalled(project)) {
+                        return;
+                    }
+
+                    if (RequestFieldUtils.isInsideCorrectMethod(position, project)) {
+                        MethodReference methodReference = MethodUtils.resolveMethodReference(position, 10);
+                        handleVariableCompletions(methodReference, project, resultSet, position);
                     }
                 }
             }

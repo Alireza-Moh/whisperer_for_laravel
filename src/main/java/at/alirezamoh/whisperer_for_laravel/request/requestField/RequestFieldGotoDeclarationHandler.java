@@ -1,6 +1,7 @@
 package at.alirezamoh.whisperer_for_laravel.request.requestField;
 
 import at.alirezamoh.whisperer_for_laravel.request.requestField.util.RequestFieldUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.MethodUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
 import com.intellij.codeInsight.navigation.actions.GotoDeclarationHandler;
 import com.intellij.openapi.actionSystem.DataContext;
@@ -54,7 +55,20 @@ public class RequestFieldGotoDeclarationHandler implements GotoDeclarationHandle
         }
 
         parent = sourceElement.getParent();
-        return parent instanceof FieldReferenceImpl fieldReference ? fieldReference.getClassReference() : null;
+        if (parent instanceof FieldReferenceImpl fieldReference) {
+            return fieldReference.getClassReference();
+        }
+
+        if (RequestFieldUtils.isInsideCorrectMethod(sourceElement, parent.getProject())) {
+            MethodReference methodReference = MethodUtils.resolveMethodReference(sourceElement, 10);
+
+            if (methodReference != null) {
+                return methodReference.getClassReference();
+            }
+            return null;
+        }
+
+        return null;
     }
 
     private @Nullable PsiElement[] findDeclarationTargets(PsiElement element, Project project, PsiElement contextElement) {
