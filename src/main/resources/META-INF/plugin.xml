@@ -31,7 +31,7 @@
                 <li>Adds support for accessing request fields via a new request methods [input(), string(), integer(), boolean(), float()]</li>
                 <li>Improves support for additional form request field access patterns</li>
                 <li>Searches for table names in models</li>
-                <li>Fixes some bugs.</li>
+                <li>Fixes some bugs</li>
             </ul>
         ]]>
     </change-notes>
