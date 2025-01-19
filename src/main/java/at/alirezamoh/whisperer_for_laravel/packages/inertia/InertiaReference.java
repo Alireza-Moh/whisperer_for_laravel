@@ -76,7 +76,12 @@ public class InertiaReference extends PsiReferenceBase<PsiElement> {
             );
         }
 
-        String[] paths = settings.getInertiaPageComponentRootPath().split(";");
+        String inertiaPaths = settings.getInertiaPageComponentRootPath();
+        if (inertiaPaths == null) {
+            return references;
+        }
+
+        String[] paths = inertiaPaths.split(";");
         paths = Arrays.stream(paths)
             .filter(path -> !path.isEmpty())
             .toArray(String[]::new);
