@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "at.alirezamoh.whisperer-for-laravel"
-version = "1.1.3"
+version = "1.1.4"
 
 repositories {
     mavenCentral()
