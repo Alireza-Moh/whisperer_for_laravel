@@ -1,23 +1,54 @@
-# ![Whisperer For Laravel](src/main/resources/META-INF/pluginIcon.svg)
+# Whisperer for Laravel
 
-[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
-![JetBrains Plugin Version](https://img.shields.io/jetbrains/plugin/v/at.alirezamoh.whisperer_for_laravel)
+Whisperer for Laravel is a PhpStorm plugin to help with Laravel development. It provides code completion for views, routes and more...
 
-# Whisperer For Laravel
+## Features
 
-Whisperer For Laravel is a PhpStorm plugin designed to boost your productivity by streamlining the development process for Laravel applications. With a set of powerful features, this plugin helps you work faster when developing Laravel applications in PhpStorm.
+- **Code Generation**: Quickly generate laravel components such as Eloquent models, migrations, controllers, seeders, jobs, and more.
+- **Code Completion**: Autocomplete for form requests, table names, Blade templates, routes, validation rules and others.
+- **Eloquent Magic Fields**: Generate helper code for Eloquent fields, linking them to migrations for enhanced PhpStorm support.
+- **Inertia.js Support**: Autocomplete and navigation for Inertia pages.
+- **Blade Components**: Autocompletion for Blade view files and components.
+- **Config Keys**: Intelligent autocompletion for configuration keys and files.
 
-[Documentation](https://alireza-moh.github.io/whisperer-for-laravel-docs/)
+---
 
-[Issues](https://github.com/Alireza-Moh/whisperer_for_laravel/issues)
+## Installation
 
-[Plugin](https://plugins.jetbrains.com/plugin/26042-whisperer-for-laravel)
+To install Whisperer for Laravel in PhpStorm:
+1. Navigate to `File > Settings > Plugins > Marketplace`.
+2. Search for **Whisperer for Laravel** and install it.
 
-Feature ideas and suggestions are always welcome! If you have an idea or a request to enhance Whisperer for Laravel,
-feel free to open an issue or get in touch. Your input plays a vital role in improving the plugin
-and making it more helpful for everyone! 🚀
+---
 
-## License
+## Code Generation
 
-This plugin is licensed under the MIT License.
+Whisperer for Laravel provides a wide range of code generation templates. Access them via the **Code Generation** option in the main menu
+
+### Available Code Generations
+
+- Eloquent Model
+- Migration
+- Controller
+- Database Seeder
+- Config File
+- Blade Component
+- Console Command
+- View
+- Job
+- Validation Rule
+- Policy
+- Observer
+- Mailable
+- Exception
+- Event Listener
+- Middleware
+- Json Resource / Collection
+- Form Request
+- Eloquent Scope / Cast
+- Broadcasting Channel
+- Database Factory
+- View Composer
+
+---
 
