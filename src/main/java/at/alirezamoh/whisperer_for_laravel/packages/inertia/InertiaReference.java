@@ -70,13 +70,13 @@ public class InertiaReference extends PsiReferenceBase<PsiElement> {
         SettingsState settings = SettingsState.getInstance(project);
 
         String defaultPath = "";
-        if (!settings.isLaravelDirectoryEmpty()) {
+        if (!settings.isProjectDirectoryEmpty()) {
             defaultPath = StrUtils.removeDoubleForwardSlashes(
-                StrUtils.addSlashes(settings.getLaravelDirectoryPath()) + defaultPath
+                StrUtils.addSlashes(settings.getProjectDirectoryPath()) + defaultPath
             );
         }
 
-        String inertiaPaths = settings.getInertiaPageComponentRootPath();
+        String inertiaPaths = settings.getInertiaPageRootPath();
         if (inertiaPaths == null) {
             return references;
         }

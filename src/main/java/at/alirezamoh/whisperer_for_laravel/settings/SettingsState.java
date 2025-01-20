@@ -24,7 +24,7 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
     /**
      * The root directory where the whole laravel project is ===> default value = the root of the opened project
      */
-    private String laravelDirectoryPath;
+    private String projectDirectoryPath;
 
     /**
      * The type of the project (Standard or Module-based)
@@ -44,7 +44,7 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
     /**
      * The path for the inertia pages components
      */
-    private String inertiaPageComponentRootPath;
+    private String inertiaPageRootPath;
 
     public static SettingsState getInstance(@NotNull Project foundedProject) {
         project = foundedProject;
@@ -70,12 +70,12 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
         PersistentStateComponent.super.initializeComponent();
     }
 
-    public String getLaravelDirectoryPath() {
-        return laravelDirectoryPath;
+    public String getProjectDirectoryPath() {
+        return projectDirectoryPath;
     }
 
-    public void setLaravelDirectoryPath(String laravelDirectoryPath) {
-        this.laravelDirectoryPath = laravelDirectoryPath;
+    public void setProjectDirectoryPath(String projectDirectoryPath) {
+        this.projectDirectoryPath = projectDirectoryPath;
     }
 
     public String getProjectType() {
@@ -102,12 +102,12 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
         this.moduleSrcDirectoryPath = moduleSrcDirectoryPath;
     }
 
-    public String getInertiaPageComponentRootPath() {
-        return inertiaPageComponentRootPath;
+    public String getInertiaPageRootPath() {
+        return inertiaPageRootPath;
     }
 
-    public void setInertiaPageComponentRootPath(String inertiaPageComponentRootPath) {
-        this.inertiaPageComponentRootPath = inertiaPageComponentRootPath;
+    public void setInertiaPageRootPath(String inertiaPageRootPath) {
+        this.inertiaPageRootPath = inertiaPageRootPath;
     }
 
     /**
@@ -118,8 +118,8 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
         return "Module based Application".equals(projectType);
     }
 
-    public boolean isLaravelDirectoryEmpty() {
-        return laravelDirectoryPath == null || laravelDirectoryPath.isEmpty();
+    public boolean isProjectDirectoryEmpty() {
+        return projectDirectoryPath == null || projectDirectoryPath.isEmpty();
     }
 
     public boolean isModuleSrcDirectoryEmpty() {

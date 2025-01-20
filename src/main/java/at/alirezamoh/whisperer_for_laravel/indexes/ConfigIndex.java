@@ -118,9 +118,9 @@ public class ConfigIndex extends FileBasedIndexExtension<String, String> {
         SettingsState settings = SettingsState.getInstance(project);
         String pathPart = "/config/";
 
-        if (!settings.isLaravelDirectoryEmpty()) {
+        if (!settings.isProjectDirectoryEmpty()) {
             pathPart = StrUtils.addSlashes(
-                settings.getLaravelDirectoryPath(),
+                settings.getProjectDirectoryPath(),
                 false,
                 true
             )

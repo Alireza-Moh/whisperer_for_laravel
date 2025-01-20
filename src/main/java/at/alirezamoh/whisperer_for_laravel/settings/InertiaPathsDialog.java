@@ -43,7 +43,7 @@ public class InertiaPathsDialog extends DialogWrapper {
 
     @Override
     protected @Nullable JComponent createCenterPanel() {
-        ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar("MyCustomToolbar", actionGroup, true);
+        ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar("InertiaPathDialog", actionGroup, true);
         toolbar.setTargetComponent(inertiaPathsField);
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.add(new JScrollPane(pathsList), BorderLayout.CENTER);

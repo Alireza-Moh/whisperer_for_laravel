@@ -142,10 +142,10 @@ public class EventProvider {
      * @return The full directory path
      */
     private String buildFullPath(String relativePath) {
-        String basePath = projectSettingState.isLaravelDirectoryEmpty()
+        String basePath = projectSettingState.isProjectDirectoryEmpty()
             ? ""
             : StrUtils.addSlashes(
-                projectSettingState.getLaravelDirectoryPath(),
+                projectSettingState.getProjectDirectoryPath(),
                 false,
                 true
             );

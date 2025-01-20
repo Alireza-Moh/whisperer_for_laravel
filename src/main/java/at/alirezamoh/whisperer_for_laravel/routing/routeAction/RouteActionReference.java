@@ -92,8 +92,8 @@ public class RouteActionReference extends PsiReferenceBase<PsiElement> {
         Map<String, PsiElement> elements = new HashMap<>();
         String path = DEFAULT_CONTROLLER_PATH;
 
-        if (!settingsState.isLaravelDirectoryEmpty()) {
-            String laravelDir = StrUtils.addSlashes(settingsState.getLaravelDirectoryPath());
+        if (!settingsState.isProjectDirectoryEmpty()) {
+            String laravelDir = StrUtils.addSlashes(settingsState.getProjectDirectoryPath());
             path = laravelDir + path;
         }
 
@@ -117,8 +117,8 @@ public class RouteActionReference extends PsiReferenceBase<PsiElement> {
     private void collectControllersFromModules(Map<String, PsiElement> elements) {
         if (settingsState.isModuleApplication()) {
             String modulesPath = settingsState.getModulesDirectoryPath();
-            if (!settingsState.isLaravelDirectoryEmpty()) {
-                modulesPath = StrUtils.addSlashes(settingsState.getLaravelDirectoryPath())
+            if (!settingsState.isProjectDirectoryEmpty()) {
+                modulesPath = StrUtils.addSlashes(settingsState.getProjectDirectoryPath())
                     + StrUtils.addSlashes(modulesPath, true, false);
             }
 

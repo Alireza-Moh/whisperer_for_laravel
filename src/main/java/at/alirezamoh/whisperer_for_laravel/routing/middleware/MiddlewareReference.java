@@ -96,8 +96,8 @@ public class MiddlewareReference extends PsiReferenceBase<PsiElement> {
         String filename = BOOTSTRAP_APP_FILE;
         String baseMiddlewareFilePath = BASE_MIDDLEWARE_FILE_PATH;
 
-        if (!settingsState.isLaravelDirectoryEmpty()) {
-            String laravelDir = StrUtils.addSlashes(settingsState.getLaravelDirectoryPath(), false, true);
+        if (!settingsState.isProjectDirectoryEmpty()) {
+            String laravelDir = StrUtils.addSlashes(settingsState.getProjectDirectoryPath(), false, true);
             filename = laravelDir + filename;
             baseMiddlewareFilePath = laravelDir + baseMiddlewareFilePath;
         }

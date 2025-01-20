@@ -43,39 +43,39 @@ public class SettingConfigurable implements Configurable {
         String currentProjectRootDirectory = settingsComponent.getProjectRootDirectoryPath();
         String currentModuleRootDirectory = settingsComponent.getModulesDirectoryPath();
         String currentModuleSrcDirectory = settingsComponent.getModuleSrcDirectoryPath();
-        String currentInertiaPageComponentRootPath = settingsComponent.getInertiaPageComponentRootPath();
+        String currentInertiaPageRootPath = settingsComponent.getInertiaPageRootPath();
 
         String storedProjectType = settingsState.getProjectType();
-        String storedProjectRootDirectory = settingsState.getLaravelDirectoryPath();
+        String storedProjectRootDirectory = settingsState.getProjectDirectoryPath();
         String storedModuleRootDirectory = settingsState.getModulesDirectoryPath();
         String storedModuleSrcDirectory = settingsState.getModuleSrcDirectoryPath();
-        String storedInertiaPageComponentRootPath = settingsState.getInertiaPageComponentRootPath();
+        String storedInertiaPageRootPath = settingsState.getInertiaPageRootPath();
 
         return !Objects.equals(currentProjectType, storedProjectType)
             || !Objects.equals(currentProjectRootDirectory, storedProjectRootDirectory)
             || !Objects.equals(currentModuleRootDirectory, storedModuleRootDirectory)
             || !Objects.equals(currentModuleSrcDirectory, storedModuleSrcDirectory)
-            || !Objects.equals(currentInertiaPageComponentRootPath, storedInertiaPageComponentRootPath);
+            || !Objects.equals(currentInertiaPageRootPath, storedInertiaPageRootPath);
     }
 
     @Override
     public void apply() throws ConfigurationException {
         validate();
 
-        settingsState.setLaravelDirectoryPath(settingsComponent.getProjectRootDirectoryPath());
+        settingsState.setProjectDirectoryPath(settingsComponent.getProjectRootDirectoryPath());
         settingsState.setProjectType(settingsComponent.getProjectType());
         settingsState.setModulesDirectoryPath(settingsComponent.getModulesDirectoryPath());
         settingsState.setModuleSrcDirectoryPath(settingsComponent.getModuleSrcDirectoryPath());
-        settingsState.setInertiaPageComponentRootPath(settingsComponent.getInertiaPageComponentRootPath());
+        settingsState.setInertiaPageRootPath(settingsComponent.getInertiaPageRootPath());
     }
 
     @Override
     public void reset() {
-        settingsComponent.setProjectRootDirectoryPath(settingsState.getLaravelDirectoryPath());
+        settingsComponent.setProjectRootDirectoryPath(settingsState.getProjectDirectoryPath());
         settingsComponent.setProjectTypeComboBox(settingsState.getProjectType());
         settingsComponent.setModulesDirectoryPathTextField(settingsState.getModulesDirectoryPath());
         settingsComponent.setModuleSrcDirectoryPathTextField(settingsState.getModuleSrcDirectoryPath());
-        settingsComponent.setInertiaPageComponentRootPath(settingsState.getInertiaPageComponentRootPath());
+        settingsComponent.setInertiaPageRootPath(settingsState.getInertiaPageRootPath());
     }
 
     @Override
