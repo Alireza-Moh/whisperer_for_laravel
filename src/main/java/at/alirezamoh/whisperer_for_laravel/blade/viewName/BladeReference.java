@@ -80,9 +80,9 @@ public class BladeReference extends PsiReferenceBase<PsiElement> {
         SettingsState settingsState = SettingsState.getInstance(project);
         String defaultViewPath = ProjectDefaultPaths.VIEW_PATH;
 
-        if (!settingsState.isLaravelDirectoryEmpty()) {
+        if (!settingsState.isProjectDirectoryEmpty()) {
             defaultViewPath = StrUtils.addSlashes(
-                settingsState.getLaravelDirectoryPath(),
+                settingsState.getProjectDirectoryPath(),
                 false,
                 true
             ) + ProjectDefaultPaths.VIEW_PATH;

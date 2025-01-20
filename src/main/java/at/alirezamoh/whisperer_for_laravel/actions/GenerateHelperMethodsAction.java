@@ -94,8 +94,8 @@ public class GenerateHelperMethodsAction extends BaseAction {
             SettingsState settingsState = SettingsState.getInstance(project);
             String path = ProjectDefaultPaths.WHISPERER_FOR_LARAVEL_DIR_PATH;
 
-            if (!settingsState.isLaravelDirectoryEmpty()) {
-                path = StrUtils.addSlashes(settingsState.getLaravelDirectoryPath(), false, true) + path;
+            if (!settingsState.isProjectDirectoryEmpty()) {
+                path = StrUtils.addSlashes(settingsState.getProjectDirectoryPath(), false, true) + path;
             }
 
             PsiDirectory pluginVendor = DirectoryUtils.getDirectory(project, path);

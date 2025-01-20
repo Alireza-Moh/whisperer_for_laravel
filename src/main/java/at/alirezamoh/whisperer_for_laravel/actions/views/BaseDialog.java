@@ -192,8 +192,8 @@ public abstract class BaseDialog extends DialogWrapper {
      */
     private void addRootApp() {
         String path = "app";
-        if (projectSettingState.isLaravelDirectoryEmpty()) {
-            path = StrUtils.addSlashes(projectSettingState.getLaravelDirectoryPath()) + "app";
+        if (projectSettingState.isProjectDirectoryEmpty()) {
+            path = StrUtils.addSlashes(projectSettingState.getProjectDirectoryPath()) + "app";
         }
         PsiDirectory rootApp = DirectoryUtils.getDirectory(project, path);
         if (rootApp != null) {

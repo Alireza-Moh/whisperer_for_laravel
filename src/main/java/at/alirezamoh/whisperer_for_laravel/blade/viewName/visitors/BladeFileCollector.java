@@ -35,11 +35,6 @@ public class BladeFileCollector {
      */
     private SettingsState projectSettingState;
 
-    /**
-     * Should save the blade file psiFile
-     */
-    private boolean withPsiFile;
-
     public BladeFileCollector(Project project) {
         this.project = project;
         this.projectSettingState = SettingsState.getInstance(project);
@@ -47,9 +42,9 @@ public class BladeFileCollector {
 
     public BladeFileCollector startSearching() {
         String defaultViewPath = ProjectDefaultPaths.VIEW_PATH;
-        if (!projectSettingState.isLaravelDirectoryEmpty()) {
+        if (!projectSettingState.isProjectDirectoryEmpty()) {
             defaultViewPath = StrUtils.addSlashes(
-                projectSettingState.getLaravelDirectoryPath(),
+                projectSettingState.getProjectDirectoryPath(),
                 false,
                 true
             ) + ProjectDefaultPaths.VIEW_PATH;

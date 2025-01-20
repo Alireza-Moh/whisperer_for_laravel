@@ -15,8 +15,8 @@ public class LaravelStartupActivity implements ProjectActivity {
         if (!MethodUtils.isDumbMode(project)) {
             SettingsState settingsState = SettingsState.getInstance(project);
 
-            if (settingsState.isLaravelDirectoryEmpty()) {
-                settingsState.setLaravelDirectoryPath("");
+            if (settingsState.isProjectDirectoryEmpty()) {
+                settingsState.setProjectDirectoryPath("");
             }
 
             if (settingsState.getProjectType() == null) {
@@ -31,8 +31,8 @@ public class LaravelStartupActivity implements ProjectActivity {
                 settingsState.setModuleSrcDirectoryPath("app");
             }
 
-            if (settingsState.getInertiaPageComponentRootPath() == null) {
-                settingsState.setInertiaPageComponentRootPath("resources/js/Pages;");
+            if (settingsState.getInertiaPageRootPath() == null) {
+                settingsState.setInertiaPageRootPath("resources/js/Pages;");
             }
         }
 
