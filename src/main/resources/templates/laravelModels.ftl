@@ -4,7 +4,7 @@
 
 namespace ${namespace} {
 
-   use IdeaWhispererForLaravel\Helper\BaseQueryBuilder;
+   use IdeaWhispererForLaravel\QueryHelper\BaseQueryBuilder;
    use Illuminate\Support\Carbon;
    use Illuminate\Database\Eloquent\Collection as _BaseEloquentCollection;
    use Illuminate\Database\Eloquent\Model;
