@@ -7,14 +7,13 @@
 
     <description>
         <![CDATA[
-        <a href="https://alireza-moh.github.io/whisperer-for-laravel-docs/">Documentation</a><br>
+        <a href="https://github.com/Alireza-Moh/whisperer_for_laravel/">Documentation</a><br>
 
-        Whisperer For Laravel is a PhpStorm plugin for Laravel applications
-        With a set of powerful features, this plugin helps you work faster when developing Laravel applications in PhpStorm.
+        Whisperer For Laravel is a PhpStorm plugin for Laravel applications. this plugin helps you work faster when developing Laravel applications in PhpStorm.
 
         <h3>Features:</h3>
         <ul>
-            <li>Code Generation Helpers</li>
+            <li>Code Generation Templates</li>
             <li>Completions for: Route, validation, request fields, gates, config, views and a lot more</li>
             <li>Blade components support</li>
             <li>Laravel packages support: InertiaJs</li>
@@ -42,7 +41,7 @@
     <depends>com.intellij.modules.platform</depends>
     <depends>com.jetbrains.php.blade</depends>
 
-    <version>1.1.4</version>
+    <version>1.1.5</version>
 
     <extensions defaultExtensionNs="com.intellij">
         <notificationGroup id="NotificationGroup" displayType="BALLOON"/>
@@ -73,7 +72,6 @@
         <completion.contributor language="XML" implementationClass="at.alirezamoh.whisperer_for_laravel.blade.component.BladeXComponentCompletionContributor"/>
         <completion.contributor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.request.requestField.RequestFieldCompletionContributor"/>
         <completion.contributor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.routing.namespace.RouteNamespaceCompletionContributor"/>
-        <completion.contributor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.env.EnvCompletionContributor"/>
 
         <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.blade.component.BladeXComponentGotoDeclarationHandler"/>
         <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.request.validation.RuleValidationGotoDeclarationHandler"/>
@@ -91,16 +89,10 @@
             <add-to-group group-id="MainMenu" anchor="last"/>
 
             <action id="at.alirezamoh.whisperer_for_laravel.ActionChooserAction" class="at.alirezamoh.whisperer_for_laravel.actions.ActionChooserAction" text="Search for Code Generation" icon="/icons/laravelIcon.svg">
-                <keyboard-shortcut first-keystroke="control shift PERIOD" keymap="$default" replace-all="false" />
             </action>
 
             <action id="at.alirezamoh.whisperer_for_laravel.GenerateHelperMethodsAction" class="at.alirezamoh.whisperer_for_laravel.actions.GenerateHelperMethodsAction" text="Generate Helper Methods" icon="/icons/laravelIcon.svg">
             </action>
-
-            <action id="at.alirezamoh.whisperer_for_laravel.EloquentNonGroupAction" class="at.alirezamoh.whisperer_for_laravel.actions.EloquentNonGroupAction" text="Create Eloquent Model" icon="/icons/laravelIcon.svg">
-            </action>
-
-            <separator />
 
             <group id="at.alirezamoh.whisperer_for_laravel.AllCodeGenerationActionsGroupAction" popup="true" icon="/icons/laravelIcon.svg" text="Available Code Generations">
                 &gt;
@@ -177,11 +169,6 @@
                 <action id="at.alirezamoh.whisperer_for_laravel.ViewComposerAction" class="at.alirezamoh.whisperer_for_laravel.actions.ViewComposerAction" text="Create View Composer" icon="/icons/laravelIcon.svg">
                 </action>
             </group>
-
-            <separator />
-
-            <action id="at.alirezamoh.whisperer_for_laravel.WhispererForLaravelSettingsNavigationAction" class="at.alirezamoh.whisperer_for_laravel.actions.WhispererForLaravelSettingsNavigationAction" text="Whisper For Laravel Settings" icon="/icons/laravelIcon.svg">
-            </action>
         </group>
     </actions>
 </idea-plugin>
