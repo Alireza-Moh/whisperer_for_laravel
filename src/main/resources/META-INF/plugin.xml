@@ -7,8 +7,6 @@
 
     <description>
         <![CDATA[
-        <a href="https://github.com/Alireza-Moh/whisperer_for_laravel/">Documentation</a><br>
-
         Whisperer For Laravel is a PhpStorm plugin for Laravel applications. this plugin helps you work faster when developing Laravel applications in PhpStorm.
 
         <h3>Features:</h3>
@@ -41,7 +39,7 @@
     <depends>com.intellij.modules.platform</depends>
     <depends>com.jetbrains.php.blade</depends>
 
-    <version>1.1.4</version>
+    <version>1.1.5</version>
 
     <extensions defaultExtensionNs="com.intellij">
         <notificationGroup id="NotificationGroup" displayType="BALLOON"/>
