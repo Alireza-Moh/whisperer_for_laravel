@@ -165,6 +165,11 @@
                 <action id="at.alirezamoh.whisperer_for_laravel.ViewComposerAction" class="at.alirezamoh.whisperer_for_laravel.actions.ViewComposerAction" text="Create View Composer From Template" icon="/icons/laravelIcon.svg">
                 </action>
             </group>
+
+            <separator />
+
+            <action id="at.alirezamoh.whisperer_for_laravel.WhispererForLaravelSettingsNavigationAction" class="at.alirezamoh.whisperer_for_laravel.actions.WhispererForLaravelSettingsNavigationAction" text="Whisper For Laravel Settings" icon="/icons/laravelIcon.svg">
+            </action>
         </group>
     </actions>
 </idea-plugin>
