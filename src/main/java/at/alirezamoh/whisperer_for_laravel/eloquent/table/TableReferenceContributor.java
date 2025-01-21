@@ -12,6 +12,9 @@ import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import org.jetbrains.annotations.NotNull;
 
 public class TableReferenceContributor extends PsiReferenceContributor {
+    /**
+     * A list of fully qualified classes
+     */
     private final static String[] QUERY_BUILDERS = {
         "\\Illuminate\\Support\\Facades\\DB",
         "\\Illuminate\\Database\\Query\\Builder",
@@ -54,6 +57,12 @@ public class TableReferenceContributor extends PsiReferenceContributor {
         );
     }
 
+    /**
+     * Checks if the given PSI element is inside a recognized query builder method
+     *
+     * @param psiElement The PSI element representing a string literal
+     * @return true or false
+     */
     private boolean isInsideCorrectMethod(PsiElement psiElement) {
         MethodReference methodReference = MethodUtils.resolveMethodReference(psiElement, 10);
 
@@ -62,6 +71,12 @@ public class TableReferenceContributor extends PsiReferenceContributor {
             && isTableParam(methodReference, psiElement);
     }
 
+    /**
+     * Checks if the method name is one of the known table-related methods, e.g. "table", "from"
+     *
+     * @param methodReference The method reference to check
+     * @return true or false
+     */
     private boolean isTableMethod(MethodReference methodReference) {
         String methodName = methodReference.getName();
 
@@ -72,6 +87,14 @@ public class TableReferenceContributor extends PsiReferenceContributor {
         return LaravelPaths.DB_TABLE_METHODS.containsKey(methodName);
     }
 
+    /**
+     * Checks whether the position of the string argument matches the parameter index
+     * required for table references in the recognized query builder methods
+     *
+     * @param method   The method reference
+     * @param position The string literal PSI element
+     * @return true or false
+     */
     private boolean isTableParam(MethodReference method, PsiElement position) {
         int paramIndex = MethodUtils.findParamIndex(position, false);
         Integer paramPosition = LaravelPaths.DB_TABLE_METHODS.get(method.getName());

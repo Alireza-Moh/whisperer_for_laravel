@@ -89,7 +89,7 @@
             <action id="at.alirezamoh.whisperer_for_laravel.ActionChooserAction" class="at.alirezamoh.whisperer_for_laravel.actions.ActionChooserAction" text="Search For Code Creation Templates" icon="/icons/laravelIcon.svg">
             </action>
 
-            <action id="at.alirezamoh.whisperer_for_laravel.GenerateHelperMethodsAction" class="at.alirezamoh.whisperer_for_laravel.actions.GenerateHelperMethodsAction" text="Create Helper Methods" icon="/icons/laravelIcon.svg">
+            <action id="at.alirezamoh.whisperer_for_laravel.GenerateHelperMethodsAction" class="at.alirezamoh.whisperer_for_laravel.actions.GenerateHelperMethodsAction" text="Create Helper Methods For Eloquent/DB" icon="/icons/laravelIcon.svg">
             </action>
 
             <group id="at.alirezamoh.whisperer_for_laravel.AllCodeGenerationActionsGroupAction" popup="true" icon="/icons/laravelIcon.svg" text="All Available Code Creation Templates">
