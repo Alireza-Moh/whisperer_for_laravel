@@ -86,7 +86,7 @@
         <group id="at.alirezamoh.whisperer_for_laravel.Actions" class="at.alirezamoh.whisperer_for_laravel.actions.StartPluginAction" text="Whisperer For Laravel" popup="true" description="The start point of the laravel plugin helper">
             <add-to-group group-id="MainMenu" anchor="last"/>
 
-            <action id="at.alirezamoh.whisperer_for_laravel.ActionChooserAction" class="at.alirezamoh.whisperer_for_laravel.actions.ActionChooserAction" text="Explore Code Creation Templates" icon="/icons/laravelIcon.svg">
+            <action id="at.alirezamoh.whisperer_for_laravel.ActionChooserAction" class="at.alirezamoh.whisperer_for_laravel.actions.ActionChooserAction" text="Search For Code Creation Templates" icon="/icons/laravelIcon.svg">
             </action>
 
             <action id="at.alirezamoh.whisperer_for_laravel.GenerateHelperMethodsAction" class="at.alirezamoh.whisperer_for_laravel.actions.GenerateHelperMethodsAction" text="Create Helper Methods" icon="/icons/laravelIcon.svg">
