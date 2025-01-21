@@ -54,7 +54,7 @@
         <projectConfigurable parentId="language" instance="at.alirezamoh.whisperer_for_laravel.settings.SettingConfigurable" id="whisperer_for_laravel_settings" displayName="Whisperer For Laravel" nonDefaultProject="true"/>
         <projectService serviceImplementation="at.alirezamoh.whisperer_for_laravel.settings.SettingsState"/>
 
-        <statusBarWidgetFactory implementation="at.alirezamoh.whisperer_for_laravel.extension.LaravelVersion" id="LaravelVersion" order="first" />
+        <statusBarWidgetFactory implementation="at.alirezamoh.whisperer_for_laravel.statusBar.LaravelVersion" id="LaravelVersion" order="first" />
 
         <psi.referenceContributor language="PHP" implementation="at.alirezamoh.whisperer_for_laravel.config.ConfigReferenceContributor"/>
         <psi.referenceContributor language="PHP" implementation="at.alirezamoh.whisperer_for_laravel.blade.viewName.BladeReferenceContributor"/>
@@ -83,7 +83,7 @@
     </extensions>
 
     <actions>
-        <group id="at.alirezamoh.whisperer_for_laravel.Actions" class="at.alirezamoh.whisperer_for_laravel.actions.StartPluginAction" text="Whisperer For Laravel" popup="true" description="The start point of the laravel plugin helper">
+        <group id="at.alirezamoh.whisperer_for_laravel.Actions" class="at.alirezamoh.whisperer_for_laravel.actions.StartPluginAction" text="Whisperer For Laravel" popup="true" description="The start point of the plugin">
             <add-to-group group-id="MainMenu" anchor="last"/>
 
             <action id="at.alirezamoh.whisperer_for_laravel.ActionChooserAction" class="at.alirezamoh.whisperer_for_laravel.actions.ActionChooserAction" text="Search For Code Creation Templates" icon="/icons/laravelIcon.svg">

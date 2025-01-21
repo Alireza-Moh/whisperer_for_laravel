@@ -72,7 +72,7 @@ public class InertiaPathsDialog extends DialogWrapper {
             String selectedPath = pathsList.getSelectedValue();
             String newPath = Messages.showInputDialog(
                 "Enter a new path",
-                "Pages Component",
+                "New Path",
                 AllIcons.Ide.ConfigFile,
                 selectedPath,
                 null
@@ -95,7 +95,7 @@ public class InertiaPathsDialog extends DialogWrapper {
             if (selectedPath != null) {
                 String newPath = Messages.showInputDialog(
                     "Edit path",
-                    "Pages Component",
+                    "New Path",
                     AllIcons.Ide.ConfigFile,
                     selectedPath,
                     null

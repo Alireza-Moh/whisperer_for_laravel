@@ -110,10 +110,6 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
         this.inertiaPageRootPath = inertiaPageRootPath;
     }
 
-    /**
-     * Checks if the project is a module-based application
-     * @return True if the project is a module-based application, false otherwise
-     */
     public boolean isModuleApplication() {
         return "Module based Application".equals(projectType);
     }

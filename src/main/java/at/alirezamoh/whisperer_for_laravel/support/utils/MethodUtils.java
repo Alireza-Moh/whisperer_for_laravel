@@ -13,6 +13,13 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 public class MethodUtils extends PhpElementVisitor {
+    /**
+     * Resolves the possible PHP classes for a given method
+     *
+     * @param method  The method reference whose classes should be resolved
+     * @param project The current project
+     * @return A list of resolved {@link PhpClassImpl} objects
+     */
     public static List<PhpClassImpl> resolveMethodClasses(MethodReference method, Project project) {
         List<PhpClassImpl> classes = new ArrayList<>();
         PhpIndex phpIndex = PhpIndex.getInstance(project);
@@ -23,6 +30,13 @@ public class MethodUtils extends PhpElementVisitor {
         return classes;
     }
 
+    /**
+     * Recursively searches up the PSI tree to find the nearest {@link MethodReference}
+     *
+     * @param element    The starting PSI element
+     * @param depthLimit Stop searching after a certain depth
+     * @return The found {@link MethodReference}, or {@code null} if not found
+     */
     public static @Nullable MethodReference resolveMethodReference(PsiElement element, int depthLimit) {
         if (element == null || depthLimit <= 0) {
             return null;
@@ -35,6 +49,13 @@ public class MethodUtils extends PhpElementVisitor {
         return resolveMethodReference(element.getParent(), depthLimit - 1);
     }
 
+    /**
+     * Recursively searches up the PSI tree to find the nearest {@link FunctionReference}.
+     *
+     * @param element    The starting PSI element
+     * @param depthLimit Stop searching after a certain depth
+     * @return The found {@link FunctionReference}, or {@code null} if not found
+     */
     public static @Nullable FunctionReference resolveFunctionReference(PsiElement element, int depthLimit) {
         if (element == null || depthLimit <= 0) {
             return null;
@@ -47,6 +68,14 @@ public class MethodUtils extends PhpElementVisitor {
         return resolveFunctionReference(element.getParent(), depthLimit - 1);
     }
 
+    /**
+     * Determines the index of a parameter within a {@link ParameterList} or
+     * {@link ArrayCreationExpressionImpl}, optionally allowing arrays
+     *
+     * @param element     The PSI element to locate
+     * @param allowArray  Whether array elements should also be considered as parameters
+     * @return The parameter index, or {@code -1} if not found
+     */
     public static int findParamIndex(PsiElement element, boolean allowArray) {
         if (element == null) {
             return -1;
@@ -72,10 +101,14 @@ public class MethodUtils extends PhpElementVisitor {
         }
     }
 
-    public static boolean isDumbMode(Project project) {
-        return com.intellij.openapi.project.DumbService.isDumb(project);
-    }
-
+    /**
+     * Resolves php classes to actual {@link PhpClassImpl} instances
+     * accounting for aliases by using their original references if available
+     *
+     * @param project   The current project
+     * @param className The FQN to resolve
+     * @param classes   A list to which resolved classes are added
+     */
     private static void collectClasses(Project project, String className, List<PhpClassImpl> classes) {
         PhpIndex phpIndex = PhpIndex.getInstance(project);
         for (PhpClass phpClass : phpIndex.getClassesByFQN(className)) {

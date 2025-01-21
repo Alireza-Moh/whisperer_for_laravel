@@ -15,6 +15,12 @@ import java.io.FileReader;
 public class PluginUtils {
     private final static Logger LOG = Logger.getInstance("Whisper-For-Laravel-Plugin");
 
+    /**
+     * Retrieves the plugin's "vendor" (whisper_for_laravel) directory for the given project
+     *
+     * @param project The current project
+     * @return A {@link PsiDirectory} pointing to the vendor directory, or {@code null} if not found
+     */
     public static @Nullable PsiDirectory getPluginVendor(Project project) {
         SettingsState settingsState = SettingsState.getInstance(project);
         String path = ProjectDefaultPaths.WHISPERER_FOR_LARAVEL_DIR_PATH;
@@ -26,16 +32,35 @@ public class PluginUtils {
         return DirectoryUtils.getDirectory(project, path);
     }
 
+    /**
+     * Returns the Logger
+     *
+     * @return A {@link Logger} instance for logging plugin-related information
+     */
     public static Logger getLOG() {
         return LOG;
     }
 
+    /**
+     * Checks if the Laravel framework appears uninstalled by verifying the absence
+     * of the <code>/vendor/laravel/framework/</code> directory in the project
+     *
+     * @param project The current project
+     * @return true for false
+     */
     public static boolean isLaravelFrameworkNotInstalled(Project project) {
         PsiDirectory psiDirectory = DirectoryUtils.getDirectory(project, "/vendor/laravel/framework/");
 
         return psiDirectory == null;
     }
 
+    /**
+     * Determines whether the given project is a Laravel project by inspecting
+     * the "composer.json" file for the "laravel/framework" requirement
+     *
+     * @param project The current project
+     * @return true or false
+     */
     public static boolean isLaravelProject(Project project) {
         File composerFile = getComposerFile(project);
         if (composerFile == null) {
@@ -53,6 +78,12 @@ public class PluginUtils {
         }
     }
 
+    /**
+     * Retrieves the Laravel version from the project's composer.json file, if present
+     *
+     * @param project The current project
+     * @return The Laravel framework version (e.g., "9.2"), or {@code null} if not found or unreadable
+     */
     public static @Nullable String laravelVersion(Project project) {
         File composerFile = getComposerFile(project);
 
@@ -75,6 +106,22 @@ public class PluginUtils {
         return null;
     }
 
+    /**
+     * Checks if the given project is currently in "dumb" mode (indexing)
+     *
+     * @param project The current project
+     * @return true or false
+     */
+    public static boolean isDumbMode(Project project) {
+        return com.intellij.openapi.project.DumbService.isDumb(project);
+    }
+
+    /**
+     * Finds the project's composer.json file based on the user-specified or default project path
+     *
+     * @param project The current project
+     * @return A {@link File} handle for "composer.json", or {@code null} if not found
+     */
     private static @Nullable File getComposerFile(Project project) {
         SettingsState settingsState = SettingsState.getInstance(project);
 

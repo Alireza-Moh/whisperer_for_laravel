@@ -1,6 +1,6 @@
 package at.alirezamoh.whisperer_for_laravel.settings;
 
-import at.alirezamoh.whisperer_for_laravel.support.utils.MethodUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.ProjectActivity;
 import kotlin.Unit;
@@ -12,7 +12,7 @@ public class LaravelStartupActivity implements ProjectActivity {
 
     @Override
     public @Nullable Object execute(@NotNull Project project, @NotNull Continuation<? super Unit> continuation) {
-        if (!MethodUtils.isDumbMode(project)) {
+        if (!PluginUtils.isDumbMode(project)) {
             SettingsState settingsState = SettingsState.getInstance(project);
 
             if (settingsState.isProjectDirectoryEmpty()) {
