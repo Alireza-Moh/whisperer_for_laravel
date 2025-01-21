@@ -120,6 +120,13 @@ public class PsiElementUtils {
         return StrUtils.removeQuotes(result);
     }
 
+    /**
+     * Checks if the given PSI element is a value in an array [key => value]
+     *
+     * @param element  The PSI element to check
+     * @param maxDepth Maximum number of parents to traverse up the PSI tree
+     * @return true or false
+     */
     public static boolean isInArrayValue(PsiElement element, int maxDepth) {
         PsiElement currentElement = element;
         int currentDepth = 0;
@@ -138,6 +145,13 @@ public class PsiElementUtils {
         return false;
     }
 
+    /**
+     * Determines if the given PSI element is part of an associative array
+     *
+     * @param element  The PSI element to check
+     * @param maxDepth Maximum number of parents to traverse up the PSI tree
+     * @return true or false
+     */
     public static boolean isAssocArray(PsiElement element, int maxDepth) {
         PsiElement currentElement = element;
         int depth = 0;
@@ -156,6 +170,13 @@ public class PsiElementUtils {
         return false;
     }
 
+    /**
+     * Determines if the given PSI element is part of a "regular" array [1, 2, "a"]
+     *
+     * @param element  The PSI element to check
+     * @param maxDepth Maximum number of parents to traverse up the PSI tree
+     * @return true or false
+     */
     public static boolean isRegularArray(PsiElement element, int maxDepth) {
         PsiElement currentElement = element;
         int depth = 0;
@@ -164,9 +185,8 @@ public class PsiElementUtils {
             if (currentElement instanceof ArrayCreationExpression arrayCreationExpression) {
                 Iterable<ArrayHashElement> iterator = arrayCreationExpression.getHashElements();
 
-                if (iterator == null) {
-                    return true;
-                } else if (!iterator.iterator().hasNext()) {
+                // If there are no hash elements, or no next element, it's a regular array
+                if (iterator == null || !iterator.iterator().hasNext()) {
                     return true;
                 }
 
@@ -179,6 +199,13 @@ public class PsiElementUtils {
         return false;
     }
 
+    /**
+     * Retrieves an {@link ArrayCreationExpression} representing an array
+     *
+     * @param element  The PSI element to start from
+     * @param maxDepth Maximum number of parents to traverse up the PSI tree
+     * @return The found {@link ArrayCreationExpression}, or {@code null} if not found or if it contains key-value pairs
+     */
     public static @Nullable ArrayCreationExpression getRegularArray(PsiElement element, int maxDepth) {
         PsiElement currentElement = element;
         int depth = 0;
@@ -187,9 +214,7 @@ public class PsiElementUtils {
             if (currentElement instanceof ArrayCreationExpression arrayCreationExpression) {
                 Iterable<ArrayHashElement> iterator = arrayCreationExpression.getHashElements();
 
-                if (iterator == null) {
-                    return arrayCreationExpression;
-                } else if (!iterator.iterator().hasNext()) {
+                if (iterator == null || !iterator.iterator().hasNext()) {
                     return arrayCreationExpression;
                 }
 
@@ -202,10 +227,23 @@ public class PsiElementUtils {
         return null;
     }
 
+    /**
+     * Resolves a file path to a {@link VirtualFile} using the local file system
+     *
+     * @param filePath A non-null string representing the file path to resolve.
+     * @return The corresponding {@link VirtualFile}, or {@code null} if the file was not found
+     */
     public static @Nullable VirtualFile resolveFilePath(@NotNull String filePath) {
         return LocalFileSystem.getInstance().findFileByPath(filePath);
     }
 
+    /**
+     * Retrieves the PSIFile of a given {@link VirtualFile}.
+     *
+     * @param file    The {@link VirtualFile} for which to get the PSI file
+     * @param project The current project
+     * @return The corresponding {@link PsiFile}, or {@code null} if it could not be resolved
+     */
     public static @Nullable PsiFile resolvePsiFile(@NotNull VirtualFile file, @NotNull Project project) {
         return PsiManager.getInstance(project).findFile(file);
     }

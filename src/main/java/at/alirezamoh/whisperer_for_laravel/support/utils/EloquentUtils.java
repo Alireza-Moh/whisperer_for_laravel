@@ -12,6 +12,9 @@ import com.jetbrains.php.lang.psi.elements.PhpClass;
 import java.util.*;
 
 public class EloquentUtils {
+    /**
+     * A list of supported PHP data types (for field extraction logic)
+     */
     private final static List<String> PHP_DATA_TYPES = Arrays.asList(
         "int",
         "float",
@@ -23,6 +26,15 @@ public class EloquentUtils {
         "mixed"
     );
 
+    /**
+     * Retrieves the attributes for the specified eloquent model by scanning eloquent_models file created by the plugin
+     * If {@code withRelations} is {@code true}, relation fields will also be included
+     *
+     * @param modelName      The name of the model class to look for
+     * @param withRelations  Whether to include fields that may represent relations
+     * @param project        The current project
+     * @return A list of extracted {@link Field} objects.
+     */
     public static List<Field> getFields(String modelName, boolean withRelations, Project project) {
         List<Field> fields = new ArrayList<>();
 
@@ -44,6 +56,15 @@ public class EloquentUtils {
         return fields;
     }
 
+
+    /**
+     * Extracts fields from a given PhpClass (eloquent model)
+     * If {@code withRelations} is {@code true}, all fields are included; otherwise, only fields
+     *
+     * @param phpClass       The PHP class which represents a eloquent model
+     * @param withRelations  Whether to include fields that may represent relations
+     * @param fields         A list to which the extracted {@link Field} instances are added
+     */
     public static void extractFieldsFromClass(PhpClass phpClass, boolean withRelations, List<Field> fields) {
         for (com.jetbrains.php.lang.psi.elements.Field field : phpClass.getOwnFields()) {
             PsiElement prev = field.getPrevPsiSibling();

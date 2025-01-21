@@ -1,4 +1,4 @@
-package at.alirezamoh.whisperer_for_laravel.extension;
+package at.alirezamoh.whisperer_for_laravel.statusBar;
 
 import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
 import com.intellij.openapi.project.Project;

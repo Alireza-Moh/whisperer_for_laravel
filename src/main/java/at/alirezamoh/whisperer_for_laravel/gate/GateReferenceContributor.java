@@ -66,6 +66,13 @@ public class GateReferenceContributor extends PsiReferenceContributor {
         );
     }
 
+    /**
+     * Checks if the given PSI element is inside a recognized Gate method call (e.g., Gate::allows or Gate::denies)
+     *
+     * @param psiElement The PSI element to inspect
+     * @param project    The current project
+     * @return true or false
+     */
     private boolean isInsideGateMethod(PsiElement psiElement, Project project) {
         MethodReference methodReference = MethodUtils.resolveMethodReference(psiElement, 10);
 
@@ -74,6 +81,14 @@ public class GateReferenceContributor extends PsiReferenceContributor {
             && isGateParam(methodReference, psiElement);
     }
 
+    /**
+     * Checks if the specified PSI element corresponds to the parameter that Gate methods expect
+     * (based on a predefined map of method names to parameter indices)
+     *
+     * @param method   The Gate method reference
+     * @param position The PSI element representing the parameter value
+     * @return true or false
+     */
     public boolean isGateParam(MethodReference method, PsiElement position) {
         Integer expectedParamIndex = GATE_METHODS.get(method.getName());
 

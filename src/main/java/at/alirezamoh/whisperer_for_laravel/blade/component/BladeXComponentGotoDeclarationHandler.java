@@ -78,6 +78,12 @@ public class BladeXComponentGotoDeclarationHandler implements GotoDeclarationHan
         return null;
     }
 
+    /**
+     * Find the PHP class for the blade component based on its name
+     * @param componentName The blade component name
+     * @param project The current project
+     * @return A collection of PHP classes founded with the specified name
+     * */
     private Collection<PhpClass> findComponentPhpClass(String componentName, Project project) {
         String componentNameInCamelCase = StrUtils.ucFirst(StrUtils.camel(componentName, '-'));
 
