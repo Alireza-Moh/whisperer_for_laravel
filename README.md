@@ -1,15 +1,19 @@
+# ![Whisperer For Laravel](src/main/resources/META-INF/pluginIcon.svg)
+
+[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
+![JetBrains Plugin Version](https://img.shields.io/jetbrains/plugin/v/at.alirezamoh.idea_whisperer_for_laravel)
+
 # Whisperer for Laravel
 
-Whisperer for Laravel is a PhpStorm plugin to help with Laravel development. It provides code completion for views, routes and more...
+Whisperer for Laravel is a PhpStorm plugin to help with Laravel development
 
 ## Features
 
-- **Code Generation**: Quickly generate laravel components such as Eloquent models, migrations, controllers, seeders, jobs, and more.
+- **Code Creation from template**: Quickly generate laravel components such as Eloquent models, migrations, controllers, seeders, jobs, and more.
 - **Code Completion**: Autocomplete for form requests, table names, Blade templates, routes, validation rules and others.
-- **Eloquent Magic Fields**: Generate helper code for Eloquent fields, linking them to migrations for enhanced PhpStorm support.
+- **Eloquent Magic Fields & Methods/DB Methods**: Generate helper code for Eloquent helper methods, fields and relations for more autocompletion
 - **Inertia.js Support**: Autocomplete and navigation for Inertia pages.
-- **Blade Components**: Autocompletion for Blade view files and components.
-- **Config Keys**: Intelligent autocompletion for configuration keys and files.
+- **Configs**: Autocompletion for config keys.
 
 ---
 
@@ -21,11 +25,11 @@ To install Whisperer for Laravel in PhpStorm:
 
 ---
 
-## Code Generation
+## Code Creation Templates
 
-Whisperer for Laravel provides a wide range of code generation templates. Access them via the **Code Generation** option in the main menu
+Whisperer for Laravel provides a wide range of code creation templates. Access them via the **All Available Code Creation Templates** or **Search For Code Creation Templates** option in the main menu
 
-### Available Code Generations
+### Available Templates
 
 - Eloquent Model
 - Migration
@@ -49,6 +53,14 @@ Whisperer for Laravel provides a wide range of code generation templates. Access
 - Broadcasting Channel
 - Database Factory
 - View Composer
-
 ---
 
+# Contributions
+
+Feature ideas and suggestions are always welcome! If you have an idea or a request to make Whisperer for Laravel better,
+feel free to open an issue or get in touch. Your input plays a vital role in improving the plugin
+and making it more helpful for everyone! 🚀
+
+## License
+
+This plugin is licensed under the MIT License.
