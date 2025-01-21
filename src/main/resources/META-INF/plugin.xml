@@ -85,13 +85,6 @@
     <actions>
         <group id="at.alirezamoh.whisperer_for_laravel.Actions" class="at.alirezamoh.whisperer_for_laravel.actions.StartPluginAction" text="Whisperer For Laravel" popup="true" description="The start point of the plugin">
             <add-to-group group-id="MainMenu" anchor="last"/>
-
-            <action id="at.alirezamoh.whisperer_for_laravel.ActionChooserAction" class="at.alirezamoh.whisperer_for_laravel.actions.ActionChooserAction" text="Search For Code Creation Templates" icon="/icons/laravelIcon.svg">
-            </action>
-
-            <action id="at.alirezamoh.whisperer_for_laravel.GenerateHelperMethodsAction" class="at.alirezamoh.whisperer_for_laravel.actions.GenerateHelperMethodsAction" text="Create Helper Methods For Eloquent/DB" icon="/icons/laravelIcon.svg">
-            </action>
-
             <group id="at.alirezamoh.whisperer_for_laravel.AllCodeGenerationActionsGroupAction" popup="true" icon="/icons/laravelIcon.svg" text="All Available Code Creation Templates">
                 <action id="at.alirezamoh.whisperer_for_laravel.EloquentAction" class="at.alirezamoh.whisperer_for_laravel.actions.EloquentAction" text="Create Eloquent Model From Template" icon="/icons/laravelIcon.svg">
                 </action>
@@ -166,9 +159,15 @@
                 </action>
             </group>
 
+            <action id="at.alirezamoh.whisperer_for_laravel.ActionChooserAction" class="at.alirezamoh.whisperer_for_laravel.actions.ActionChooserAction" text="Search For Code Creation Templates" icon="/icons/laravelIcon.svg">
+            </action>
+
+            <action id="at.alirezamoh.whisperer_for_laravel.GenerateHelperMethodsAction" class="at.alirezamoh.whisperer_for_laravel.actions.GenerateHelperMethodsAction" text="Create Helper Methods For Eloquent/DB" icon="/icons/laravelIcon.svg">
+            </action>
+
             <separator />
 
-            <action id="at.alirezamoh.whisperer_for_laravel.WhispererForLaravelSettingsNavigationAction" class="at.alirezamoh.whisperer_for_laravel.actions.WhispererForLaravelSettingsNavigationAction" text="Whisper For Laravel Settings" icon="/icons/laravelIcon.svg">
+            <action id="at.alirezamoh.whisperer_for_laravel.WhispererForLaravelSettingsNavigationAction" class="at.alirezamoh.whisperer_for_laravel.actions.WhispererForLaravelSettingsNavigationAction" text="Go To Plugin Settings" icon="/icons/laravelIcon.svg">
             </action>
         </group>
     </actions>
