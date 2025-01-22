@@ -4,6 +4,7 @@ import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.whisperer_for_laravel.support.ProjectDefaultPaths;
 import at.alirezamoh.whisperer_for_laravel.support.utils.DirectoryUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PhpClassUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
@@ -142,15 +143,7 @@ public class EventProvider {
      * @return The full directory path
      */
     private String buildFullPath(String relativePath) {
-        String basePath = projectSettingState.isProjectDirectoryEmpty()
-            ? ""
-            : StrUtils.addSlashes(
-                projectSettingState.getProjectDirectoryPath(),
-                false,
-                true
-            );
-
-        return basePath + relativePath;
+        return PluginUtils.getProjectDirectoryBasePath(project, relativePath, true);
     }
 
     /**

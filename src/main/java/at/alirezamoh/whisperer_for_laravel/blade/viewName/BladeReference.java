@@ -5,6 +5,7 @@ import at.alirezamoh.whisperer_for_laravel.indexes.ServiceProviderIndex;
 import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.whisperer_for_laravel.support.ProjectDefaultPaths;
 import at.alirezamoh.whisperer_for_laravel.support.utils.DirectoryUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.openapi.project.Project;
@@ -77,18 +78,10 @@ public class BladeReference extends PsiReferenceBase<PsiElement> {
      * @return The base view directory or null if not found.
      */
     private @Nullable PsiDirectory getBaseViewDirectory() {
-        SettingsState settingsState = SettingsState.getInstance(project);
-        String defaultViewPath = ProjectDefaultPaths.VIEW_PATH;
-
-        if (!settingsState.isProjectDirectoryEmpty()) {
-            defaultViewPath = StrUtils.addSlashes(
-                settingsState.getProjectDirectoryPath(),
-                false,
-                true
-            ) + ProjectDefaultPaths.VIEW_PATH;
-        }
-
-        return DirectoryUtils.getDirectory(project, defaultViewPath);
+        return DirectoryUtils.getDirectory(
+            project,
+            ProjectDefaultPaths.VIEW_PATH
+        );
     }
 
     private PsiElement searchInServiceProviderForBladeFile(String viewPath) {

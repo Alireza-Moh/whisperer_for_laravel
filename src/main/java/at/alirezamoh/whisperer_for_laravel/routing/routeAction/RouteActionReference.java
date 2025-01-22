@@ -1,10 +1,7 @@
 package at.alirezamoh.whisperer_for_laravel.routing.routeAction;
 
 import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
-import at.alirezamoh.whisperer_for_laravel.support.utils.DirectoryUtils;
-import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
-import at.alirezamoh.whisperer_for_laravel.support.utils.PhpClassUtils;
-import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.*;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
@@ -90,13 +87,7 @@ public class RouteActionReference extends PsiReferenceBase<PsiElement> {
      */
     private Map<String, PsiElement> getAllControllersWithActions() {
         Map<String, PsiElement> elements = new HashMap<>();
-        String path = DEFAULT_CONTROLLER_PATH;
-
-        if (!settingsState.isProjectDirectoryEmpty()) {
-            String laravelDir = StrUtils.addSlashes(settingsState.getProjectDirectoryPath());
-            path = laravelDir + path;
-        }
-
+        String path = PluginUtils.getProjectDirectoryBasePath(project, DEFAULT_CONTROLLER_PATH, true);
 
         PsiDirectory controllerDir = DirectoryUtils.getDirectory(project, path);
 
@@ -116,11 +107,7 @@ public class RouteActionReference extends PsiReferenceBase<PsiElement> {
      */
     private void collectControllersFromModules(Map<String, PsiElement> elements) {
         if (settingsState.isModuleApplication()) {
-            String modulesPath = settingsState.getModulesDirectoryPath();
-            if (!settingsState.isProjectDirectoryEmpty()) {
-                modulesPath = StrUtils.addSlashes(settingsState.getProjectDirectoryPath())
-                    + StrUtils.addSlashes(modulesPath, true, false);
-            }
+            String modulesPath = PluginUtils.getProjectDirectoryBasePath(project, settingsState.getModulesDirectoryPath(), true);
 
             PsiDirectory modulesDir = DirectoryUtils.getDirectory(project, modulesPath);
 

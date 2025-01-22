@@ -17,9 +17,15 @@ public class DirectoryUtils {
      * @return         The PsiDirectory object, or null if not found
      */
     public static @Nullable PsiDirectory getDirectory(Project project, String dirName) {
-        PsiManager psiManager = PsiManager.getInstance(project);
+        dirName = PluginUtils.getProjectDirectoryBasePath(project, dirName, true);
 
+        if (dirName == null) {
+            return null;
+        }
+
+        PsiManager psiManager = PsiManager.getInstance(project);
         VirtualFile virtualFile = ProjectUtil.guessProjectDir(project);
+
         if (virtualFile != null) {
             virtualFile = virtualFile.findFileByRelativePath(dirName);
         }
@@ -39,6 +45,11 @@ public class DirectoryUtils {
      * @return        The PsiFile or null if not found
      */
     public static @Nullable PsiFile getFileByName(Project project, String path) {
+        path = PluginUtils.getProjectDirectoryBasePath(project, path, true);
+        if (path == null) {
+            return null;
+        }
+
         String fullPath = project.getBasePath() + path;
 
         VirtualFile virtualFile = LocalFileSystem.getInstance().findFileByPath(fullPath);

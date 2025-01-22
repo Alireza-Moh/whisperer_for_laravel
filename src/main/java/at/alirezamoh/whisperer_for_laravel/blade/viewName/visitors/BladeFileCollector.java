@@ -41,16 +41,7 @@ public class BladeFileCollector {
     }
 
     public BladeFileCollector startSearching() {
-        String defaultViewPath = ProjectDefaultPaths.VIEW_PATH;
-        if (!projectSettingState.isProjectDirectoryEmpty()) {
-            defaultViewPath = StrUtils.addSlashes(
-                projectSettingState.getProjectDirectoryPath(),
-                false,
-                true
-            ) + ProjectDefaultPaths.VIEW_PATH;
-        }
-
-        PsiDirectory defaultResDir = DirectoryUtils.getDirectory(project, defaultViewPath);
+        PsiDirectory defaultResDir = DirectoryUtils.getDirectory(project, ProjectDefaultPaths.VIEW_PATH);
 
         if (defaultResDir != null) {
             collectBladeFiles(defaultResDir, "", null, (viewName, filePath) -> {

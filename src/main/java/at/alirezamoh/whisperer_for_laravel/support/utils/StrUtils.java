@@ -102,6 +102,29 @@ public class StrUtils {
 
     /**
      * Converts double forward slashes (except leading ones) to a single forward slash
+     * and double backslashes to a single backslash.
+     *
+     * @param text The text
+     * @return A string where double forward slashes are converted to single slashes
+     * or an empty string if the input is null or empty
+     */
+    public static String removeDoubleSlashes(String text) {
+        if (text == null || text.isEmpty()) {
+            return "";
+        }
+
+        // Replace double forward slashes (//) with a single slash (/),
+        // but skip cases where // is part of a URL protocol like http:// or file://.
+        text = text.replaceAll("(?<!:)//+", "/");
+
+        // Replace double backslashes (\\) with a single backslash (\).
+        text = text.replaceAll("\\\\{2,}", "\\");
+
+        return text;
+    }
+
+    /**
+     * Converts double forward slashes (except leading ones) to a single forward slash
      *
      * @param input The input string
      * @return A string where double forward slashes are converted to a single slash,
@@ -213,6 +236,7 @@ public class StrUtils {
         if (removeSlashFromStart) {
             text = text.substring(1);
         }
+
         if (removeSlashFromEnd) {
             text = text.substring(0, text.length() - 1);
         }

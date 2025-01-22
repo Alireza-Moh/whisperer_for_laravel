@@ -54,7 +54,7 @@ final public class ProjectDefaultPaths {
 
     public static final String VIEW_COMPOSER_PATH = "/Http/ViewComposers/";
 
-    public static final String WHISPERER_FOR_LARAVEL_DIR_PATH = "vendor/whisperer_for_laravel/";
+    public static final String WHISPERER_FOR_LARAVEL_DIR_PATH = "/vendor/whisperer_for_laravel/";
 
     public static final String LARAVEL_DB_QUERY_BUILDER_PATH = "/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php";
 
