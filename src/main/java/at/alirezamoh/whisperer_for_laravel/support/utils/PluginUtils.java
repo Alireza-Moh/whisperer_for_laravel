@@ -49,7 +49,23 @@ public class PluginUtils {
      * @return true for false
      */
     public static boolean isLaravelFrameworkNotInstalled(Project project) {
-        PsiDirectory psiDirectory = DirectoryUtils.getDirectory(project, "/vendor/laravel/framework/");
+        SettingsState settingsState = SettingsState.getInstance(project);
+
+        if (settingsState == null) {
+            return true;
+        }
+
+        String defaultPath = ProjectDefaultPaths.LARAVEL_VENDOR_FRAMEWORK_PATH;
+
+        if (!settingsState.isProjectDirectoryEmpty()) {
+            defaultPath = StrUtils.addSlashes(
+                settingsState.getProjectDirectoryPath(),
+                false,
+                true
+            ) + defaultPath;
+        }
+
+        PsiDirectory psiDirectory = DirectoryUtils.getDirectory(project, defaultPath);
 
         return psiDirectory == null;
     }
@@ -117,12 +133,14 @@ public class PluginUtils {
     }
 
     /**
-     * Finds the project's composer.json file based on the user-specified or default project path
+     * Retrieves the base path of the project, optionally appending a custom directory path
+     * specified in the project settings
      *
      * @param project The current project
-     * @return A {@link File} handle for "composer.json", or {@code null} if not found
+     * @return The project base path as a string, including the custom directory path
+     *         from settings if configured, or {@code null} if settings are unavailable
      */
-    private static @Nullable File getComposerFile(Project project) {
+    public static @Nullable String getProjectBasePath(Project project, boolean removeSlashFromEnd) {
         SettingsState settingsState = SettingsState.getInstance(project);
 
         if (settingsState == null) {
@@ -135,10 +153,21 @@ public class PluginUtils {
             defaultPath = defaultPath + StrUtils.addSlashes(
                 settingsState.getProjectDirectoryPath(),
                 false,
-                true
+                removeSlashFromEnd
             );
         }
 
-        return new File(defaultPath, "composer.json");
+        return defaultPath;
+    }
+
+    /**
+     * Finds the project's composer.json file based on the user-specified or default project path
+     *
+     * @param project The current project
+     * @return A {@link File} handle for "composer.json", or {@code null} if not found
+     */
+    private static @Nullable File getComposerFile(Project project) {
+
+        return new File(getProjectBasePath(project, true), "composer.json");
     }
 }
