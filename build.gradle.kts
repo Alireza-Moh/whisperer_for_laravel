@@ -22,7 +22,6 @@ dependencies {
         instrumentationTools()
     }
 
-    implementation("org.atteo:evo-inflector:1.3")
     implementation("org.freemarker:freemarker:2.3.33")
 }
 
