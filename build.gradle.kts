@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "at.alirezamoh.whisperer-for-laravel"
-version = "1.1.5"
+version = "1.1.6"
 
 repositories {
     mavenCentral()
@@ -22,7 +22,6 @@ dependencies {
         instrumentationTools()
     }
 
-    implementation("org.atteo:evo-inflector:1.3")
     implementation("org.freemarker:freemarker:2.3.33")
 }
 

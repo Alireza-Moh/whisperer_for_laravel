@@ -3,6 +3,7 @@ package at.alirezamoh.whisperer_for_laravel.routing.middleware;
 import at.alirezamoh.whisperer_for_laravel.gate.visitors.GateProcessor;
 import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.whisperer_for_laravel.support.utils.DirectoryUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
@@ -93,14 +94,9 @@ public class MiddlewareReference extends PsiReferenceBase<PsiElement> {
     }
 
     private List<PsiElement> collectAllMiddlewares() {
-        String filename = BOOTSTRAP_APP_FILE;
-        String baseMiddlewareFilePath = BASE_MIDDLEWARE_FILE_PATH;
+        String filename = PluginUtils.getProjectDirectoryBasePath(project, BOOTSTRAP_APP_FILE, true);
+        String baseMiddlewareFilePath = PluginUtils.getProjectDirectoryBasePath(project, BASE_MIDDLEWARE_FILE_PATH, true);
 
-        if (!settingsState.isProjectDirectoryEmpty()) {
-            String laravelDir = StrUtils.addSlashes(settingsState.getProjectDirectoryPath(), false, true);
-            filename = laravelDir + filename;
-            baseMiddlewareFilePath = laravelDir + baseMiddlewareFilePath;
-        }
         PsiFile appFile = DirectoryUtils.getFileByName(project, filename);
         PsiFile baseMiddlewareFile = DirectoryUtils.getFileByName(project, baseMiddlewareFilePath);
 

@@ -11,7 +11,7 @@ Whisperer for Laravel is a PhpStorm plugin to help with Laravel development
 
 - **Code Creation from template**: Quickly generate laravel components such as Eloquent models, migrations, controllers, seeders, jobs, and more.
 - **Code Completion**: Autocomplete for form requests, table names, Blade templates, routes, validation rules and others.
-- **Eloquent Magic Fields & Methods/DB Methods**: Generate helper code for Eloquent helper methods, fields and relations for more autocompletion
+- **Eloquent Magic Fields & Methods/DB Methods**: Generate helper methods for Eloquent helper methods, fields and relations for more autocompletion
 - **Inertia.js Support**: Autocomplete and navigation for Inertia pages.
 - **Configs**: Autocompletion for config keys.
 
@@ -61,22 +61,10 @@ Feature ideas and suggestions are always welcome! If you have an idea or a reque
 feel free to open an issue or get in touch. Your input plays a vital role in improving the plugin
 and making it more helpful for everyone! 🚀
 
-## License
+# License
 
-This plugin is licensed under the MIT License.
+This plugin is licensed under the MIT License
 
-# Plugin Icon Attribution
 
-The plugin icon was created by combining the following icons:
-
-- **Laravel Icon**
-    - **Source:** [Iconduck](https://iconduck.com/icons/11216/laravel)
-    - **License:** [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
-    - **Creator:** [Łukasz Holeczek](https://iconduck.com/designers/lukasz-holeczek), [CoreUI Icons](https://coreui.io/icons/), [Icondock CoreUI](https://iconduck.com/designers/coreui)
-    - **Modifications:** Integrated with the music note equalizer icon
-
-- **Entertainment Music Note Equalizer Icon**
-    - **Source:** [Iconduck](https://iconduck.com/icons/176166/entertainment-music-note-equalizer-music-audio-note-wave-sound-equalizer)
-    - **License:** [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
-    - **Creator:** [Flex Icon Set](https://iconduck.com/sets/flex-icon-set), [Streamline](https://iconduck.com/designers/streamline)
-    - **Modifications:** Integrated with the Laravel icon
+# Attributions
+For more information, please see [Attributions](./ATTRIBUTION.md).

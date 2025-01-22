@@ -124,7 +124,7 @@ public class ConfigIndex extends FileBasedIndexExtension<String, String> {
                 false,
                 true
             )
-                + pathPart;
+            + pathPart;
         }
 
         return file.getPath().replace(basePath, "").startsWith(pathPart);

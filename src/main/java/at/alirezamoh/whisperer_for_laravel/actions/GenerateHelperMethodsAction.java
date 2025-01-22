@@ -91,15 +91,7 @@ public class GenerateHelperMethodsAction extends BaseAction {
 
     private void deletePluginVendorDir() {
         ApplicationManager.getApplication().runWriteAction(() -> {
-            SettingsState settingsState = SettingsState.getInstance(project);
-            String path = ProjectDefaultPaths.WHISPERER_FOR_LARAVEL_DIR_PATH;
-
-            if (!settingsState.isProjectDirectoryEmpty()) {
-                path = StrUtils.addSlashes(settingsState.getProjectDirectoryPath(), false, true) + path;
-            }
-
-            PsiDirectory pluginVendor = DirectoryUtils.getDirectory(project, path);
-
+            PsiDirectory pluginVendor = PluginUtils.getPluginVendor(project);
             if (pluginVendor != null) {
                 try {
                     pluginVendor.delete();

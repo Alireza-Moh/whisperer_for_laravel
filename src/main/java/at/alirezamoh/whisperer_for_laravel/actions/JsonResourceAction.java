@@ -31,7 +31,7 @@ public class JsonResourceAction extends BaseAction {
 
     private void addEloquentModel(Project project, JsonResourceModel jsonResourceModel) {
         if (PluginUtils.getPluginVendor(project) == null) {
-            Notify.notifyWarning(project, "Could not add eloquent attributes to the Json Resource [Run 'Generate Helper Methods']");
+            Notify.notifyWarning(project, "Could not add eloquent attributes to the Json Resource [Run 'Create Helper Methods For Eloquent/DB']");
         }
         else {
             String[] parts = jsonResourceModel.getModelNamespace().split("\\\\");
