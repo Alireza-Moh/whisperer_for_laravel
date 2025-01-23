@@ -301,7 +301,7 @@ abstract public class BaseModel {
      * Splits the file name into an array of strings
      * @return An array of strings representing the file name
      */
-    private String[] getNameAsArray() {
+    public String[] getNameAsArray() {
         return name.split("[\\\\/]");
     }
 
