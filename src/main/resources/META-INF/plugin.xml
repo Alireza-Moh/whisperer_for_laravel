@@ -70,6 +70,7 @@
         <completion.contributor language="XML" implementationClass="at.alirezamoh.whisperer_for_laravel.blade.component.BladeXComponentCompletionContributor"/>
         <completion.contributor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.request.requestField.RequestFieldCompletionContributor"/>
         <completion.contributor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.routing.namespace.RouteNamespaceCompletionContributor"/>
+        <completion.contributor language="XML" implementationClass="at.alirezamoh.whisperer_for_laravel.packages.livewire.htmlDirectives.LivewireHtmlDirectiveCompletionContributor"/>
 
         <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.blade.component.BladeXComponentGotoDeclarationHandler"/>
         <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.request.validation.RuleValidationGotoDeclarationHandler"/>
