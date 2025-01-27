@@ -1,5 +1,4 @@
 package at.alirezamoh.whisperer_for_laravel.packages.livewire.htmlDirectives;
-import at.alirezamoh.whisperer_for_laravel.packages.livewire.LivewireDirectives;
 import at.alirezamoh.whisperer_for_laravel.packages.livewire.LivewireUtil;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
 import com.intellij.codeInsight.completion.*;
@@ -7,7 +6,6 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.patterns.XmlPatterns;
-import com.intellij.psi.PsiReference;
 import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.blade.BladeFileType;
 import org.jetbrains.annotations.NotNull;
@@ -15,6 +13,24 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 public class LivewireHtmlDirectiveCompletionContributor extends CompletionContributor {
+    private final List<String> DIRECTIVES = List.of(
+        "wire:click",
+        "wire:submit",
+        "wire:navigate",
+        "wire:model",
+        "wire:loading",
+        "wire:current",
+        "wire:dirty",
+        "wire:confirm",
+        "wire:transition",
+        "wire:init",
+        "wire:poll",
+        "wire:offline",
+        "wire:ignore",
+        "wire:replace",
+        "wire:stream"
+    );
+
     public LivewireHtmlDirectiveCompletionContributor() {
         extend(
             CompletionType.BASIC,
@@ -31,15 +47,13 @@ public class LivewireHtmlDirectiveCompletionContributor extends CompletionContri
                         return;
                     }
 
-                    for (List<String> directiveList : LivewireDirectives.DIRECTIVES) {
-                        for (String directive : directiveList) {
-                            LookupElementBuilder lookupElementBuilder = PsiElementUtils.buildSimpleLookupElement(directive)
-                                .withInsertHandler(new XmlAttributeInsertHandler());
+                    for (String directive : DIRECTIVES) {
+                        LookupElementBuilder lookupElementBuilder = PsiElementUtils.buildSimpleLookupElement(directive)
+                            .withInsertHandler(new XmlAttributeInsertHandler());
 
-                            completionResultSet.addElement(
-                                PsiElementUtils.buildPrioritizedLookupElement(lookupElementBuilder, 100)
-                            );
-                        }
+                        completionResultSet.addElement(
+                            PsiElementUtils.buildPrioritizedLookupElement(lookupElementBuilder, 100)
+                        );
                     }
                 }
             }
