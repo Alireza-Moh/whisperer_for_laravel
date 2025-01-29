@@ -145,6 +145,32 @@ public class PluginUtils {
     }
 
     /**
+     * Determines whether the given package exists in the project by inspecting
+     * the "composer.json" file
+     *
+     * @param project The current project
+     * @return true or false
+     */
+    public static boolean doesPackageExists(Project project, String packageName) {
+        PsiFile composerFile = getComposerFile(project);
+        if (composerFile == null) {
+            return false;
+        }
+
+        try {
+            String fileContent = composerFile.getText();
+
+            JsonObject jsonObject = JsonParser.parseString(fileContent).getAsJsonObject();
+            JsonObject require = jsonObject.getAsJsonObject("require");
+
+            return require != null && require.has(packageName);
+        } catch (Exception e) {
+            LOG.error("Could not extract " + packageName + " from composer file", e);
+            return false;
+        }
+    }
+
+    /**
      * Finds the project's composer.json file based on the user-specified or default project path
      *
      * @param project The current project
