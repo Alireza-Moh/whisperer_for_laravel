@@ -86,6 +86,7 @@
         <errorHandler implementation="com.intellij.diagnostic.JetBrainsMarketplaceErrorReportSubmitter"/>
 
         <lang.inspectionSuppressor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.request.requestField.RequestFieldSuppressor"/>
+        <lang.inspectionSuppressor language="XML" implementationClass="at.alirezamoh.whisperer_for_laravel.packages.livewire.htmlDirectives.supressor.LivewireHtmlDirectiveSuppressor" />
     </extensions>
 
     <actions>
