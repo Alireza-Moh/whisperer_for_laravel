@@ -2,6 +2,7 @@ package at.alirezamoh.whisperer_for_laravel.packages.livewire.htmlDirectives.sup
 
 import at.alirezamoh.whisperer_for_laravel.packages.livewire.LivewireUtil;
 import com.intellij.codeInspection.*;
+import com.intellij.codeInspection.htmlInspections.HtmlUnknownAttributeInspection;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.xml.XmlAttribute;
@@ -16,7 +17,7 @@ import java.util.List;
  */
 public class LivewireHtmlDirectiveSuppressor implements InspectionSuppressor {
     private final List<String> suppressedXMLInspections = List.of(
-        "HtmlUnknownAttribute"
+        new HtmlUnknownAttributeInspection().getID()
     );
 
     @Override
