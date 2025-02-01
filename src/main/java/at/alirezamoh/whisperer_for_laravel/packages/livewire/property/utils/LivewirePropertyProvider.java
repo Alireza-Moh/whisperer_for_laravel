@@ -4,10 +4,12 @@ import at.alirezamoh.whisperer_for_laravel.support.utils.PhpIndexUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
+import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.jetbrains.php.blade.BladeFileType;
+import com.jetbrains.php.blade.html.BladeHtmlFileType;
 import com.jetbrains.php.lang.PhpFileType;
 import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.*;
@@ -39,7 +41,8 @@ public class LivewirePropertyProvider {
         }
 
         //completion for blade files
-        if (originalFile.getFileType() == BladeFileType.INSTANCE) {
+        FileType fileType = originalFile.getFileType();
+        if (fileType instanceof BladeHtmlFileType || fileType instanceof BladeFileType) {
             Collection<PhpClass> phpClasses = findLivewireClasses(project, originalFile);
             if (phpClasses == null) {
                 return null;

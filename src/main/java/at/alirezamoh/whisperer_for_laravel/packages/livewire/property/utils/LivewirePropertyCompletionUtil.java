@@ -69,7 +69,7 @@ public class LivewirePropertyCompletionUtil {
 
     /**
      * Convenience method that calls {@link LivewirePropertyProvider#collectProperties} on the given file,
-     * and adds them to the {@link CompletionResultSet}.
+     * and adds them to the {@link CompletionResultSet}
      *
      * @param project The current project.
      * @param file The file in which to collect properties.

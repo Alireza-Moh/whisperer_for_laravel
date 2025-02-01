@@ -4,12 +4,10 @@ import at.alirezamoh.whisperer_for_laravel.packages.livewire.LivewireUtil;
 import at.alirezamoh.whisperer_for_laravel.packages.livewire.property.utils.LivewirePropertyProvider;
 import com.intellij.codeInsight.completion.*;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
-import com.intellij.ide.highlighter.HtmlFileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.patterns.XmlPatterns;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
 import com.intellij.psi.xml.XmlAttribute;
 import com.intellij.psi.xml.XmlAttributeValue;
 import com.intellij.util.ProcessingContext;
@@ -22,22 +20,13 @@ public class LivewirePropertyDataBindingCompletionContributor extends Completion
     public LivewirePropertyDataBindingCompletionContributor() {
         extend(
             CompletionType.BASIC,
-            PlatformPatterns.or(
-                PlatformPatterns.psiElement().inside(XmlPatterns.xmlAttributeValue()).withParent(
-                    PlatformPatterns.psiElement(XmlAttributeValue.class)
-                        .withParent(
-                            PlatformPatterns.psiElement(XmlAttribute.class)
-                                .withName("wire:model")
-                        )
-                ).inVirtualFile(PlatformPatterns.virtualFile().ofType(BladeFileType.INSTANCE)),
-                PlatformPatterns.psiElement().inside(XmlPatterns.xmlAttributeValue()).withParent(
-                    PlatformPatterns.psiElement(XmlAttributeValue.class)
-                        .withParent(
-                            PlatformPatterns.psiElement(XmlAttribute.class)
-                                .withName("wire:model")
-                        )
-                ).inVirtualFile(PlatformPatterns.virtualFile().ofType(HtmlFileType.INSTANCE))
-            ),
+            PlatformPatterns.psiElement().inside(XmlPatterns.xmlAttributeValue()).withParent(
+                PlatformPatterns.psiElement(XmlAttributeValue.class)
+                    .withParent(
+                        PlatformPatterns.psiElement(XmlAttribute.class)
+                            .withName("wire:model")
+                    )
+            ).inVirtualFile(PlatformPatterns.virtualFile().ofType(BladeFileType.INSTANCE)),
             new CompletionProvider<>() {
                 @Override
                 protected void addCompletions(@NotNull CompletionParameters parameters, @NotNull ProcessingContext context, @NotNull CompletionResultSet resultSet) {
@@ -48,10 +37,11 @@ public class LivewirePropertyDataBindingCompletionContributor extends Completion
                         return;
                     }
 
-                    PsiFile originalFile = parameters.getOriginalFile();
-
-                    List<LookupElementBuilder> variants = LivewirePropertyProvider.collectProperties(project, originalFile, true);
-
+                    List<LookupElementBuilder> variants = LivewirePropertyProvider.collectProperties(
+                        project,
+                        position.getContainingFile(),
+                        true
+                    );
 
                     if (variants != null) {
                         resultSet.addAllElements(variants);
