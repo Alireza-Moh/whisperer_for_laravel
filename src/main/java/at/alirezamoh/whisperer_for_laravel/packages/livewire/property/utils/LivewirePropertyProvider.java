@@ -1,5 +1,6 @@
 package at.alirezamoh.whisperer_for_laravel.packages.livewire.property.utils;
 
+import at.alirezamoh.whisperer_for_laravel.packages.livewire.LivewireUtil;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PhpIndexUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
@@ -51,6 +52,14 @@ public class LivewirePropertyProvider {
             for (PhpClass phpClass : phpClasses) {
                 phpClass.acceptChildren(visitor);
             }
+
+            return buildLookupElementsFromProperties(visitor.properties);
+        }
+
+        //completion for inline html
+        originalFile = LivewireUtil.getFileFromPsiLanguageInjectionHost(project, originalFile);
+        if (originalFile instanceof PhpFile) {
+            originalFile.acceptChildren(visitor);
 
             return buildLookupElementsFromProperties(visitor.properties);
         }

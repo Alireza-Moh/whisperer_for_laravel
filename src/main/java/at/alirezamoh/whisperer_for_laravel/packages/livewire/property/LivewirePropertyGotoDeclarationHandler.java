@@ -37,7 +37,7 @@ public class LivewirePropertyGotoDeclarationHandler implements GotoDeclarationHa
         PsiElement originalPosition = sourceElement.getOriginalElement();
         PsiFile originalFile = sourceElement.getContainingFile();
         if (originalPosition != null && InjectedLanguageManager.getInstance(originalFile.getProject()).isInjectedFragment(originalFile)) {
-            PsiLanguageInjectionHost host = InjectedLanguageManager.getInstance(project).getInjectionHost(originalPosition);
+            PsiLanguageInjectionHost host = LivewireUtil.getFromPsiLanguageInjectionHost(project, originalPosition);
             if (host instanceof BladePsiLanguageInjectionHost) {
                 String text = StrUtils.removeQuotes(sourceElement.getText());
                 if (!text.startsWith("$")) {

@@ -9,7 +9,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiLanguageInjectionHost;
-import com.intellij.util.Processor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -51,7 +50,7 @@ public class LivewirePropertyCompletionUtil {
             && InjectedLanguageManager.getInstance(originalFile.getProject()).isInjectedFragment(originalFile)
         ) {
 
-            PsiLanguageInjectionHost host = InjectedLanguageManager.getInstance(project).getInjectionHost(originalPosition);
+            PsiLanguageInjectionHost host = LivewireUtil.getFromPsiLanguageInjectionHost(project, originalPosition);
 
             if (host != null && hostFilter.test(host)) {
 

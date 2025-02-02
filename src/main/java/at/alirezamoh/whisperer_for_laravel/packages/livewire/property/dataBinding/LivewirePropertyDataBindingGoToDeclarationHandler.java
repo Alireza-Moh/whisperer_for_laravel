@@ -13,7 +13,7 @@ import com.intellij.psi.xml.XmlAttribute;
 import com.intellij.psi.xml.XmlAttributeValue;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
+import java.util.List;
 
 public class LivewirePropertyDataBindingGoToDeclarationHandler implements GotoDeclarationHandler {
     @Override
@@ -32,9 +32,18 @@ public class LivewirePropertyDataBindingGoToDeclarationHandler implements GotoDe
         if (attributeValue != null && attributeValue.getParent() instanceof XmlAttribute xmlAttribute && xmlAttribute.getName().equals("wire:model")) {
             PsiFile originalFile = psiElement.getContainingFile();
 
-            return Objects.requireNonNull(
-                LivewirePropertyProvider.resolveProperty(project, originalFile, StrUtils.removeQuotes(attributeValue.getValue()), true)
-            ).toArray(new PsiElement[0]);
+            List<PsiElement> resolvedProperties = LivewirePropertyProvider.resolveProperty(
+                project,
+                originalFile,
+                StrUtils.removeQuotes(attributeValue.getValue()),
+                true
+            );
+
+            if (resolvedProperties == null) {
+                return PsiElement.EMPTY_ARRAY;
+            }
+
+            return resolvedProperties.toArray(new PsiElement[0]);
         }
 
         return null;

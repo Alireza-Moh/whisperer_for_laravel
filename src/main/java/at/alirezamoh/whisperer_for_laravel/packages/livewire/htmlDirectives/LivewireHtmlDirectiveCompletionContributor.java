@@ -36,7 +36,10 @@ public class LivewireHtmlDirectiveCompletionContributor extends CompletionContri
         "wire:offline",
         "wire:ignore",
         "wire:replace",
-        "wire:stream"
+        "wire:stream",
+        "wire:keydown",
+        "wire:keyup",
+        "wire:mouseenter"
     );
 
     public LivewireHtmlDirectiveCompletionContributor() {
@@ -84,7 +87,7 @@ public class LivewireHtmlDirectiveCompletionContributor extends CompletionContri
                         return;
                     }
 
-                    PsiLanguageInjectionHost host = InjectedLanguageManager.getInstance(project).getInjectionHost(originalPosition);
+                    PsiLanguageInjectionHost host = LivewireUtil.getFromPsiLanguageInjectionHost(project, originalPosition);
                     if (!(host instanceof StringLiteralExpression stringLiteralExpression)) {
                         return;
                     }
