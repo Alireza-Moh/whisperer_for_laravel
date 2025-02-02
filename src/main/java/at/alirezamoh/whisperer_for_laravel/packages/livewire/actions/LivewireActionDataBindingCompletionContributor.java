@@ -22,12 +22,15 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Objects;
 
 public class LivewireActionDataBindingCompletionContributor extends CompletionContributor {
     private static final String[] PREDEFINED_ACTIONS = {
         "$refresh",
-        "$commit"
+        "$commit",
+        "$toggle",
+        "$set",
+        "$parent",
+        "$dispatch"
     };
     public LivewireActionDataBindingCompletionContributor() {
         extend(
