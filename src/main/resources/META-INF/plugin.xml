@@ -74,12 +74,14 @@
         <completion.contributor language="XML" implementationClass="at.alirezamoh.whisperer_for_laravel.packages.livewire.property.LivewirePropertyInInlineCompletionContributor"/>
         <completion.contributor language="XML" implementationClass="at.alirezamoh.whisperer_for_laravel.packages.livewire.property.dataBinding.LivewirePropertyDataBindingCompletionContributor"/>
         <completion.contributor language="XML" implementationClass="at.alirezamoh.whisperer_for_laravel.packages.livewire.htmlDirectives.LivewireHtmlDirectiveCompletionContributor"/>
+        <completion.contributor language="XML" implementationClass="at.alirezamoh.whisperer_for_laravel.packages.livewire.actions.LivewireActionDataBindingCompletionContributor"/>
 
         <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.blade.component.BladeXComponentGotoDeclarationHandler"/>
         <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.request.validation.RuleValidationGotoDeclarationHandler"/>
         <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.request.requestField.RequestFieldGotoDeclarationHandler"/>
         <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.packages.livewire.property.LivewirePropertyGotoDeclarationHandler"/>
         <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.packages.livewire.property.dataBinding.LivewirePropertyDataBindingGoToDeclarationHandler"/>
+        <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.packages.livewire.actions.LivewireActionDataBindingGoToDeclarationHandler"/>
 
         <codeInsight.template.postfixTemplateProvider language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.postfixes.dd.DDPostfixProvider" />
 
