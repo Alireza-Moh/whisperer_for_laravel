@@ -41,6 +41,46 @@ public class LivewireHtmlDirectiveCompletionContributor extends CompletionContri
         "wire:keyup",
         "wire:mouseenter"
     );
+    
+    private final List<String> KEY_DIRECTIVES = List.of(
+        "wire:keydown",
+        "wire:keyup"
+    );
+
+    private final List<String> KEYS = List.of(
+        "shift",
+        "enter",
+        "space",
+        "ctrl",
+        "cmd",
+        "meta",
+        "alt",
+        "up",
+        "down",
+        "left",
+        "right",
+        "escape",
+        "tab",
+        "caps-lock",
+        "equal",
+        "period",
+        "slash",
+        "prevent",
+        "stop",
+        "window",
+        "outside",
+        "document",
+        "once",
+        "debounce",
+        "debounce.100ms",
+        "throttle",
+        "throttle.100ms",
+        "self",
+        "camel",
+        "dot",
+        "passive",
+        "capture"
+    );
 
     public LivewireHtmlDirectiveCompletionContributor() {
         extend(
@@ -103,6 +143,83 @@ public class LivewireHtmlDirectiveCompletionContributor extends CompletionContri
                 }
             }
         );
+
+        extend(
+            CompletionType.BASIC,
+            PlatformPatterns.psiElement().inside(XmlPatterns.xmlAttribute())
+                .andNot(PlatformPatterns.psiElement().inside(XmlPatterns.xmlAttributeValue()))
+                .inVirtualFile(PlatformPatterns.virtualFile().ofType(BladeFileType.INSTANCE)),
+            new CompletionProvider<>() {
+
+                @Override
+                protected void addCompletions(@NotNull CompletionParameters completionParameters, @NotNull ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
+
+                    PsiElement psiElement = completionParameters.getPosition();
+                    Project project = psiElement.getProject();
+                    if (LivewireUtil.doNotCompleteOrNavigate(project)) {
+                        return;
+                    }
+
+                    buildSuggestionsForKeys(completionParameters, completionResultSet, psiElement);
+                }
+            }
+        );
+
+        extend(
+            CompletionType.BASIC,
+            PlatformPatterns.psiElement().inside(XmlPatterns.xmlAttribute())
+                .andNot(PlatformPatterns.psiElement().inside(XmlPatterns.xmlAttributeValue())),
+            new CompletionProvider<>() {
+
+                @Override
+                protected void addCompletions(@NotNull CompletionParameters completionParameters, @NotNull ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
+                    PsiElement position = completionParameters.getPosition();
+                    Project project = position.getProject();
+                    if (LivewireUtil.doNotCompleteOrNavigate(project)) {
+                        return;
+                    }
+
+                    PsiElement originalPosition = completionParameters.getOriginalPosition();
+                    PsiFile originalFile = completionParameters.getOriginalFile();
+                    if (originalPosition == null) {
+                        return;
+                    }
+
+                    if (!InjectedLanguageManager.getInstance(originalFile.getProject()).isInjectedFragment(originalFile)) {
+                        return;
+                    }
+
+                    PsiLanguageInjectionHost host = LivewireUtil.getFromPsiLanguageInjectionHost(project, originalPosition);
+                    if (!(host instanceof StringLiteralExpression stringLiteralExpression)) {
+                        return;
+                    }
+
+                    if (!Objects.equals(stringLiteralExpression.getName(), "HTML")) {
+                        return;
+                    }
+
+                    Method renderMethod = PsiTreeUtil.getParentOfType(stringLiteralExpression, Method.class);
+                    if (renderMethod != null && "render".equals(renderMethod.getName())) {
+                        buildSuggestionsForKeys(completionParameters, completionResultSet, position);
+                    }
+                }
+            }
+        );
+    }
+
+    private void buildSuggestionsForKeys(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet, PsiElement psiElement) {
+        CompletionResultSet resultOnPipe = getCompletionResultSetOnDot(psiElement, completionResultSet, completionParameters);
+        if (resultOnPipe != null) {
+            completionResultSet = resultOnPipe;
+        }
+
+        for (String key : KEYS) {
+            LookupElementBuilder lookupElementBuilder = PsiElementUtils.buildSimpleLookupElement(key);
+
+            completionResultSet.addElement(
+                PsiElementUtils.buildPrioritizedLookupElement(lookupElementBuilder, 1000)
+            );
+        }
     }
 
     private void buildSuggestions(@NotNull CompletionResultSet completionResultSet) {
@@ -114,5 +231,27 @@ public class LivewireHtmlDirectiveCompletionContributor extends CompletionContri
                 PsiElementUtils.buildPrioritizedLookupElement(lookupElementBuilder, 100)
             );
         }
+    }
+
+    /**
+     * Returns a new CompletionResultSet with a prefix matcher based on the text after the last dot symbol
+     * This method checks if the current PSI element's text contains a dot symbol (|).
+     * If it does, it creates a new CompletionResultSet with a prefix matcher that matches
+     * the text after the last dot symbol. This allows for accurate completion suggestions
+     * when the user is typing validation rules separated by dots
+     * @return The new CompletionResultSet with a prefix matcher, or null if no dot symbol is found
+     */
+    private CompletionResultSet getCompletionResultSetOnDot(PsiElement psiElement, CompletionResultSet currentCompletionResult, CompletionParameters completionParameters) {
+        String text = psiElement.getText();
+        CompletionResultSet newCompletionResult = null;
+
+        if (text.contains(".")) {
+            int dotIndex = text.lastIndexOf('.', completionParameters.getOffset() - psiElement.getTextRange().getStartOffset() - 1);
+            String newText = text.substring(dotIndex + 1, completionParameters.getOffset() - psiElement.getTextRange().getStartOffset());
+
+            newCompletionResult = currentCompletionResult.withPrefixMatcher(newText);
+        }
+
+        return newCompletionResult;
     }
 }
