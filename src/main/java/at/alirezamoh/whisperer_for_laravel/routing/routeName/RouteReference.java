@@ -10,13 +10,12 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.indexing.FileBasedIndex;
+import com.intellij.util.indexing.IdFilter;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /**
  * This class resolves references to route names and provides code completion
@@ -57,21 +56,24 @@ public class RouteReference extends PsiReferenceBase<PsiElement> implements PsiP
     public Object @NotNull [] getVariants() {
         List<LookupElementBuilder> variants = new ArrayList<>();
 
-         Collection<String> routes = FileBasedIndex.getInstance().getAllKeys(RouteIndex.INDEX_ID, project);
-
-         for (String route : routes) {
-             String[] split = route.split(" \\| ");
-
-             if (split.length >= 3) {
-                 variants.add(
-                     LookupElementBuilder
-                         .create(split[1])
-                         .bold()
-                         .withTypeText(split[0], true)
-                         .withIcon(WhispererForLaravelIcon.LARAVEL_ICON)
-                 );
-             }
-         };
+        FileBasedIndex.getInstance().processAllKeys(
+            RouteIndex.INDEX_ID,
+            route -> {
+                String[] split = route.split(" \\| ");
+                if (split.length >= 3) {
+                    variants.add(
+                        LookupElementBuilder
+                            .create(split[1])
+                            .bold()
+                            .withTypeText(split[0], true)
+                            .withIcon(WhispererForLaravelIcon.LARAVEL_ICON)
+                    );
+                }
+                return true;
+            },
+            GlobalSearchScope.projectScope(project),
+            IdFilter.getProjectIdFilter(project, false)
+        );
 
         return variants.toArray();
     }
@@ -82,14 +84,26 @@ public class RouteReference extends PsiReferenceBase<PsiElement> implements PsiP
         List<ResolveResult> results = new ArrayList<>();
         FileBasedIndex fileBasedIndex = FileBasedIndex.getInstance();
 
-        Collection<String> keys = fileBasedIndex.getAllKeys(RouteIndex.INDEX_ID, project);
+        Set<String> matchingKeys = new HashSet<>();
+        fileBasedIndex.processAllKeys(RouteIndex.INDEX_ID, key -> {
+            String[] split = key.split(" \\| ");
+            if (split.length >= 3 && split[1].equals(routeName)) {
+                matchingKeys.add(key);
+            }
+            return true;
+        },
+            GlobalSearchScope.projectScope(project),
+            IdFilter.getProjectIdFilter(project, false)
+        );
 
-        for (String key : keys) {
+        for (String key : matchingKeys) {
             String[] split = key.split(" \\| ");
 
             if (split.length >= 3 && split[1].equals(routeName)) {
                 Collection<VirtualFile> files = fileBasedIndex.getContainingFiles(
-                    RouteIndex.INDEX_ID, key, GlobalSearchScope.allScope(project)
+                    RouteIndex.INDEX_ID,
+                    key,
+                    GlobalSearchScope.projectScope(project)
                 );
 
                 for (VirtualFile file : files) {
