@@ -7,17 +7,15 @@ import at.alirezamoh.whisperer_for_laravel.actions.models.dataTables.Relation;
 import at.alirezamoh.whisperer_for_laravel.actions.models.dataTables.Table;
 import at.alirezamoh.whisperer_for_laravel.indexes.TableIndex;
 import at.alirezamoh.whisperer_for_laravel.support.codeGeneration.vistors.MigrationVisitor;
-import at.alirezamoh.whisperer_for_laravel.support.utils.LaravelPaths;
-import at.alirezamoh.whisperer_for_laravel.support.utils.MethodUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.*;
 import at.alirezamoh.whisperer_for_laravel.support.providers.ModelProvider;
-import at.alirezamoh.whisperer_for_laravel.support.utils.PhpClassUtils;
-import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.indexing.FileBasedIndex;
+import com.intellij.util.indexing.IdFilter;
 import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.impl.*;
@@ -124,31 +122,35 @@ public class MigrationManager {
      * Searches for migration files and extracts tables
      */
     private void searchForMigrations() {
-        Collection<VirtualFile> files = new ArrayList<>();
-
         FileBasedIndex fileBasedIndex = FileBasedIndex.getInstance();
+        Set<String> keys = new HashSet<>();
 
-        Collection<String> tables = fileBasedIndex.getAllKeys(TableIndex.INDEX_ID, project);
+        FileBasedIndex.getInstance().processAllKeys(
+            TableIndex.INDEX_ID,
+            key -> {
+                keys.add(key);
+                return true;
+            },
+            project
+        );
 
-        for (String table : tables) {
-            files.addAll(
-                fileBasedIndex.getContainingFiles(
-                    TableIndex.INDEX_ID,
-                    table,
-                    GlobalSearchScope.allScope(project)
-                )
-            );
-        }
-
-        for (VirtualFile file : files) {
-            PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
-
-            if (psiFile != null) {
-                MigrationVisitor migrationVisitor = new MigrationVisitor();
-                psiFile.acceptChildren(migrationVisitor);
-                this.tables.addAll(migrationVisitor.getTables());
+        PsiManager psiManager = PsiManager.getInstance(project);
+        fileBasedIndex.processFilesContainingAnyKey(
+            TableIndex.INDEX_ID,
+            keys,
+            GlobalSearchScope.allScope(project),
+            null,
+            null,
+            file -> {
+                PsiFile psiFile = psiManager.findFile(file);
+                if (psiFile != null) {
+                    MigrationVisitor migrationVisitor = new MigrationVisitor();
+                    psiFile.acceptChildren(migrationVisitor);
+                    this.tables.addAll(migrationVisitor.getTables());
+                }
+                return true;
             }
-        }
+        );
     }
 
     /**

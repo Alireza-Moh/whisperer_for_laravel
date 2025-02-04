@@ -10,6 +10,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.indexing.FileBasedIndex;
+import com.intellij.util.indexing.IdFilter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -70,13 +71,17 @@ public class TableReference extends PsiReferenceBase<PsiElement> implements PsiP
     @Override
     public Object @NotNull [] getVariants() {
         List<LookupElementBuilder> variants = new ArrayList<>();
-        Collection<String> tables = FileBasedIndex.getInstance().getAllKeys(TableIndex.INDEX_ID, project);
-
-        for (String table : tables) {
-            variants.add(
-                PsiElementUtils.buildSimpleLookupElement(table)
-            );
-        }
+        FileBasedIndex.getInstance().processAllKeys(
+            TableIndex.INDEX_ID,
+            key -> {
+                if (key instanceof String table) {
+                    variants.add(PsiElementUtils.buildSimpleLookupElement(table));
+                }
+                return true;
+            },
+            GlobalSearchScope.projectScope(project),
+            IdFilter.getProjectIdFilter(project, false)
+        );
 
         return variants.toArray();
     }

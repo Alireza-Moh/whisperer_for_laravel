@@ -76,7 +76,7 @@ public class TableIndex extends FileBasedIndexExtension<String, Void> {
 
     @Override
     public int getVersion() {
-        return 1;
+        return 2;
     }
 
     @Override
@@ -86,6 +86,11 @@ public class TableIndex extends FileBasedIndexExtension<String, Void> {
 
     @Override
     public boolean dependsOnFileContent() {
+        return true;
+    }
+
+    @Override
+    public boolean traceKeyHashToVirtualFileMapping() {
         return true;
     }
 
