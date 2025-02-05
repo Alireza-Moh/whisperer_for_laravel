@@ -12,6 +12,7 @@ import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.indexing.FileBasedIndex;
+import com.intellij.util.indexing.IdFilter;
 import com.jetbrains.php.lang.psi.elements.ArrayCreationExpression;
 import com.jetbrains.php.lang.psi.elements.ArrayHashElement;
 import com.jetbrains.php.lang.psi.elements.PhpPsiElement;
@@ -50,11 +51,14 @@ public class ConfigKeyResolver {
                 key,
                 null,
                 (file, serviceProvider) -> checkServiceProviderForConfigKey(text, project, serviceProvider, foundElement),
-                GlobalSearchScope.projectScope(project)
+                GlobalSearchScope.allScope(project)
             );
 
             return foundElement.get() == null;
-        }, project);
+        },
+            GlobalSearchScope.projectScope(project),
+            IdFilter.getProjectIdFilter(project, true)
+        );
 
         return foundElement.get();
     }
@@ -134,6 +138,12 @@ public class ConfigKeyResolver {
             (file, value) -> {
                 PsiFile psiFile = psiManager.findFile(file);
                 if (psiFile != null) {
+                    String relativePath = getRelativeConfigFilePath(file);
+                    if (relativePath != null && relativePath.equals(text)) {
+                        foundElement.set(psiFile);
+                        return false;
+                    }
+
                     String keyPath = extractKeyPath(text, file);
                     if (keyPath != null) {
                         PsiElement element = findConfigKeyInFile(psiFile, keyPath);
@@ -152,6 +162,22 @@ public class ConfigKeyResolver {
     }
 
     private @Nullable String extractKeyPath(@NotNull String fullKey, @NotNull VirtualFile configFile) {
+        String relativePath = getRelativeConfigFilePath(configFile);
+        if (relativePath == null) {
+            return null;
+        }
+
+        String prefixWithDot = relativePath + ".";
+        if (fullKey.startsWith(prefixWithDot)) {
+            return fullKey.substring(prefixWithDot.length());
+        } else if (fullKey.equals(relativePath)) {
+            return "";
+        } else {
+            return null;
+        }
+    }
+
+    private @Nullable String getRelativeConfigFilePath(@NotNull VirtualFile configFile) {
         String filePath = configFile.getPath().replace('\\', '/');
         int configIndex = filePath.lastIndexOf("/config/");
         if (configIndex == -1) {
@@ -163,15 +189,7 @@ public class ConfigKeyResolver {
             relativePath = relativePath.substring(0, relativePath.length() - ".php".length());
         }
 
-        String configKeyPrefix = relativePath.replace('/', '.');
-        String prefixWithDot = configKeyPrefix + ".";
-        if (fullKey.startsWith(prefixWithDot)) {
-            return fullKey.substring(prefixWithDot.length());
-        } else if (fullKey.equals(configKeyPrefix)) {
-            return "";
-        } else {
-            return null;
-        }
+        return relativePath.replace('/', '.');
     }
 
     private boolean checkServiceProviderForConfigKey(

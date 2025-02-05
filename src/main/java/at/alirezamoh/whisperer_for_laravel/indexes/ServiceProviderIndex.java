@@ -77,7 +77,7 @@ public class ServiceProviderIndex extends FileBasedIndexExtension<String, Servic
 
     @Override
     public int getVersion() {
-        return 1;
+        return 2;
     }
 
     @Override
@@ -87,6 +87,11 @@ public class ServiceProviderIndex extends FileBasedIndexExtension<String, Servic
 
     @Override
     public boolean dependsOnFileContent() {
+        return true;
+    }
+
+    @Override
+    public boolean traceKeyHashToVirtualFileMapping() {
         return true;
     }
 

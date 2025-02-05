@@ -7,6 +7,7 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.indexing.FileBasedIndex;
+import com.intellij.util.indexing.IdFilter;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -70,11 +71,15 @@ public class ConfigKeyCollector {
 
                     return true;
                 },
-                GlobalSearchScope.projectScope(project)
+                GlobalSearchScope.projectScope(project),
+                IdFilter.getProjectIdFilter(project, true)
             );
 
             return true;
-        }, project);
+        },
+            GlobalSearchScope.projectScope(project),
+            IdFilter.getProjectIdFilter(project, true)
+        );
     }
 
     private @NotNull String buildKeyValue(String value) {
