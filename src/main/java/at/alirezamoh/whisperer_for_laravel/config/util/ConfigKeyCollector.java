@@ -40,10 +40,14 @@ public class ConfigKeyCollector {
 
                     return true;
                 },
-                GlobalSearchScope.projectScope(project)
+                GlobalSearchScope.projectScope(project),
+                IdFilter.getProjectIdFilter(project, false)
             );
             return true;
-        }, project);
+        },
+            GlobalSearchScope.projectScope(project),
+            IdFilter.getProjectIdFilter(project, false)
+        );
     }
 
     private void getVariantsFromServiceProviderIndex(@NotNull Project project, FileBasedIndex fileBasedIndex, List<LookupElementBuilder> variants) {

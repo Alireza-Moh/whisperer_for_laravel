@@ -116,7 +116,7 @@ public class ConfigKeyResolver {
         Collection<VirtualFile> configFiles = FileBasedIndex.getInstance().getContainingFiles(
             ConfigIndex.INDEX_ID,
             text,
-            GlobalSearchScope.allScope(project)
+            GlobalSearchScope.projectScope(project)
         );
 
         for (VirtualFile configFile : configFiles) {
@@ -155,7 +155,8 @@ public class ConfigKeyResolver {
                 }
                 return true;
             },
-            GlobalSearchScope.projectScope(project)
+            GlobalSearchScope.projectScope(project),
+            IdFilter.getProjectIdFilter(project, false)
         );
 
         return foundElement.get();

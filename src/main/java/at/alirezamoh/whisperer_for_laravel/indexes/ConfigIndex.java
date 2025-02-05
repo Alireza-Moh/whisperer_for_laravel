@@ -84,7 +84,7 @@ public class ConfigIndex extends FileBasedIndexExtension<String, String> {
 
     @Override
     public int getVersion() {
-        return 1;
+        return 2;
     }
 
     @Override
@@ -105,6 +105,11 @@ public class ConfigIndex extends FileBasedIndexExtension<String, String> {
 
     @Override
     public boolean dependsOnFileContent() {
+        return true;
+    }
+
+    @Override
+    public boolean traceKeyHashToVirtualFileMapping() {
         return true;
     }
 
