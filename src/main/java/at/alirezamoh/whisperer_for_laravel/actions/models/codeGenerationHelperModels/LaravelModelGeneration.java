@@ -18,13 +18,13 @@ public class LaravelModelGeneration extends BaseModel {
         this.slug = "";
         this.name = "whisperer_for_laravel_models_" + shortUuid;
         this.extension = ".php";
-        this.destination = "/" + ProjectDefaultPaths.WHISPERER_FOR_LARAVEL_DIR_PATH;
+        this.destination =  settingsState.getProjectDirectoryPath() + ProjectDefaultPaths.WHISPERER_FOR_LARAVEL_DIR_PATH;
 
         if (settingsState.isProjectDirectoryEmpty()) {
             this.filePath = ProjectDefaultPaths.WHISPERER_FOR_LARAVEL_DIR_PATH + this.name + ".php";
         }
         else {
-            this.filePath = ProjectDefaultPaths.WHISPERER_FOR_LARAVEL_DIR_PATH + settingsState.getProjectDirectoryPath() + "/" + this.name + ".php";
+            this.filePath = settingsState.getProjectDirectoryPath() + ProjectDefaultPaths.WHISPERER_FOR_LARAVEL_DIR_PATH + this.name + ".php";
         }
     }
 
