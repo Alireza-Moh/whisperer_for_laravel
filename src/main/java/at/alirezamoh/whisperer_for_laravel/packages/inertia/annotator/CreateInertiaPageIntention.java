@@ -1,6 +1,7 @@
 package at.alirezamoh.whisperer_for_laravel.packages.inertia.annotator;
 
 import at.alirezamoh.whisperer_for_laravel.actions.models.InertiaPageModel;
+import at.alirezamoh.whisperer_for_laravel.packages.inertia.InertiaPageCollector;
 import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.whisperer_for_laravel.support.TemplateLoader;
 import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
@@ -21,8 +22,6 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -71,7 +70,7 @@ public class CreateInertiaPageIntention extends BaseIntentionAction {
      */
     @Override
     public void invoke(@NotNull Project project, Editor editor, PsiFile psiFile) throws IncorrectOperationException {
-        List<String> options = getInertiaPaths(project);
+        List<String> options = InertiaPageCollector.getInertiaPaths(project);
         if (options == null) {
             return;
         }
@@ -104,7 +103,7 @@ public class CreateInertiaPageIntention extends BaseIntentionAction {
         comboPanel.add(pageTypeComboBox);
         comboPanel.add(Box.createVerticalStrut(10));
 
-        JLabel pageVariantLabel = new JLabel("Page variant:");
+        JLabel pageVariantLabel = new JLabel("Page variant: (Ignore if it's not a Vue file)");
         pageVariantLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         comboPanel.add(pageVariantLabel);
         comboPanel.add(pageVariantComboBox);
@@ -153,25 +152,6 @@ public class CreateInertiaPageIntention extends BaseIntentionAction {
         cancelButton.addActionListener(e -> popup.cancel());
 
         popup.showInBestPositionFor(editor);
-    }
-
-    /**
-     * Retrieves the available Inertia paths from the project settings
-     *
-     * @param project The current project
-     * @return A list of inertia paths or an empty list if none are set
-     */
-    private List<String> getInertiaPaths(@NotNull Project project) {
-        settingsState = SettingsState.getInstance(project);
-        String inertiaPaths = settingsState.getInertiaPageRootPath();
-        if (inertiaPaths == null) {
-            return new ArrayList<>();
-        }
-
-        String[] paths = inertiaPaths.split(";");
-        return Arrays.stream(paths)
-            .filter(path -> !path.isEmpty())
-            .toList();
     }
 
     @Override

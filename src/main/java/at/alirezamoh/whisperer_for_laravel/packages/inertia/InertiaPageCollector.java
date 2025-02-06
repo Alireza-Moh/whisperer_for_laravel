@@ -6,6 +6,7 @@ import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,6 +55,25 @@ public class InertiaPageCollector {
         }
 
         return references;
+    }
+
+    /**
+     * Retrieves the available Inertia paths from the project settings
+     *
+     * @param project The current project
+     * @return A list of inertia paths or an empty list if none are set
+     */
+    public static List<String> getInertiaPaths(@NotNull Project project) {
+        SettingsState settingsState = SettingsState.getInstance(project);
+        String inertiaPaths = settingsState.getInertiaPageRootPath();
+        if (inertiaPaths == null) {
+            return new ArrayList<>();
+        }
+
+        String[] paths = inertiaPaths.split(";");
+        return Arrays.stream(paths)
+            .filter(path -> !path.isEmpty())
+            .toList();
     }
 
     /**

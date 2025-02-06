@@ -10,6 +10,8 @@ public class InertiaPageModel extends BaseModel {
 
     private boolean withOptionsApi;
 
+    private boolean vue;
+
     /**
      * @param name                      The name of the inertia page
      * @param unformattedModuleFullPath The unformatted module full path
@@ -38,6 +40,7 @@ public class InertiaPageModel extends BaseModel {
 
         this.pageName = getName();
         this.withOptionsApi = withOptionsApi;
+        this.vue = pageType.equals(".vue");
     }
 
     @Override
@@ -51,5 +54,9 @@ public class InertiaPageModel extends BaseModel {
 
     public boolean isWithOptionsApi() {
         return withOptionsApi;
+    }
+
+    public boolean isVue() {
+        return vue;
     }
 }

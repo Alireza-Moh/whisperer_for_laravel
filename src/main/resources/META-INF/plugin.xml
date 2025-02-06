@@ -159,6 +159,9 @@
 
                 <action id="at.alirezamoh.whisperer_for_laravel.ViewComposerAction" class="at.alirezamoh.whisperer_for_laravel.actions.ViewComposerAction" text="Generate View Composer From Template" icon="/icons/laravelIcon.svg">
                 </action>
+
+                <action id="at.alirezamoh.whisperer_for_laravel.InertiaPageAction" class="at.alirezamoh.whisperer_for_laravel.actions.InertiaPageAction" text="Generate Inertia Page Template" icon="/icons/laravelIcon.svg">
+                </action>
             </group>
 
             <action id="at.alirezamoh.whisperer_for_laravel.ActionChooserAction" class="at.alirezamoh.whisperer_for_laravel.actions.ActionChooserAction" text="Search For Code Creation Templates" icon="/icons/laravelIcon.svg">

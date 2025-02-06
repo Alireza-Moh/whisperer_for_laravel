@@ -1,3 +1,4 @@
+<#if vue>
 <#if withOptionsApi>
 <script>
     export default {
@@ -24,4 +25,17 @@
 <style scoped>
 
 </style>
+</#if>
+<#else>
+import React from 'react';
+
+const ${pageName} = () => {
+    return (
+        <div>
+            {/* Your component markup goes here */}
+        </div>
+    );
+};
+
+export default ${pageName};
 </#if>
