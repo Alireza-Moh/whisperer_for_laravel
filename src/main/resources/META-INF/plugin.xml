@@ -80,6 +80,8 @@
         <errorHandler implementation="com.intellij.diagnostic.JetBrainsMarketplaceErrorReportSubmitter"/>
 
         <lang.inspectionSuppressor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.request.requestField.RequestFieldSuppressor"/>
+
+        <annotator language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.packages.inertia.annotator.InertiaPageExistenceAnnotator"/>
     </extensions>
 
     <actions>
