@@ -98,7 +98,11 @@ public class InertiaPageView extends BaseDialog {
         pageVariantComboBox = new ComboBox<>(new String[]{"Options API", "Composition API"});
         pageTypeComboBox = new ComboBox<>(new String[]{".vue", ".jsx"});
 
-        initDefaultContentPaneSettings();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0;
+
+        gbc.gridx = 0;
+        gbc.gridy = 0;
 
         gbc.insets = JBUI.insetsLeft(3);
         contentPane.add(new JLabel("Enter page name:"), gbc);
