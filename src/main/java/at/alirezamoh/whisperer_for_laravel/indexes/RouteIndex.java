@@ -63,7 +63,7 @@ public class RouteIndex extends FileBasedIndexExtension<String, Void> {
         return inputData -> {
             Project project = inputData.getProject();
 
-            if (!PluginUtils.isLaravelProject(project) && PluginUtils.isLaravelFrameworkNotInstalled(project)) {
+            if (PluginUtils.shouldNotCompleteOrNavigate(project)) {
                 return Collections.emptyMap();
             }
 

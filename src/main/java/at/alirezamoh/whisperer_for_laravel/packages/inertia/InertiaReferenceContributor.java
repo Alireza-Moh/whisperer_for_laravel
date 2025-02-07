@@ -51,9 +51,7 @@ public class InertiaReferenceContributor extends PsiReferenceContributor {
 
                 @Override
                 public PsiReference @NotNull [] getReferencesByElement(@NotNull PsiElement psiElement, @NotNull ProcessingContext processingContext) {
-                    Project project = psiElement.getProject();
-
-                    if (!PluginUtils.isLaravelProject(project) && PluginUtils.isLaravelFrameworkNotInstalled(project)) {
+                    if (InertiaPageCollector.doNotCompleteOrNavigate(psiElement.getProject())) {
                         return PsiReference.EMPTY_ARRAY;
                     }
 

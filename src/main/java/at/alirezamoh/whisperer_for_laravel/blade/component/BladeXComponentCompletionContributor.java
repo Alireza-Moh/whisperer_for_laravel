@@ -43,7 +43,7 @@ public class BladeXComponentCompletionContributor extends CompletionContributor 
                     PsiElement element = completionParameters.getPosition();
                     Project project = element.getProject();
 
-                    if (!PluginUtils.isLaravelProject(project) && PluginUtils.isLaravelFrameworkNotInstalled(project)) {
+                    if (PluginUtils.shouldNotCompleteOrNavigate(project)) {
                         return;
                     }
 

@@ -2,6 +2,7 @@ package at.alirezamoh.whisperer_for_laravel.packages.inertia;
 
 import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.whisperer_for_laravel.support.utils.DirectoryUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
@@ -74,6 +75,17 @@ public class InertiaPageCollector {
         return Arrays.stream(paths)
             .filter(path -> !path.isEmpty())
             .toList();
+    }
+
+    /**
+     * Check if the project is using the inertia package
+     * @param project The current project
+     */
+    public static boolean doNotCompleteOrNavigate(Project project) {
+        return !PluginUtils.isLaravelProject(project)
+            || PluginUtils.isLaravelFrameworkNotInstalled(project)
+            || !PluginUtils.doesPackageExists(project, "inertiajs/inertia-laravel")
+            || DirectoryUtils.getDirectory(project, "/vendor/inertiajs/inertia-laravel") == null;
     }
 
     /**

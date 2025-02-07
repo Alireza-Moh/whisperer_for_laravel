@@ -5,6 +5,7 @@ import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
 import com.intellij.lang.annotation.HighlightSeverity;
+import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
@@ -33,11 +34,16 @@ public class InertiaPageExistenceAnnotator implements Annotator {
             return;
         }
 
+        Project project = psiElement.getProject();
+        if (InertiaPageCollector.doNotCompleteOrNavigate(project)) {
+            return;
+        }
+
         if (psiElement instanceof StringLiteralExpression stringLiteralExpression) {
             PsiElement parent = stringLiteralExpression.getParent().getParent();
 
             if (parent instanceof MethodReference methodReference && Objects.equals(methodReference.getName(), "render")) {
-                boolean exists = InertiaPageCollector.collectPages(psiElement.getProject(), false)
+                boolean exists = InertiaPageCollector.collectPages(project, false)
                     .stream()
                     .anyMatch(page -> page.getPath().equals(StrUtils.removeQuotes(stringLiteralExpression.getText())));
                 if (!exists) {
