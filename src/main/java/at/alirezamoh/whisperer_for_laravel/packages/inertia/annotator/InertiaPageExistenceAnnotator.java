@@ -1,5 +1,6 @@
 package at.alirezamoh.whisperer_for_laravel.packages.inertia.annotator;
 
+import at.alirezamoh.whisperer_for_laravel.packages.inertia.InertiaMethodValidator;
 import at.alirezamoh.whisperer_for_laravel.packages.inertia.InertiaPageCollector;
 import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.lang.annotation.AnnotationHolder;
@@ -7,11 +8,8 @@ import com.intellij.lang.annotation.Annotator;
 import com.intellij.lang.annotation.HighlightSeverity;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
-import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Objects;
 
 /**
  * Annotator that checks if an Inertia page exists
@@ -39,20 +37,25 @@ public class InertiaPageExistenceAnnotator implements Annotator {
             return;
         }
 
-        if (psiElement instanceof StringLiteralExpression stringLiteralExpression) {
-            PsiElement parent = stringLiteralExpression.getParent().getParent();
-
-            if (parent instanceof MethodReference methodReference && Objects.equals(methodReference.getName(), "render")) {
-                boolean exists = InertiaPageCollector.collectPages(project, false)
-                    .stream()
-                    .anyMatch(page -> page.getPath().equals(StrUtils.removeQuotes(stringLiteralExpression.getText())));
-                if (!exists) {
-                    annotationHolder.newAnnotation(HighlightSeverity.WARNING, "Inertia page not found")
-                        .range(stringLiteralExpression.getTextRange())
-                        .withFix(new CreateInertiaPageIntention(stringLiteralExpression.getText()))
-                        .create();
-                }
-            }
+        if (!(psiElement instanceof StringLiteralExpression stringLiteralExpression)) {
+            return;
         }
+
+        if (!InertiaMethodValidator.isInsideCorrectMethod(stringLiteralExpression)) {
+            return;
+        }
+
+        if (!doesPageExists(stringLiteralExpression, project)) {
+            annotationHolder.newAnnotation(HighlightSeverity.WARNING, "Inertia page not found")
+                .range(stringLiteralExpression.getTextRange())
+                .withFix(new CreateInertiaPageIntention(stringLiteralExpression.getText()))
+                .create();
+        }
+    }
+
+    private boolean doesPageExists(StringLiteralExpression stringLiteralExpression, Project project) {
+        return InertiaPageCollector.collectPages(project, false)
+            .stream()
+            .anyMatch(page -> page.getPath().equals(StrUtils.removeQuotes(stringLiteralExpression.getText())));
     }
 }
