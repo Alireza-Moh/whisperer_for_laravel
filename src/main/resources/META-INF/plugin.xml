@@ -164,7 +164,8 @@
                 </action>
             </group>
 
-            <action id="at.alirezamoh.whisperer_for_laravel.ActionChooserAction" class="at.alirezamoh.whisperer_for_laravel.actions.ActionChooserAction" text="Search For Code Creation Templates" icon="/icons/laravelIcon.svg">
+            <action id="at.alirezamoh.whisperer_for_laravel.ActionChooserAction" class="at.alirezamoh.whisperer_for_laravel.actions.ActionChooserAction" text="Search For Code Generation Templates" icon="/icons/laravelIcon.svg">
+                <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt G"/>
             </action>
 
             <action id="at.alirezamoh.whisperer_for_laravel.GenerateHelperMethodsAction" class="at.alirezamoh.whisperer_for_laravel.actions.GenerateHelperMethodsAction" text="Generate Helper Methods For Eloquent/DB" icon="/icons/laravelIcon.svg">
