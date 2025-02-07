@@ -17,6 +17,8 @@
             <li>Laravel packages support: InertiaJs</li>
         </ul>
 
+        <a href="https://alireza-moh.github.io/whisperer_for_laravel_docs/">Documentation</a><br>
+
         <h3>Contributions:</h3>
         <p>Contributions are always welcome! If you encounter any issues, feel free to open an issue on the <a href="https://github.com/Alireza-Moh/whisperer_for_laravel">GitHub Issues page</a>. If you want to contribute to the project, do not hesitate</p>
         ]]>
@@ -26,8 +28,12 @@
     <change-notes>
         <![CDATA[
             <ul>
-                <li>Bug fix: Validates Laravel framework installation based on the specified version.</li>
-                <li>Removes unused libraries</li>
+                <li>Adds keyboard shortcut for the search menu.</li>
+                <li>Adds Inertia page creation action.</li>
+                <li>Adds Inertia page inspection check.</li>
+                <li>Adds route action 'Go to Declaration' support for older Laravel versions.</li>
+                <li>Fixes bugs.</li>
+                <li>Minimum required version set to PhpStorm 2024.1, dropping support for 2023 and below</li>
             </ul>
         ]]>
     </change-notes>
@@ -39,7 +45,7 @@
     <depends>com.intellij.modules.platform</depends>
     <depends>com.jetbrains.php.blade</depends>
 
-    <version>1.1.6</version>
+    <version>1.2.0</version>
 
     <extensions defaultExtensionNs="com.intellij">
         <notificationGroup id="NotificationGroup" displayType="BALLOON"/>
