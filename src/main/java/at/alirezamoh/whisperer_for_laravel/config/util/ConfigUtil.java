@@ -13,7 +13,7 @@ public class ConfigUtil {
         ArrayReturnPsiRecursiveVisitor visitor = new ArrayReturnPsiRecursiveVisitor(dirName);
         configFile.acceptChildren(visitor);
 
-        variants.put(dirName, null);
+        variants.put(dirName, "");
         variants.putAll(visitor.getVariants());
     }
 

@@ -32,10 +32,7 @@ public class RequestFieldSuppressor implements InspectionSuppressor {
     @Override
     public boolean isSuppressedFor(@NotNull PsiElement psiElement, @NotNull String s) {
         Project project = psiElement.getProject();
-        if (
-            (!PluginUtils.isLaravelProject(project) && PluginUtils.isLaravelFrameworkNotInstalled(project))
-            || !suppressedPhpInspections.contains(s)
-        ) {
+        if (PluginUtils.shouldNotCompleteOrNavigate(project) || !suppressedPhpInspections.contains(s)) {
             return false;
         }
 

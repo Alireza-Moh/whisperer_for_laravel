@@ -35,7 +35,7 @@ public class BladeXComponentGotoDeclarationHandler implements GotoDeclarationHan
 
         Project project = sourceElement.getProject();
 
-        if (!PluginUtils.isLaravelProject(project) && PluginUtils.isLaravelFrameworkNotInstalled(project)) {
+        if (PluginUtils.shouldNotCompleteOrNavigate(project)) {
             return null;
         }
 

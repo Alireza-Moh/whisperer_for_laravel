@@ -40,7 +40,7 @@ public class GateReferenceContributor extends PsiReferenceContributor {
                 public PsiReference @NotNull [] getReferencesByElement(@NotNull PsiElement element, @NotNull ProcessingContext context) {
                     Project project = element.getProject();
 
-                    if (!PluginUtils.isLaravelProject(project) && PluginUtils.isLaravelFrameworkNotInstalled(project)) {
+                    if (PluginUtils.shouldNotCompleteOrNavigate(project)) {
                         return PsiReference.EMPTY_ARRAY;
                     }
 

@@ -28,7 +28,7 @@ public class RequestFieldGotoDeclarationHandler implements GotoDeclarationHandle
         }
 
         Project project = sourceElement.getProject();
-        if (!PluginUtils.isLaravelProject(project) && PluginUtils.isLaravelFrameworkNotInstalled(project)) {
+        if (PluginUtils.shouldNotCompleteOrNavigate(project)) {
             return null;
         }
 

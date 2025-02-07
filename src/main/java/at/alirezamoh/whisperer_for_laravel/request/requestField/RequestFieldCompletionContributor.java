@@ -45,7 +45,7 @@ public class RequestFieldCompletionContributor extends CompletionContributor {
                     PsiElement position = parameters.getPosition().getOriginalElement();
 
                     Project project = position.getProject();
-                    if (!PluginUtils.isLaravelProject(project) && PluginUtils.isLaravelFrameworkNotInstalled(project)) {
+                    if (PluginUtils.shouldNotCompleteOrNavigate(project)) {
                         return;
                     }
 
@@ -70,7 +70,7 @@ public class RequestFieldCompletionContributor extends CompletionContributor {
                     PsiElement position = parameters.getPosition().getOriginalElement();
 
                     Project project = position.getProject();
-                    if (!PluginUtils.isLaravelProject(project) && PluginUtils.isLaravelFrameworkNotInstalled(project)) {
+                    if (PluginUtils.shouldNotCompleteOrNavigate(project)) {
                         return;
                     }
 

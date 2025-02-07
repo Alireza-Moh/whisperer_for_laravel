@@ -16,15 +16,13 @@ public class StartPluginAction extends DefaultActionGroup {
     @Override
     public void update(@NotNull AnActionEvent e) {
         Project project = e.getProject();
-        if (project != null && !PluginUtils.isDumbMode(project)) {
-            if (!PluginUtils.isLaravelProject(project)) {
-                e.getPresentation().setEnabledAndVisible(false);
-            }
-        }
 
-        if (project == null) {
-            e.getPresentation().setEnabledAndVisible(false);
-        }
+        boolean isVisible =
+            project != null
+            && !PluginUtils.isDumbMode(project)
+            && PluginUtils.isLaravelProject(project);
+
+        e.getPresentation().setEnabledAndVisible(isVisible);
     }
 
     @Override

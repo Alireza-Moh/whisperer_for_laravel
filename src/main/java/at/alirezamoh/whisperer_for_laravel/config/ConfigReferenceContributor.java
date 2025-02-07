@@ -56,7 +56,7 @@ public class ConfigReferenceContributor extends PsiReferenceContributor {
                     public PsiReference @NotNull [] getReferencesByElement(@NotNull PsiElement psiElement, @NotNull ProcessingContext processingContext) {
                         Project project = psiElement.getProject();
 
-                        if (!PluginUtils.isLaravelProject(project) && PluginUtils.isLaravelFrameworkNotInstalled(project)) {
+                        if (PluginUtils.shouldNotCompleteOrNavigate(project)) {
                             return PsiReference.EMPTY_ARRAY;
                         }
 

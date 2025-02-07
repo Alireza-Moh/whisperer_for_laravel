@@ -10,7 +10,6 @@ import at.alirezamoh.whisperer_for_laravel.support.codeGeneration.vistors.ClassM
 import at.alirezamoh.whisperer_for_laravel.support.utils.DirectoryUtils;
 import at.alirezamoh.whisperer_for_laravel.support.notification.Notify;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
-import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import at.alirezamoh.whisperer_for_laravel.support.TemplateLoader;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
@@ -61,7 +60,7 @@ public class GenerateHelperMethodsAction extends BaseAction {
     public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
         project = anActionEvent.getProject();
 
-        if (PluginUtils.isLaravelFrameworkNotInstalled(project)) {
+        if (PluginUtils.shouldNotCompleteOrNavigate(project)) {
             Notify.notifyWarning(project, "Laravel Framework is not installed");
             return;
         }
