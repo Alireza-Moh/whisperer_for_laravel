@@ -49,12 +49,16 @@ public class RequestFieldGotoDeclarationHandler implements GotoDeclarationHandle
     }
 
     private PsiElement resolveParentElement(PsiElement sourceElement) {
-        PsiElement parent = sourceElement.getParent().getParent().getParent();
-        if (parent instanceof ArrayAccessExpression arrayAccessExpression) {
+        PsiElement greatGrandParent = getNthParent(sourceElement, 3);
+        if (greatGrandParent == null) {
+            return null;
+        }
+
+        if (greatGrandParent instanceof ArrayAccessExpression arrayAccessExpression) {
             return arrayAccessExpression.getValue();
         }
 
-        parent = sourceElement.getParent();
+        PsiElement parent = sourceElement.getParent();
         if (parent instanceof FieldReferenceImpl fieldReference) {
             return fieldReference.getClassReference();
         }
@@ -86,5 +90,16 @@ public class RequestFieldGotoDeclarationHandler implements GotoDeclarationHandle
                 .filter(rule -> RequestFieldUtils.isMatchingRule(contextElement, rule))
                 .map(ArrayHashElement::getKey)
                 .toArray(PsiElement[]::new);
+    }
+
+    private PsiElement getNthParent(PsiElement element, int n) {
+        PsiElement current = element;
+        for (int i = 0; i < n; i++) {
+            if (current == null) {
+                return null;
+            }
+            current = current.getParent();
+        }
+        return current;
     }
 }
