@@ -44,6 +44,10 @@ public class ClassMethodLoader {
 
     public @Nullable Method extractMethodInfo(com.jetbrains.php.lang.psi.elements.Method actualMethod, Set<String> methodsTobeIgnored) {
         String methodName = actualMethod.getName();
+        if (methodName == null) {
+            return null;
+        }
+
         if (methodsTobeIgnored.contains(methodName)) {
             return null;
         }

@@ -64,9 +64,11 @@ public class RuleValidationUtil {
     }
 
     private static boolean isInsideRequestMethod(PsiElement psiElement, MethodReference methodReference, Project project) {
+        String methodName = methodReference.getName();
 
         return PhpClassUtils.isCorrectRelatedClass(methodReference, project, "\\Illuminate\\Http\\Request")
-            && RequestFieldUtils.VALIDATION_METHODS.contains(methodReference.getName())
+            && methodName != null
+            && RequestFieldUtils.VALIDATION_METHODS.contains(methodName)
             && isRuleParam(methodReference, psiElement)
             && isInsideArrayValue(psiElement);
     }
@@ -103,8 +105,12 @@ public class RuleValidationUtil {
     }
 
     public static boolean isRuleParam(MethodReference method, PsiElement position) {
-        Integer paramPositions = RULES_METHODS.get(method.getName());
+        String methodName = method.getName();
+        if (methodName == null) {
+            return false;
+        }
 
+        Integer paramPositions = RULES_METHODS.get(methodName);
         if (paramPositions == null) {
             return false;
         }

@@ -118,7 +118,9 @@ public class MigrationVisitor extends PsiRecursiveElementWalkingVisitor {
     }
 
     private boolean isColumnDefinition(MethodReference method) {
-        return AVAILABLE_TYPES.contains(method.getName());
+        String methodName = method.getName();
+
+        return methodName != null && AVAILABLE_TYPES.contains(methodName);
     }
 
     private List<MethodReference> getColumnsMethodsForTable(MethodReference method) {
@@ -144,7 +146,7 @@ public class MigrationVisitor extends PsiRecursiveElementWalkingVisitor {
             .orElse(null);
 
         if (targetTable != null) {
-            if (isId(referenceMethod) && doesNotContain(targetTable.fields(), "id")) {
+            if (isId(referenceMethod) && doesNotContain(targetTable.fields(), "id") && referenceMethod.getName() != null) {
                 targetTable.fields().add(new Field(PhpTypeConverter.convert(referenceMethod.getName()), "id", false, false, false, null));
             } else if (isTimestamps(referenceMethod)) {
                 if (doesNotContain(targetTable.fields(), "created_at")) {
@@ -187,9 +189,14 @@ public class MigrationVisitor extends PsiRecursiveElementWalkingVisitor {
 
     private List<Field> getColumnName(MethodReference method) {
         List<Field> fields = new ArrayList<>();
-        PsiElement parameter = method.getParameter(0);
+        String methodName = method.getName();
 
-        boolean isRenameDefinition = Objects.equals(method.getName(), "renameColumn");
+        if (methodName == null) {
+            return fields;
+        }
+
+        PsiElement parameter = method.getParameter(0);
+        boolean isRenameDefinition = Objects.equals(methodName, "renameColumn");
         RenameField renameField = null;
 
         PsiElement secParameter = method.getParameter(1);
@@ -206,10 +213,10 @@ public class MigrationVisitor extends PsiRecursiveElementWalkingVisitor {
                 if (value instanceof PhpPsiElement phpPsiElement) {
                     fields.add(
                         new Field(
-                            PhpTypeConverter.convert(method.getName()),
+                            PhpTypeConverter.convert(methodName),
                             StrUtils.removeQuotes(phpPsiElement.getText()),
                             false,
-                            AVOIDABLE_TYPES.contains(method.getName()),
+                            AVOIDABLE_TYPES.contains(methodName),
                             isRenameDefinition,
                             renameField
                         )
@@ -219,10 +226,10 @@ public class MigrationVisitor extends PsiRecursiveElementWalkingVisitor {
         } else if (parameter instanceof StringLiteralExpression) {
             fields.add(
                 new Field(
-                    PhpTypeConverter.convert(method.getName()),
+                    PhpTypeConverter.convert(methodName),
                     StrUtils.removeQuotes(parameter.getText()),
                     false,
-                    AVOIDABLE_TYPES.contains(method.getName()),
+                    AVOIDABLE_TYPES.contains(methodName),
                     isRenameDefinition,
                     renameField
                 )

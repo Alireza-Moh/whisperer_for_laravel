@@ -111,8 +111,11 @@ public class RouteReferenceContributor extends PsiReferenceContributor {
             ? ((MethodReference) reference).getName()
             : ((FunctionReference) reference).getName();
 
-        Integer expectedParamIndex = REDIRECT_AND_URL_METHODS.get(referenceName);
+        if (referenceName == null) {
+            return false;
+        }
 
+        Integer expectedParamIndex = REDIRECT_AND_URL_METHODS.get(referenceName);
         if (expectedParamIndex == null) {
             expectedParamIndex = ROUTE_METHODS.get(referenceName);
         }

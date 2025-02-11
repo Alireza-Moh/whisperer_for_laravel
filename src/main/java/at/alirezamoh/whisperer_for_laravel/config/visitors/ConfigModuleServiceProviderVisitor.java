@@ -64,36 +64,39 @@ public class ConfigModuleServiceProviderVisitor extends BaseServiceProviderVisit
      */
     private void initParameters(MethodReference method) {
         String configKeyIdentifier = PsiElementUtils.getMethodParameterAt(method, 1);
-        String configFileName = PsiElementUtils.getMethodParameterAt(method, 0);
-
-        if (configKeyIdentifier == null || configFileName == null) {
+        if (configKeyIdentifier == null) {
             return;
         }
 
         ParameterList parameters = method.getParameterList();
-        if (parameters != null) {
-            PsiElement namespaceParameter = parameters.getParameter(0);
-            if (namespaceParameter instanceof ConcatenationExpressionImpl concatenationExpression) {
-                PsiFile containingFile = concatenationExpression.getContainingFile();
-                VirtualFile virtualFile = containingFile.getVirtualFile();
+        if (parameters == null) {
+            return;
+        }
 
-                if (virtualFile != null) {
-                    VirtualFile parentDir = virtualFile.getParent();
-                    PsiElement rightOperand = concatenationExpression.getRightOperand();
-                    if (rightOperand instanceof StringLiteralExpression relativePathConfigFilePath && parentDir != null) {
-                        VirtualFile resolvedVirtualFile = parentDir.findFileByRelativePath(
-                            StrUtils.removeQuotes(relativePathConfigFilePath.getText())
-                        );
+        PsiElement namespaceParameter = parameters.getParameter(0);
+        if (!(namespaceParameter instanceof ConcatenationExpressionImpl concatenationExpression)) {
+            return;
+        }
 
-                        if (resolvedVirtualFile != null) {
-                            PsiFile configFile = PsiManager.getInstance(project).findFile(resolvedVirtualFile);
-                            if (configFile != null) {
-                                configFilesInModule.add(
-                                    new ConfigModule(configFile, configKeyIdentifier)
-                                );
-                            }
-                        }
-                    }
+        PsiFile containingFile = concatenationExpression.getContainingFile();
+        VirtualFile virtualFile = containingFile.getVirtualFile();
+        if (virtualFile == null) {
+            return;
+        }
+
+        VirtualFile parentDir = virtualFile.getParent();
+        PsiElement rightOperand = concatenationExpression.getRightOperand();
+        if (rightOperand instanceof StringLiteralExpression relativePathConfigFilePath && parentDir != null) {
+            VirtualFile resolvedVirtualFile = parentDir.findFileByRelativePath(
+                StrUtils.removeQuotes(relativePathConfigFilePath.getText())
+            );
+
+            if (resolvedVirtualFile != null) {
+                PsiFile configFile = PsiManager.getInstance(project).findFile(resolvedVirtualFile);
+                if (configFile != null) {
+                    configFilesInModule.add(
+                        new ConfigModule(configFile, configKeyIdentifier)
+                    );
                 }
             }
         }

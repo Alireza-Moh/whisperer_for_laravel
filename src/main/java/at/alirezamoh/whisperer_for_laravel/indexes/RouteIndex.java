@@ -120,9 +120,12 @@ public class RouteIndex extends FileBasedIndexExtension<String, Void> {
 
     private boolean isLaravelRouteMethod(MethodReference methodReference) {
         PhpExpression routeClassReference = methodReference.getClassReference();
+        String methodName = methodReference.getName();
 
         return routeClassReference instanceof ClassReferenceImpl classReferences
-            && ROUTE_METHODS.containsKey(methodReference.getName())
+            && methodName != null
+            && ROUTE_METHODS.containsKey(methodName)
+            && classReferences.getFQN() != null
             && ROUTE_NAMESPACES.contains(classReferences.getFQN());
     }
 

@@ -89,8 +89,12 @@ public class RouteNamespaceCompletionContributor extends CompletionContributor {
      * @return True or false
      */
     private boolean isNamespaceParam(MethodReference reference, PsiElement position) {
-        Integer expectedParamIndex = NAMESPACE_METHODS.get(reference.getName());
+        String methodName = reference.getName();
+        if (methodName == null) {
+            return false;
+        }
 
+        Integer expectedParamIndex = NAMESPACE_METHODS.get(methodName);
         if (expectedParamIndex == null) {
             return false;
         }
