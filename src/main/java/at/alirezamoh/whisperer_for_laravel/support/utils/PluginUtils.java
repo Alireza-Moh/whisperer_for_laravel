@@ -182,12 +182,6 @@ public class PluginUtils {
      * @return A {@link PsiFile} handle for "composer.json", or {@code null} if not found
      */
     private static @Nullable PsiFile getComposerFile(Project project) {
-        PsiFile composerFile = DirectoryUtils.getFileByName(project, "/composer.json");
-
-        if (composerFile == null) {
-            Notify.notifyError(project, "composer.json file not found");
-        }
-
         return DirectoryUtils.getFileByName(project, "/composer.json");
     }
 }
