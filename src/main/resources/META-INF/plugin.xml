@@ -28,12 +28,7 @@
     <change-notes>
         <![CDATA[
             <ul>
-                <li>Adds keyboard shortcut for the search menu.</li>
-                <li>Adds Inertia page creation action.</li>
-                <li>Adds Inertia page inspection check.</li>
-                <li>Adds route action 'Go to Declaration' support for older Laravel versions.</li>
                 <li>Fixes bugs.</li>
-                <li>Minimum required version set to PhpStorm 2024.1, dropping support for 2023 and below</li>
             </ul>
         ]]>
     </change-notes>
@@ -45,7 +40,7 @@
     <depends>com.intellij.modules.platform</depends>
     <depends>com.jetbrains.php.blade</depends>
 
-    <version>1.2.0</version>
+    <version>1.2.1</version>
 
     <extensions defaultExtensionNs="com.intellij">
         <notificationGroup id="NotificationGroup" displayType="BALLOON"/>
