@@ -66,8 +66,11 @@ public class BladeModuleServiceProviderVisitor extends BaseServiceProviderVisito
      */
     private void initParameters(MethodReference method) {
         String viewNamespace = PsiElementUtils.getMethodParameterAt(method, 1);
-        ParameterList parameters = method.getParameterList();
+        if (viewNamespace == null) {
+            return;
+        }
 
+        ParameterList parameters = method.getParameterList();
         if (parameters == null) {
             return;
         }

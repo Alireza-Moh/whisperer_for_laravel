@@ -13,7 +13,10 @@ import com.jetbrains.php.lang.lexer.PhpTokenTypes;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class RouteNamespaceCompletionContributor extends CompletionContributor {
     /**
@@ -94,7 +97,6 @@ public class RouteNamespaceCompletionContributor extends CompletionContributor {
         if (expectedParamIndex == null) {
             return false;
         }
-
         return MethodUtils.findParamIndex(position, false) == expectedParamIndex;
     }
 }

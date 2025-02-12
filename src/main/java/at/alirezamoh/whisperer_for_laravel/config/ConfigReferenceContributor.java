@@ -115,8 +115,11 @@ public class ConfigReferenceContributor extends PsiReferenceContributor {
                 ? ((MethodReference) reference).getName()
                 : ((FunctionReference) reference).getName();
 
-        Integer expectedParamIndex = CONFIG_METHODS.get(referenceName);
+        if (referenceName == null) {
+            return false;
+        }
 
+        Integer expectedParamIndex = CONFIG_METHODS.get(referenceName);
         if (expectedParamIndex == null) {
             return false;
         }

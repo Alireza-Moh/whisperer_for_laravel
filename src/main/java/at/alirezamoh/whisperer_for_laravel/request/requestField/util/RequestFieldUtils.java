@@ -101,7 +101,7 @@ final public class RequestFieldUtils {
     }
 
     /**
-     * Extracts validation rules from a method if it references a validation method.
+     * Analyzes the given method to extract validation rules defined through calls to known validation methods
      *
      * @param method the method to analyze
      * @return a collection of ArrayHashElements representing the validation rules
@@ -113,7 +113,8 @@ final public class RequestFieldUtils {
 
         return PsiTreeUtil.findChildrenOfType(method, MethodReference.class).stream()
             .filter(methodReference -> {
-                if (!VALIDATION_METHODS.contains(methodReference.getName())) {
+                String methodName = methodReference.getName();
+                if (methodName == null || !VALIDATION_METHODS.contains(methodName)) {
                     return false;
                 }
 
@@ -235,14 +236,19 @@ final public class RequestFieldUtils {
         MethodReference methodReference = MethodUtils.resolveMethodReference(psiElement, 10);
 
         return methodReference != null
+            && methodReference.getName() != null
             && PhpClassUtils.isCorrectRelatedClass(methodReference, project, REQUEST_CLASSES)
             && REQUEST_METHODS.containsKey(methodReference.getName())
             && isFieldParam(methodReference, psiElement);
     }
 
     public static boolean isFieldParam(MethodReference method, PsiElement position) {
-        Integer paramPositions = REQUEST_METHODS.get(method.getName());
+        String methodName = method.getName();
+        if (methodName == null) {
+            return false;
+        }
 
+        Integer paramPositions = REQUEST_METHODS.get(methodName);
         if (paramPositions == null) {
             return false;
         }

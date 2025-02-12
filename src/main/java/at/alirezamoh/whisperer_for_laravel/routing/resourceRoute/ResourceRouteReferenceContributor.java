@@ -97,7 +97,6 @@ public class ResourceRouteReferenceContributor extends PsiReferenceContributor {
         if (expectedParamIndex == null) {
             return false;
         }
-
         return MethodUtils.findParamIndex(position, false) == expectedParamIndex;
     }
 }

@@ -99,7 +99,12 @@ public class InertiaMethodValidator {
         Map<String, Integer> methodMap,
         String expectedClassFQN
     ) {
-        Integer expectedParamIndex = methodMap.get(methodReference.getName());
+        String methodName = methodReference.getName();
+        if (methodName == null) {
+            return false;
+        }
+
+        Integer expectedParamIndex = methodMap.get(methodName);
 
         if (expectedParamIndex == null) {
             return false;
@@ -124,7 +129,12 @@ public class InertiaMethodValidator {
             return false;
         }
 
-        Integer expectedParamIndex = ROUTE_INERTIA_METHODS.get(functionReference.getName());
+        String methodName = functionReference.getName();
+        if (methodName == null) {
+            return false;
+        }
+
+        Integer expectedParamIndex = ROUTE_INERTIA_METHODS.get(methodName);
 
         if (expectedParamIndex == null) {
             return false;

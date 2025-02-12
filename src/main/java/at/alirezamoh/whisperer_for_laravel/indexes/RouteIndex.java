@@ -123,6 +123,7 @@ public class RouteIndex extends FileBasedIndexExtension<String, Void> {
 
         return routeClassReference instanceof ClassReferenceImpl classReferences
             && ROUTE_METHODS.containsKey(methodReference.getName())
+            && classReferences.getFQN() != null
             && ROUTE_NAMESPACES.contains(classReferences.getFQN());
     }
 

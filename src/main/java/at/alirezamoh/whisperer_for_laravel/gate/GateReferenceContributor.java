@@ -95,7 +95,6 @@ public class GateReferenceContributor extends PsiReferenceContributor {
         if (expectedParamIndex == null) {
             return false;
         }
-
-        return GATE_METHODS.get(method.getName()) == MethodUtils.findParamIndex(position, false);
+        return expectedParamIndex == MethodUtils.findParamIndex(position, false);
     }
 }

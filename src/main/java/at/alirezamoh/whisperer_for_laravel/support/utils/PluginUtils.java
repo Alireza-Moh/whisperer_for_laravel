@@ -2,6 +2,7 @@ package at.alirezamoh.whisperer_for_laravel.support.utils;
 
 import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.whisperer_for_laravel.support.ProjectDefaultPaths;
+import at.alirezamoh.whisperer_for_laravel.support.notification.Notify;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.intellij.openapi.diagnostic.Logger;
@@ -181,7 +182,6 @@ public class PluginUtils {
      * @return A {@link PsiFile} handle for "composer.json", or {@code null} if not found
      */
     private static @Nullable PsiFile getComposerFile(Project project) {
-
         return DirectoryUtils.getFileByName(project, "/composer.json");
     }
 }

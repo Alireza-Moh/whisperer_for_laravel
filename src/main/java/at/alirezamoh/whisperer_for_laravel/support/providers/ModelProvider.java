@@ -5,18 +5,17 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /**
  * Provides a list of Laravel models in a project.
- * This class retrieves all PHP files from the "Models" directory and,
- * if the project is module-based, also from the "Models" directory within each module.
- * It then extracts the fully qualified namespace of each model and returns a list of these namespaces.
+ * This class retrieves all PHP files containing eloquent models
  */
 public class ModelProvider {
+    private static final Logger log = LoggerFactory.getLogger(ModelProvider.class);
     /**
      * List to store the fully qualified namespaces of the models.
      */
@@ -82,17 +81,16 @@ public class ModelProvider {
      * @param phpIndex The PhpIndex instance for accessing class hierarchy information.
      */
     private void processSubclasses(String classFQN, PhpIndex phpIndex) {
-        Collection<PhpClass> subclasses = phpIndex.getDirectSubclasses(classFQN);
+        Set<PhpClass> visited = new HashSet<>();
 
-        for (PhpClass subclass : subclasses) {
-            if (subclass.isAbstract()) {
-                processSubclasses(subclass.getFQN(), phpIndex);
-            } else {
+        phpIndex.processAllSubclasses(classFQN, visited, subclass -> {
+            if (!subclass.isAbstract() && !subclass.getFQN().equals("\\Illuminate\\Foundation\\Auth\\User")) {
                 if (withFile) {
                     originalModels.add(subclass.getContainingFile());
                 }
                 models.add(subclass.getPresentableFQN());
             }
-        }
+            return true;
+        });
     }
 }
