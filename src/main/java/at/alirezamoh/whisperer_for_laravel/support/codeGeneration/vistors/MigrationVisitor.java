@@ -118,9 +118,7 @@ public class MigrationVisitor extends PsiRecursiveElementWalkingVisitor {
     }
 
     private boolean isColumnDefinition(MethodReference method) {
-        String methodName = method.getName();
-
-        return methodName != null && AVAILABLE_TYPES.contains(methodName);
+        return AVAILABLE_TYPES.contains(method.getName());
     }
 
     private List<MethodReference> getColumnsMethodsForTable(MethodReference method) {

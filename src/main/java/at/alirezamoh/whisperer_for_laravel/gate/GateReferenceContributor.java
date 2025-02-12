@@ -90,18 +90,11 @@ public class GateReferenceContributor extends PsiReferenceContributor {
      * @return true or false
      */
     public boolean isGateParam(MethodReference method, PsiElement position) {
-        String methodName = method.getName();
-
-        if (methodName == null) {
-            return false;
-        }
-
-        Integer expectedParamIndex = GATE_METHODS.get(methodName);
+        Integer expectedParamIndex = GATE_METHODS.get(method.getName());
 
         if (expectedParamIndex == null) {
             return false;
         }
-
-        return GATE_METHODS.get(methodName) == MethodUtils.findParamIndex(position, false);
+        return expectedParamIndex == MethodUtils.findParamIndex(position, false);
     }
 }

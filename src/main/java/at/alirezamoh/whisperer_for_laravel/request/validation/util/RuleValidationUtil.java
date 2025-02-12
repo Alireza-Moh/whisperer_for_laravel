@@ -105,16 +105,11 @@ public class RuleValidationUtil {
     }
 
     public static boolean isRuleParam(MethodReference method, PsiElement position) {
-        String methodName = method.getName();
-        if (methodName == null) {
-            return false;
-        }
+        Integer paramPositions = RULES_METHODS.get(method.getName());
 
-        Integer paramPositions = RULES_METHODS.get(methodName);
         if (paramPositions == null) {
             return false;
         }
-
         return MethodUtils.findParamIndex(position, false) == paramPositions;
     }
 }

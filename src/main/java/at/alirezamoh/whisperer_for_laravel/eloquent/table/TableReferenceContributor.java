@@ -96,14 +96,11 @@ public class TableReferenceContributor extends PsiReferenceContributor {
      * @return true or false
      */
     private boolean isTableParam(MethodReference method, PsiElement position) {
-        int paramIndex = MethodUtils.findParamIndex(position, false);
-        String methodName = method.getName();
+        Integer paramPosition = LaravelPaths.DB_TABLE_METHODS.get(method.getName());
 
-        if (methodName == null) {
+        if (paramPosition == null) {
             return false;
         }
-
-        Integer paramPosition = LaravelPaths.DB_TABLE_METHODS.get(methodName);
-        return paramPosition == paramIndex;
+        return paramPosition == MethodUtils.findParamIndex(position, false);
     }
 }

@@ -13,7 +13,10 @@ import com.jetbrains.php.lang.lexer.PhpTokenTypes;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class RouteNamespaceCompletionContributor extends CompletionContributor {
     /**
@@ -89,16 +92,11 @@ public class RouteNamespaceCompletionContributor extends CompletionContributor {
      * @return True or false
      */
     private boolean isNamespaceParam(MethodReference reference, PsiElement position) {
-        String methodName = reference.getName();
-        if (methodName == null) {
-            return false;
-        }
+        Integer expectedParamIndex = NAMESPACE_METHODS.get(reference.getName());
 
-        Integer expectedParamIndex = NAMESPACE_METHODS.get(methodName);
         if (expectedParamIndex == null) {
             return false;
         }
-
         return MethodUtils.findParamIndex(position, false) == expectedParamIndex;
     }
 }
