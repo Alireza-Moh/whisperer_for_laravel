@@ -1,0 +1,20 @@
+name: Feature Request
+description: Suggest a feature for the plugin.
+title: "[Feature]: "
+labels: ["ty:feature"]
+projects: ["whisperer_for_laravel"]
+body:
+  - type: input
+    id: title
+    attributes:
+      label: Title
+      placeholder: my-feature
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      placeholder: A description of the feature you are interested in.
+    validations:
+      required: true
