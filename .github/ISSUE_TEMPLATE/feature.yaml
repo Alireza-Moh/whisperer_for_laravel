@@ -2,13 +2,6 @@ name: Feature Request
 description: Suggest a feature for the plugin.
 title: "[Feature]: "
 body:
-  - type: input
-    id: title
-    attributes:
-      label: Title
-      placeholder: my-feature
-    validations:
-      required: true
   - type: textarea
     id: description
     attributes:
