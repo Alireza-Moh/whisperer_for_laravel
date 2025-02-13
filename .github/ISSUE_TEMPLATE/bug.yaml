@@ -19,7 +19,7 @@ body:
         - Windows
         - Linux
         - Mac
-      default: Windows    
+      default: 0    
   - type: input
     id: version
     attributes:
