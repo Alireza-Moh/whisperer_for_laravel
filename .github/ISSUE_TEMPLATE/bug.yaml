@@ -1,0 +1,33 @@
+name: Bug Report
+description: File a bug report
+title: "[Bug]: "
+labels: ["bug", "triage"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug description
+      description: Describe the bug and the expected outcome.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Plugin version
+      description: Which plugin version are using?
+      placeholder: "1.2.1"
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      description: Which operating system are you using?
+      options:
+        - Windows
+        - Linux
+        - Mac
+  - type: textarea
+    id: stacktrace
+    attributes:
+      label: Stacktrace
+      description: If possible, provide the Stacktrace
+      render: shell
