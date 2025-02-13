@@ -10,12 +10,6 @@ body:
       description: Describe the bug and the expected outcome.
     validations:
       required: true
-  - type: input
-    id: version
-    attributes:
-      label: Plugin version
-      description: Which plugin version are using?
-      placeholder: "1.2.1"
   - type: dropdown
     id: os
     attributes:
@@ -25,9 +19,16 @@ body:
         - Windows
         - Linux
         - Mac
+      default: Windows    
+  - type: input
+    id: version
+    attributes:
+      label: Plugin version
+      description: Which plugin version are using?
+      placeholder: "1.2.1"
   - type: textarea
     id: stacktrace
     attributes:
       label: Stacktrace
-      description: If possible, provide the Stacktrace
+      description: If possible, provide the stacktrace
       render: shell
