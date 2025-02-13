@@ -6,6 +6,6 @@ body:
     id: description
     attributes:
       label: Description
-      placeholder: A description of the feature you are interested in.
+      description: A description of the feature you are interested in.
     validations:
       required: true
