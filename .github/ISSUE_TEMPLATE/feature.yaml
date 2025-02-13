@@ -1,6 +1,7 @@
 name: Feature Request
 description: Suggest a feature for the plugin.
 title: "[Feature]: "
+labels: ["ty:feature"]
 body:
   - type: textarea
     id: description
