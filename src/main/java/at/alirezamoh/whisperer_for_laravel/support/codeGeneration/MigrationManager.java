@@ -10,12 +10,9 @@ import at.alirezamoh.whisperer_for_laravel.support.codeGeneration.vistors.Migrat
 import at.alirezamoh.whisperer_for_laravel.support.utils.*;
 import at.alirezamoh.whisperer_for_laravel.support.providers.ModelProvider;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.indexing.FileBasedIndex;
-import com.intellij.util.indexing.IdFilter;
 import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.impl.*;
@@ -281,23 +278,7 @@ public class MigrationManager {
             }
 
             for (PhpClass phpClass : PhpClassUtils.getPhpClassesFromFile(phpFile)) {
-                String finalModelName = "";
-                String modelNameWithoutExtension = StrUtils.removePhpExtension(phpClass.getName());
-
-                if (StrUtils.isCamelCase(modelNameWithoutExtension)) {
-                    String[] parts = StrUtils.snake(modelNameWithoutExtension, "_").split("_");
-
-                    parts[parts.length - 1] = StringUtil.pluralize(parts[parts.length - 1]);
-
-                    finalModelName = String.join("_", parts);
-                }
-
-                com.jetbrains.php.lang.psi.elements.Field tableField = phpClass.findFieldByName("table", false);
-
-                if (
-                    StrUtils.lcFirst(finalModelName).equals(tableName)
-                    || (tableField != null && StrUtils.removeQuotes(tableField.getDefaultValuePresentation()).equals(tableName))
-                ) {
+                if (EloquentUtils.getTableName(phpClass).equals(tableName)) {
                     return phpClass;
                 }
             }
@@ -369,8 +350,10 @@ public class MigrationManager {
             .anyMatch(methodReference -> {
                 List<PhpClassImpl> classes = MethodUtils.resolveMethodClasses(methodReference, project);
                 PhpClass relationClass = PhpClassUtils.getClassByFQN(project, LaravelPaths.LaravelClasses.Model);
+                String methodName = methodReference.getName();
 
-                return RELATION_METHODS.containsKey(methodReference.getName())
+                return methodName != null
+                    && RELATION_METHODS.containsKey(methodName)
                     && relationClass != null
                     && classes.stream().anyMatch(clazz -> PhpClassUtils.isChildOf(clazz, relationClass));
             });

@@ -5,8 +5,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -15,7 +13,6 @@ import java.util.*;
  * This class retrieves all PHP files containing eloquent models
  */
 public class ModelProvider {
-    private static final Logger log = LoggerFactory.getLogger(ModelProvider.class);
     /**
      * List to store the fully qualified namespaces of the models.
      */
@@ -47,7 +44,7 @@ public class ModelProvider {
 
     /**
      * @param project  The current project
-     * @param withFile should save mode files
+     * @param withFile should save model files
      */
     public ModelProvider(Project project, boolean withFile) {
         this.project = project;

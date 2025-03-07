@@ -1,12 +1,12 @@
 package at.alirezamoh.whisperer_for_laravel.eloquent.table;
 
 import at.alirezamoh.whisperer_for_laravel.indexes.TableIndex;
+import at.alirezamoh.whisperer_for_laravel.support.utils.EloquentUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.indexing.FileBasedIndex;
@@ -15,7 +15,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class TableReference extends PsiReferenceBase<PsiElement> implements PsiPolyVariantReference {
@@ -41,28 +40,17 @@ public class TableReference extends PsiReferenceBase<PsiElement> implements PsiP
 
     @Override
     public ResolveResult @NotNull [] multiResolve(boolean b) {
-        String text = StrUtils.removeQuotes(myElement.getText());
+        String tableName = StrUtils.removeQuotes(myElement.getText());
 
+        List<PsiFile> migrations = EloquentUtils.getMigrationFilesForEloquentModel(project, tableName);
 
-        Collection<VirtualFile> paths = FileBasedIndex.getInstance().getContainingFiles(
-            TableIndex.INDEX_ID,
-            text,
-            GlobalSearchScope.allScope(project)
-        );
-
-        if (paths.isEmpty()) {
+        if (migrations == null) {
             return ResolveResult.EMPTY_ARRAY;
         }
 
         List<ResolveResult> results = new ArrayList<>();
-        for (VirtualFile path : paths) {
-            if (path != null) {
-                PsiFile psiFile = PsiManager.getInstance(project).findFile(path);
-
-                if (psiFile != null) {
-                    results.add(new PsiElementResolveResult(psiFile));
-                }
-            }
+        for (PsiFile migration : migrations) {
+            results.add(new PsiElementResolveResult(migration));
         }
 
         return results.toArray(new ResolveResult[0]);
