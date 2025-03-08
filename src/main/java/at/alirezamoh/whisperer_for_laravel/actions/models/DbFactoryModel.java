@@ -40,14 +40,10 @@ public class DbFactoryModel extends BaseModel {
         if (unformattedModuleFullPath.equals("app") || unformattedModuleFullPath.isEmpty()) {
             this.unformattedModuleFullPath = "";
             this.formattedModuleFullPath = "";
-            initDestination();
-            initNamespace("Database\\Factories");
-            initFilePath();
+            initDefaultSettings();
         }
         else {
-            initDestination();
-            initNamespace("Database\\Seeders");
-            initFilePath();
+            initDefaultSettings();
         }
     }
 
@@ -66,5 +62,11 @@ public class DbFactoryModel extends BaseModel {
 
     public String getModelNamespace() {
         return modelNamespace;
+    }
+
+    private void initDefaultSettings() {
+        initDestination();
+        initNamespace("Database\\Factories");
+        initFilePath();
     }
 }

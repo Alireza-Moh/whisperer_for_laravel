@@ -1,7 +1,6 @@
 package at.alirezamoh.whisperer_for_laravel.actions.views;
 
 import at.alirezamoh.whisperer_for_laravel.actions.models.DbFactoryModel;
-import at.alirezamoh.whisperer_for_laravel.actions.models.JsonResourceModel;
 import at.alirezamoh.whisperer_for_laravel.actions.views.providers.TextFieldAutoCompletionProvider;
 import at.alirezamoh.whisperer_for_laravel.support.providers.ModelProvider;
 import com.intellij.icons.AllIcons;

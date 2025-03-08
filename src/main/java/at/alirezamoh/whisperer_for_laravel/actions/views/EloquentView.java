@@ -45,6 +45,9 @@ public class EloquentView extends BaseDialog {
     private JTextField controllerNameTextField;
     private JCheckBox controllerCheckBox;
 
+    private JTextField factoryNameTextField;
+    private JCheckBox factoryCheckBox;
+
     private String tableName;
 
     /**
@@ -80,6 +83,14 @@ public class EloquentView extends BaseDialog {
 
     public String getControllerName() {
         return controllerNameTextField.getText();
+    }
+
+    public boolean withFactory() {
+        return factoryCheckBox.isSelected();
+    }
+
+    public String getFactoryName() {
+        return factoryNameTextField.getText();
     }
 
     public boolean withMigration() {
@@ -253,11 +264,17 @@ public class EloquentView extends BaseDialog {
         controllerNameTextField = new JTextField();
         controllerCheckBox = new JCheckBox("Controller");
 
+        factoryNameTextField = new JTextField();
+        factoryCheckBox = new JCheckBox("Factory");
+
         gbc.gridy++;
         createOptionPair(migrationFileNameTextField, migrationCheckBox, optionPanel);
 
         gbc.gridy++;
         createOptionPair(controllerNameTextField, controllerCheckBox, optionPanel);
+
+        gbc.gridy++;
+        createOptionPair(factoryNameTextField, factoryCheckBox, optionPanel);
 
         gbc.gridy++;
         this.contentPane.add(optionPanel, gbc);
@@ -322,11 +339,13 @@ public class EloquentView extends BaseDialog {
                 + tableName
                 + "_table"
         );
+        factoryNameTextField.setText(capitalizeFirstLetter(realModelName) + "Factory");
     }
 
     private void unsetOptionsText() {
         controllerNameTextField.setText("");
         migrationFileNameTextField.setText("");
+        factoryNameTextField.setText("");
         tableName = "";
     }
 
