@@ -52,6 +52,7 @@
         <fileBasedIndex implementation="at.alirezamoh.whisperer_for_laravel.indexes.ConfigIndex"/>
         <fileBasedIndex implementation="at.alirezamoh.whisperer_for_laravel.indexes.ServiceProviderIndex"/>
         <fileBasedIndex implementation="at.alirezamoh.whisperer_for_laravel.indexes.ModelFactoryIndex"/>
+        <fileBasedIndex implementation="at.alirezamoh.whisperer_for_laravel.indexes.PolicyIndex"/>
 
         <projectConfigurable parentId="language" instance="at.alirezamoh.whisperer_for_laravel.settings.SettingConfigurable" id="whisperer_for_laravel_settings" displayName="Whisperer For Laravel" nonDefaultProject="true"/>
         <projectService serviceImplementation="at.alirezamoh.whisperer_for_laravel.settings.SettingsState"/>
