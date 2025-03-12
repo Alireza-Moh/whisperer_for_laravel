@@ -71,7 +71,7 @@ public class PolicyIndex extends FileBasedIndexExtension<String, List<String>> {
 
     @Override
     public int getVersion() {
-        return 2;
+        return 1;
     }
 
     @Override
@@ -108,10 +108,10 @@ public class PolicyIndex extends FileBasedIndexExtension<String, List<String>> {
 
         for (Method method : PhpClassUtils.getClassPublicMethods(phpClass, true)) {
             if (StrUtils.isCamelCase(method.getName())) {
-                policies.add(StrUtils.snake(method.getName(), "-"));
+                policies.add(StrUtils.snake(method.getName(), "-") + "|" + method.getName());
             }
             else {
-                policies.add(method.getName());
+                policies.add(method.getName() + "|" + method.getName());
             }
         }
 
