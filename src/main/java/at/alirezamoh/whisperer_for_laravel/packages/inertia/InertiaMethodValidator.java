@@ -30,6 +30,13 @@ public class InertiaMethodValidator {
     }};
 
     /**
+     * The names of the inertia test class methods
+     */
+    private static final Map<String, Integer> INERTIA_TEST_METHODS = new HashMap<>() {{
+        put("component", 0);
+    }};
+
+    /**
      * The FQN of the 'Route' facade
      */
     private static final String INERTIA = "\\Inertia\\Inertia";
@@ -38,6 +45,11 @@ public class InertiaMethodValidator {
      * The FQN of the 'Route' facade
      */
     private static final String ROUTE = "\\Illuminate\\Support\\Facades\\Route";
+
+    /**
+     * The FQN of the inertia test class
+     */
+    private static final String INERTIA_TEST_CLASS = "\\Inertia\\Testing\\AssertableInertia";
 
     private InertiaMethodValidator() {}
 
@@ -52,7 +64,9 @@ public class InertiaMethodValidator {
         Project project = psiElement.getProject();
 
         if (method != null) {
-            return isInertiaMethod(method, psiElement, project) || isRouteMethod(method, psiElement, project);
+            return isInertiaMethod(method, psiElement, project)
+                || isRouteMethod(method, psiElement, project)
+                || isInertiaTestMethod(method, psiElement, project);
         }
 
         return isInertiaFunction(psiElement);
@@ -68,6 +82,18 @@ public class InertiaMethodValidator {
      */
     private static boolean isInertiaMethod(MethodReference methodReference, PsiElement position, Project project) {
         return isExpectedMethod(methodReference, position, project, INERTIA_METHODS, INERTIA);
+    }
+
+    /**
+     * Checks if a given method reference matches an Inertia test method.
+     *
+     * @param methodReference The method reference.
+     * @param position        The PSI element position.
+     * @param project         The current project.
+     * @return                true or false
+     */
+    private static boolean isInertiaTestMethod(MethodReference methodReference, PsiElement position, Project project) {
+        return isExpectedMethod(methodReference, position, project, INERTIA_TEST_METHODS, INERTIA_TEST_CLASS);
     }
 
     /**
