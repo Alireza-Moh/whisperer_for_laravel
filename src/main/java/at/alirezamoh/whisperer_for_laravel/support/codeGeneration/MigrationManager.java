@@ -14,6 +14,7 @@ import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.jetbrains.php.lang.psi.PhpFile;
+import com.jetbrains.php.lang.psi.elements.Parameter;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.impl.*;
 import org.jetbrains.annotations.Nullable;
@@ -78,7 +79,7 @@ public class MigrationManager {
                 laravelModel.setFields(table.fields());
 
                 List<Relation> relations = new ArrayList<>();
-                for (com.jetbrains.php.lang.psi.elements.Method method : resolveAllRelations(modelClass, project)) {
+                for (com.jetbrains.php.lang.psi.elements.Method method : collectModelRelations(modelClass, project)) {
                     Map.Entry<String, PhpClass> methodNameAndRelatedModel = findRelationships(method);
                     if (methodNameAndRelatedModel != null) {
                         relations.add(
@@ -98,6 +99,8 @@ public class MigrationManager {
                 }
                 laravelModel.setRelations(relations);
                 createLaravelModelHelperMethods(laravelModel);
+                addLocalScopeMethods(modelClass, laravelModel);
+
                 models.add(laravelModel);
             }
         }
@@ -293,7 +296,7 @@ public class MigrationManager {
      * @param foundedMethod the relationship method defined in the eloquent model
      * @return an entry containing the method name and related PhpClass, or null if no relationship is found
      */
-    public @Nullable Map.Entry<String, PhpClass> findRelationships(com.jetbrains.php.lang.psi.elements.Method foundedMethod) {
+    private @Nullable Map.Entry<String, PhpClass> findRelationships(com.jetbrains.php.lang.psi.elements.Method foundedMethod) {
         return Arrays.stream(foundedMethod.getChildren())
             .filter(element -> element instanceof GroupStatementImpl)
             .flatMap(groupStatement -> Arrays.stream(groupStatement.getChildren()))
@@ -320,7 +323,7 @@ public class MigrationManager {
      * @param project the project
      * @return a list of relationships in the given model class
      */
-    public List<com.jetbrains.php.lang.psi.elements.Method> resolveAllRelations(PhpClass model, Project project) {
+    private List<com.jetbrains.php.lang.psi.elements.Method> collectModelRelations(PhpClass model, Project project) {
         List<com.jetbrains.php.lang.psi.elements.Method> relations = new ArrayList<>();
 
         for (com.jetbrains.php.lang.psi.elements.Method method : model.getOwnMethods()) {
@@ -339,7 +342,7 @@ public class MigrationManager {
      * @param project the project
      * @return true or false
      */
-    public boolean isRelationshipMethod(com.jetbrains.php.lang.psi.elements.Method method, Project project) {
+    private boolean isRelationshipMethod(com.jetbrains.php.lang.psi.elements.Method method, Project project) {
         return Arrays.stream(method.getChildren())
             .filter(element -> element instanceof GroupStatementImpl)
             .flatMap(element -> Arrays.stream(element.getChildren()))
@@ -365,7 +368,7 @@ public class MigrationManager {
      * @param foundedMethod the relationship method to analyze
      * @return the PhpClass of the related model, or null if no related model is found
      */
-    public @Nullable PhpClass findRelatedModelFromMethod(com.jetbrains.php.lang.psi.elements.Method foundedMethod) {
+    private @Nullable PhpClass findRelatedModelFromMethod(com.jetbrains.php.lang.psi.elements.Method foundedMethod) {
         return Arrays.stream(foundedMethod.getChildren())
             .filter(element -> element instanceof GroupStatementImpl)
             .flatMap(groupStatement -> Arrays.stream(groupStatement.getChildren()))
@@ -382,5 +385,24 @@ public class MigrationManager {
             .map(resolvedClass -> (PhpClass) resolvedClass)
             .findFirst()
             .orElse(null);
+    }
+
+    private void addLocalScopeMethods(PhpClass model, LaravelModel laravelModel) {
+        for (com.jetbrains.php.lang.psi.elements.Method method : model.getOwnMethods()) {
+            String methodName = method.getName();
+            if (methodName.startsWith("scope")) {
+                Method localScopeMethod = new Method(
+                    StrUtils.lcFirst(methodName.replace("scope", ""))
+                );
+                localScopeMethod.setReturnType(
+                    "\\Illuminate\\Database\\Eloquent\\Builder"
+                );
+                for (Parameter param : method.getParameters()) {
+                    localScopeMethod.addParameter(param.getName(), param.getType().toString(), "");
+                }
+
+                laravelModel.addMethod(localScopeMethod);
+            }
+        }
     }
 }

@@ -173,7 +173,7 @@
                 <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt G"/>
             </action>
 
-            <action id="at.alirezamoh.whisperer_for_laravel.GenerateHelperMethodsAction" class="at.alirezamoh.whisperer_for_laravel.actions.GenerateHelperMethodsAction" text="Generate Helper Methods For Eloquent/DB" icon="/icons/laravelIcon.svg">
+            <action id="at.alirezamoh.whisperer_for_laravel.GenerateHelperMethodsAction" class="at.alirezamoh.whisperer_for_laravel.actions.GenerateHelperMethodsAction" text="Generate Helper Doc For Eloquent/DB" icon="/icons/laravelIcon.svg">
             </action>
 
             <separator />
