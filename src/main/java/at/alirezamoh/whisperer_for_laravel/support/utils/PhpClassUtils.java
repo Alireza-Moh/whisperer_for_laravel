@@ -1,9 +1,12 @@
 package at.alirezamoh.whisperer_for_laravel.support.utils;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiReference;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.*;
+import com.jetbrains.php.lang.psi.elements.impl.ClassReferenceImpl;
 import com.jetbrains.php.lang.psi.elements.impl.PhpClassAliasImpl;
 import com.jetbrains.php.lang.psi.elements.impl.PhpClassImpl;
 import org.jetbrains.annotations.Nullable;
@@ -158,4 +161,41 @@ public class PhpClassUtils {
 
         return classes;
     }
+
+    public static @Nullable PhpClass getPhpClassFromMethodRef(MethodReference methodReference) {
+        if (methodReference == null) {
+            return null;
+        }
+
+        ClassReferenceImpl classReference = getClassReferenceImplFromMethodRef(methodReference);
+        if (classReference == null) {
+            return null;
+        }
+
+        PsiReference reference = classReference.getReference();
+        if (reference == null) {
+            return null;
+        }
+
+        PsiElement resolved = reference.resolve();
+        if (!(resolved instanceof PhpClass possiblePhpClass)) {
+            return null;
+        }
+
+        return possiblePhpClass;
+    }
+
+    public static @Nullable ClassReferenceImpl getClassReferenceImplFromMethodRef(MethodReference methodReference) {
+        if (methodReference == null) {
+            return null;
+        }
+
+        PhpExpression phpExpression = methodReference.getClassReference();
+        if (!(phpExpression instanceof ClassReferenceImpl classReference)) {
+            return null;
+        }
+
+        return classReference;
+    }
+
 }

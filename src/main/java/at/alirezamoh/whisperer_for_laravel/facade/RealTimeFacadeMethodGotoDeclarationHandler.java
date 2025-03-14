@@ -1,6 +1,7 @@
 package at.alirezamoh.whisperer_for_laravel.facade;
 
 import at.alirezamoh.whisperer_for_laravel.facade.util.RealTimeFacadeUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PhpClassUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
 import com.intellij.codeInsight.navigation.actions.GotoDeclarationHandler;
 import com.intellij.openapi.actionSystem.DataContext;
@@ -8,6 +9,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.jetbrains.php.lang.psi.elements.*;
+import com.jetbrains.php.lang.psi.elements.impl.ClassReferenceImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -31,8 +33,8 @@ public class RealTimeFacadeMethodGotoDeclarationHandler implements GotoDeclarati
             return null;
         }
 
-        PhpExpression phpExpression = methodReference.getClassReference();
-        if (!(phpExpression instanceof ClassReference classReference)) {
+        ClassReferenceImpl classReference = PhpClassUtils.getClassReferenceImplFromMethodRef(methodReference);
+        if (classReference == null) {
             return null;
         }
 

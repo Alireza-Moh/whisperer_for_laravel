@@ -1,6 +1,7 @@
 package at.alirezamoh.whisperer_for_laravel.eloquent;
 
 import at.alirezamoh.whisperer_for_laravel.support.utils.EloquentUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PhpClassUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
 import com.intellij.codeInsight.navigation.actions.GotoDeclarationHandler;
 import com.intellij.openapi.editor.Editor;
@@ -38,25 +39,15 @@ public class ModelFactoryGotoDeclarationHandler implements GotoDeclarationHandle
             return null;
         }
 
-        PhpExpression phpExpression = methodReference.getClassReference();
-        if (!(phpExpression instanceof ClassReferenceImpl classReference)) {
+        PhpClass model = PhpClassUtils.getPhpClassFromMethodRef(methodReference);
+        if (model == null) {
             return null;
         }
 
-        PsiReference reference = classReference.getReference();
-        if (reference == null) {
-            return null;
-        }
-
-        PsiElement resolved = reference.resolve();
-        if (resolved instanceof PhpClass possibleModel) {
-            if (EloquentUtils.isEloquentModel(possibleModel, project)) {
-
-                List<PsiFile> files = new ArrayList<>();
-                EloquentUtils.collectFactoriesForModel(project, possibleModel.getName(), files);
-
-                return files.toArray(new PsiElement[0]);
-            }
+        if (EloquentUtils.isEloquentModel(model, project)) {
+            List<PsiFile> files = new ArrayList<>();
+            EloquentUtils.collectFactoriesForModel(project, model.getName(), files);
+            return files.toArray(new PsiElement[0]);
         }
 
         return new PsiElement[0];

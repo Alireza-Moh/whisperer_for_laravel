@@ -2,6 +2,7 @@ package at.alirezamoh.whisperer_for_laravel.eloquent;
 
 import at.alirezamoh.whisperer_for_laravel.support.caching.ListenersCacheManager;
 import at.alirezamoh.whisperer_for_laravel.support.utils.EloquentUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PhpClassUtils;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;

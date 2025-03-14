@@ -1,5 +1,6 @@
 package at.alirezamoh.whisperer_for_laravel.indexes;
 
+import at.alirezamoh.whisperer_for_laravel.support.utils.PhpClassUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.openapi.project.Project;
@@ -95,12 +96,12 @@ public class TableIndex extends FileBasedIndexExtension<String, Void> {
     }
 
     private boolean shouldScanMethod(MethodReference methodReference) {
-        PhpExpression schemaClassReference = methodReference.getClassReference();
+        ClassReferenceImpl schemaClassReference = PhpClassUtils.getClassReferenceImplFromMethodRef(methodReference);
 
         return isInsideUpMethod(methodReference)
             && isCreateOrTable(methodReference)
-            && schemaClassReference instanceof ClassReferenceImpl classReference
-            && Objects.equals(classReference.getFQN(), SCHEMA_CLASS);
+            && schemaClassReference != null
+            && Objects.equals(schemaClassReference.getFQN(), SCHEMA_CLASS);
     }
 
     private boolean isInsideUpMethod(MethodReference methodReference) {
