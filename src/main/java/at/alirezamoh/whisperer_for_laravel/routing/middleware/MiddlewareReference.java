@@ -61,10 +61,15 @@ public class MiddlewareReference extends PsiReferenceBase<PsiElement> {
             if (targetMiddleware.startsWith("can:")) {
                 targetMiddleware = targetMiddleware.substring("can:".length());
             }
-            foundedElement = gateProcessor.findGateAbility(
+
+            List<PsiElement> foundedGates = gateProcessor.findGateAbility(
                 PhpPsiElementFactory.createStringLiteralExpression(project, targetMiddleware, false),
                 false
-            ).getFirst();
+            );
+
+            if (!foundedGates.isEmpty()) {
+                foundedElement = foundedGates.get(0); // used get() because of java 17
+            }
         }
 
         return foundedElement;
