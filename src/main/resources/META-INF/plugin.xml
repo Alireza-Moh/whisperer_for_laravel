@@ -27,10 +27,18 @@
 
     <change-notes>
         <![CDATA[
-            <ul>
-                <li>Fixes bugs.</li>
-            </ul>
-        ]]>
+        <ul>
+            <li>Fixes bugs.</li>
+            <li>Adds setting to toggle facade suppression warnings.</li>
+            <li>Suppresses real-time facade warnings.</li>
+            <li>Adds support for field.rule completion in FormRequest messages method.</li>
+            <li>Adds support for real-time facade method and class completion and navigation.</li>
+            <li>Adds support for policy completion and navigation.</li>
+            <li>Enhances Inertia support by adding page completion for test method `Inertia\Testing\AssertableInertia::component()`.</li>
+            <li>Adds local scope methods to code generation.</li>
+            <li>Adds support for generating a database factory when creating models.</li>
+        </ul>
+    ]]>
     </change-notes>
 
 
@@ -40,7 +48,7 @@
     <depends>com.intellij.modules.platform</depends>
     <depends>com.jetbrains.php.blade</depends>
 
-    <version>1.2.1</version>
+    <version>1.2.2</version>
 
     <extensions defaultExtensionNs="com.intellij">
         <notificationGroup id="NotificationGroup" displayType="BALLOON"/>
