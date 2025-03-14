@@ -15,6 +15,14 @@ public class RealTimeFacadeUtil {
      * @return the corresponding PhpClass, or null if not found
      */
     public static @Nullable PhpClass getFacadeClass(Project project, String facadeFqn) {
+        if (facadeFqn == null) {
+            return null;
+        }
+
+        if (!facadeFqn.startsWith("\\Facades\\")) {
+            return null;
+        }
+
         return PhpClassUtils.getClassByFQN(project, facadeFqn.replace("\\Facades", ""));
     }
 }

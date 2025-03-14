@@ -22,8 +22,8 @@ import java.util.stream.Collectors;
 /**
  * Provides code completion for fields defined in FormRequest rules
  */
-public class RealTimeFacadeCompletionContributor extends CompletionContributor {
-    public RealTimeFacadeCompletionContributor() {
+public class RealTimeFacadeMethodCompletionContributor extends CompletionContributor {
+    public RealTimeFacadeMethodCompletionContributor() {
         extend(
             CompletionType.BASIC,
             PlatformPatterns.or(

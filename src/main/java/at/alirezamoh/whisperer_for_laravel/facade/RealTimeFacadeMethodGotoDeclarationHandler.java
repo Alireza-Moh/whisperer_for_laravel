@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Handles navigation to the declaration of real time facade methods
  */
-public class RealTimeFacadeGotoDeclarationHandler implements GotoDeclarationHandler {
+public class RealTimeFacadeMethodGotoDeclarationHandler implements GotoDeclarationHandler {
     @Override
     public PsiElement @Nullable [] getGotoDeclarationTargets(PsiElement sourceElement, int offset, Editor editor) {
         if (sourceElement == null) {
@@ -36,7 +36,13 @@ public class RealTimeFacadeGotoDeclarationHandler implements GotoDeclarationHand
             return null;
         }
 
-        return new Method[]{getFacadeMethodByName(project, classReference.getFQN(), methodReference.getName())};
+        Method method = getFacadeMethodByName(project, classReference.getFQN(), methodReference.getName());
+
+        if (method == null) {
+            return null;
+        }
+
+        return new Method[]{method};
     }
 
     @Override
