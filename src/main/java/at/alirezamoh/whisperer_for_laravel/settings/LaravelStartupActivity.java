@@ -34,6 +34,10 @@ public class LaravelStartupActivity implements ProjectActivity {
             if (settingsState.getInertiaPageRootPath() == null) {
                 settingsState.setInertiaPageRootPath("resources/js/Pages;");
             }
+
+            if (!settingsState.isSuppressRealTimeFacadeWarnings()) {
+                settingsState.setSuppressRealTimeFacadeWarnings(true);
+            }
         }
 
         return Unit.INSTANCE;
