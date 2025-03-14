@@ -50,9 +50,12 @@ public class RequestMessageCompletionContributor extends CompletionContributor {
     private boolean isInsideMessagesMethod(PsiElement psiElement) {
         MethodImpl methodCall = PsiTreeUtil.getParentOfType(psiElement, MethodImpl.class);
 
-        return methodCall != null
+        return (
+            methodCall != null
             && methodCall.getName().equals("messages")
-            && isInsideArrayKey(psiElement);
+            && isInsideArrayKey(psiElement)
+        )
+            || PsiElementUtils.isRegularArray(psiElement, 5);
     }
 
     private boolean isInsideArrayKey(PsiElement psiElement) {

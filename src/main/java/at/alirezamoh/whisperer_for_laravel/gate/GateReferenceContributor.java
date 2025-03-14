@@ -1,23 +1,26 @@
 package at.alirezamoh.whisperer_for_laravel.gate;
 
-import at.alirezamoh.whisperer_for_laravel.support.utils.MethodUtils;
-import at.alirezamoh.whisperer_for_laravel.support.utils.PhpClassUtils;
-import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
-import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.*;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.*;
 import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
+import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
+import com.jetbrains.php.lang.psi.elements.impl.MethodImpl;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class GateReferenceContributor extends PsiReferenceContributor {
     public static final String GATE = "\\Illuminate\\Support\\Facades\\Gate";
+
+    public static final String AUTH = "\\Illuminate\\Foundation\\Auth\\Access\\Authorizable";
 
     public static Map<String, Integer> GATE_METHODS = new HashMap<>() {{
         put("allows", 0);
@@ -28,6 +31,10 @@ public class GateReferenceContributor extends PsiReferenceContributor {
         put("check", 0);
         put("inspect", 0);
         put("has", 0);
+    }};
+
+    public static Map<String, Integer> AUTH_METHODS = new HashMap<>() {{
+        put("can", 0);
     }};
 
     @Override
@@ -76,14 +83,20 @@ public class GateReferenceContributor extends PsiReferenceContributor {
     private boolean isInsideGateMethod(PsiElement psiElement, Project project) {
         MethodReference methodReference = MethodUtils.resolveMethodReference(psiElement, 10);
 
-        return methodReference != null
+        return (
+            methodReference != null
             && PhpClassUtils.isCorrectRelatedClass(methodReference, project, GATE)
-            && isGateParam(methodReference, psiElement);
+            && isGateParam(methodReference, psiElement)
+        )
+            || (
+                methodReference != null
+                && isAuthMethod(methodReference)
+                && isGateParamForAuth(methodReference, psiElement)
+        );
     }
 
     /**
      * Checks if the specified PSI element corresponds to the parameter that Gate methods expect
-     * (based on a predefined map of method names to parameter indices)
      *
      * @param method   The Gate method reference
      * @param position The PSI element representing the parameter value
@@ -96,5 +109,41 @@ public class GateReferenceContributor extends PsiReferenceContributor {
             return false;
         }
         return expectedParamIndex == MethodUtils.findParamIndex(position, false);
+    }
+
+
+    /**
+     * Checks if the specified PSI element corresponds to the parameter that auth method expect
+     *
+     * @param method   The Gate method reference
+     * @param position The PSI element representing the parameter value
+     * @return true or false
+     */
+    public boolean isGateParamForAuth(MethodReference method, PsiElement position) {
+        Integer expectedParamIndex = AUTH_METHODS.get(method.getName());
+
+        if (expectedParamIndex == null) {
+            return false;
+        }
+        return expectedParamIndex == MethodUtils.findParamIndex(position, false);
+    }
+
+    private boolean isAuthMethod(MethodReference methodReference) {
+        PsiReference reference = methodReference.getReference();
+        if (reference == null) {
+            return false;
+        }
+
+        PsiElement resolved = reference.resolve();
+        if (resolved instanceof MethodImpl method) {
+            PhpClass phpClass = method.getContainingClass();
+            if (phpClass == null) {
+                return false;
+            }
+
+            return phpClass.getFQN().equals(AUTH);
+        }
+
+        return false;
     }
 }

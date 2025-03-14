@@ -104,7 +104,13 @@ public class GateProcessor {
                     key,
                     null,
                     (file, values) -> {
-                        policies.addAll(values);
+                        for (String value : values) {
+                            String[] splitValue = value.split("\\|");
+
+                            if (splitValue.length > 0) {
+                                policies.add(splitValue[0]);
+                            }
+                        }
                         return true;
                     },
                     GlobalSearchScope.projectScope(project),
