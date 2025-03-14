@@ -27,10 +27,18 @@
 
     <change-notes>
         <![CDATA[
-            <ul>
-                <li>Fixes bugs.</li>
-            </ul>
-        ]]>
+        <ul>
+            <li>Fixes bugs.</li>
+            <li>Adds setting to toggle facade suppression warnings.</li>
+            <li>Suppresses real-time facade warnings.</li>
+            <li>Adds support for field.rule completion in FormRequest messages method.</li>
+            <li>Adds support for real-time facade method and class completion and navigation.</li>
+            <li>Adds support for policy completion and navigation.</li>
+            <li>Enhances Inertia support by adding page completion for test method `Inertia\Testing\AssertableInertia::component()`.</li>
+            <li>Adds local scope methods to code generation.</li>
+            <li>Adds support for generating a database factory when creating models.</li>
+        </ul>
+    ]]>
     </change-notes>
 
 
@@ -40,7 +48,7 @@
     <depends>com.intellij.modules.platform</depends>
     <depends>com.jetbrains.php.blade</depends>
 
-    <version>1.2.1</version>
+    <version>1.2.2</version>
 
     <extensions defaultExtensionNs="com.intellij">
         <notificationGroup id="NotificationGroup" displayType="BALLOON"/>
@@ -51,6 +59,8 @@
         <fileBasedIndex implementation="at.alirezamoh.whisperer_for_laravel.indexes.TableIndex"/>
         <fileBasedIndex implementation="at.alirezamoh.whisperer_for_laravel.indexes.ConfigIndex"/>
         <fileBasedIndex implementation="at.alirezamoh.whisperer_for_laravel.indexes.ServiceProviderIndex"/>
+        <fileBasedIndex implementation="at.alirezamoh.whisperer_for_laravel.indexes.ModelFactoryIndex"/>
+        <fileBasedIndex implementation="at.alirezamoh.whisperer_for_laravel.indexes.PolicyIndex"/>
 
         <projectConfigurable parentId="language" instance="at.alirezamoh.whisperer_for_laravel.settings.SettingConfigurable" id="whisperer_for_laravel_settings" displayName="Whisperer For Laravel" nonDefaultProject="true"/>
         <projectService serviceImplementation="at.alirezamoh.whisperer_for_laravel.settings.SettingsState"/>
@@ -71,18 +81,26 @@
         <completion.contributor language="XML" implementationClass="at.alirezamoh.whisperer_for_laravel.blade.component.BladeXComponentCompletionContributor"/>
         <completion.contributor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.request.requestField.RequestFieldCompletionContributor"/>
         <completion.contributor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.routing.namespace.RouteNamespaceCompletionContributor"/>
+        <completion.contributor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.request.validation.RequestMessageCompletionContributor"/>
+        <completion.contributor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.facade.RealTimeFacadeMethodCompletionContributor"/>
 
         <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.blade.component.BladeXComponentGotoDeclarationHandler"/>
         <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.request.validation.RuleValidationGotoDeclarationHandler"/>
         <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.request.requestField.RequestFieldGotoDeclarationHandler"/>
+        <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.eloquent.ModelFactoryGotoDeclarationHandler"/>
+        <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.facade.RealTimeFacadeMethodGotoDeclarationHandler"/>
+        <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.facade.RealTimeFacadeClassGotoDeclarationHandler"/>
 
         <codeInsight.template.postfixTemplateProvider language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.postfixes.dd.DDPostfixProvider" />
 
         <errorHandler implementation="com.intellij.diagnostic.JetBrainsMarketplaceErrorReportSubmitter"/>
 
         <lang.inspectionSuppressor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.request.requestField.RequestFieldSuppressor"/>
+        <lang.inspectionSuppressor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.facade.RealTimeFacadeSuppressor"/>
 
         <annotator language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.packages.inertia.annotator.InertiaPageExistenceAnnotator"/>
+
+        <codeInsight.lineMarkerProvider language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.eloquent.EloquentModelLineMarker"/>
     </extensions>
 
     <actions>
@@ -169,7 +187,7 @@
                 <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt G"/>
             </action>
 
-            <action id="at.alirezamoh.whisperer_for_laravel.GenerateHelperMethodsAction" class="at.alirezamoh.whisperer_for_laravel.actions.GenerateHelperMethodsAction" text="Generate Helper Methods For Eloquent/DB" icon="/icons/laravelIcon.svg">
+            <action id="at.alirezamoh.whisperer_for_laravel.GenerateHelperMethodsAction" class="at.alirezamoh.whisperer_for_laravel.actions.GenerateHelperMethodsAction" text="Generate Helper Doc For Eloquent/DB" icon="/icons/laravelIcon.svg">
             </action>
 
             <separator />

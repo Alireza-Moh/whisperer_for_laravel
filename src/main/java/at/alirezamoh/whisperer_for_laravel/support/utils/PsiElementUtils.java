@@ -146,6 +146,31 @@ public class PsiElementUtils {
     }
 
     /**
+     * Checks if the given PSI element is a key in an array [key => value]
+     *
+     * @param element  The PSI element to check
+     * @param maxDepth Maximum number of parents to traverse up the PSI tree
+     * @return true or false
+     */
+    public static boolean isInArrayKey(PsiElement element, int maxDepth) {
+        PsiElement currentElement = element;
+        int currentDepth = 0;
+
+        while (currentElement != null && currentDepth < maxDepth) {
+            if (currentElement instanceof ArrayHashElementImpl arrayHashElement) {
+                if (arrayHashElement.getKey() == element) {
+                    return true;
+                }
+            }
+
+            currentElement = currentElement.getParent();
+            currentDepth++;
+        }
+
+        return false;
+    }
+
+    /**
      * Determines if the given PSI element is part of an associative array
      *
      * @param element  The PSI element to check

@@ -1,5 +1,6 @@
 package at.alirezamoh.whisperer_for_laravel.indexes;
 
+import at.alirezamoh.whisperer_for_laravel.support.utils.PhpClassUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.openapi.project.Project;
@@ -119,12 +120,12 @@ public class RouteIndex extends FileBasedIndexExtension<String, Void> {
     }
 
     private boolean isLaravelRouteMethod(MethodReference methodReference) {
-        PhpExpression routeClassReference = methodReference.getClassReference();
+        ClassReferenceImpl routeClassReference = PhpClassUtils.getClassReferenceImplFromMethodRef(methodReference);
 
-        return routeClassReference instanceof ClassReferenceImpl classReferences
+        return routeClassReference != null
             && ROUTE_METHODS.containsKey(methodReference.getName())
-            && classReferences.getFQN() != null
-            && ROUTE_NAMESPACES.contains(classReferences.getFQN());
+            && routeClassReference.getFQN() != null
+            && ROUTE_NAMESPACES.contains(routeClassReference.getFQN());
     }
 
     private @Nullable String extractRouteData(MethodReference methodReference) {

@@ -31,6 +31,9 @@ public class SettingsComponent {
     private final JBTextField inertiaPageRootPathTextField = new JBTextField();
 
 
+    /*==============Components for laravel inspections & suppressions==============*/
+    private final JBCheckBox suppressRealTimeFacadeWarningsCheckbox = new JBCheckBox();
+
     public SettingsComponent() {
         initializeTabs();
 
@@ -89,12 +92,21 @@ public class SettingsComponent {
         this.inertiaPageRootPathTextField.setText(inertiaPageRootPath);
     }
 
+    public boolean suppressRealTimeFacadeWarnings() {
+        return suppressRealTimeFacadeWarningsCheckbox.isSelected();
+    }
+
+    public void setSuppressRealTimeFacadeWarnings(boolean suppress) {
+        this.suppressRealTimeFacadeWarningsCheckbox.setSelected(suppress);
+    }
+
     /**
      * Initializes the tabs in the `JBTabbedPane`
      */
     private void initializeTabs() {
         tabbedPane.addTab("General Settings", createGeneralSettingsPanel());
         tabbedPane.addTab("Settings for laravel packages", createLaravelPackagesPanel());
+        tabbedPane.addTab("Inspections & Suppressions", createInspectionsAndSuppressionsPanel());
     }
 
     /**
@@ -145,6 +157,20 @@ public class SettingsComponent {
                 10,
                 false
             );
+
+        JPanel parentPanel = new JPanel(new BorderLayout());
+        parentPanel.add(builder.getPanel(), BorderLayout.PAGE_START);
+
+        return parentPanel;
+    }
+
+    private JPanel createInspectionsAndSuppressionsPanel() {
+        JPanel checkboxPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        checkboxPanel.add(suppressRealTimeFacadeWarningsCheckbox);
+        checkboxPanel.add(new JBLabel("Suppress real-time facade warnings: 'Undefined class' & 'Undefined namespace'"));
+
+        FormBuilder builder = FormBuilder.createFormBuilder()
+            .addComponent(checkboxPanel);
 
         JPanel parentPanel = new JPanel(new BorderLayout());
         parentPanel.add(builder.getPanel(), BorderLayout.PAGE_START);

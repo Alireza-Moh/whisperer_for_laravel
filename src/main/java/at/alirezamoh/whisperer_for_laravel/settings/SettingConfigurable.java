@@ -44,18 +44,21 @@ public class SettingConfigurable implements Configurable {
         String currentModuleRootDirectory = settingsComponent.getModulesDirectoryPath();
         String currentModuleSrcDirectory = settingsComponent.getModuleSrcDirectoryPath();
         String currentInertiaPageRootPath = settingsComponent.getInertiaPageRootPath();
+        boolean currentSuppressRealTimeFacadeWarnings = settingsComponent.suppressRealTimeFacadeWarnings();
 
         String storedProjectType = settingsState.getProjectType();
         String storedProjectRootDirectory = settingsState.getProjectDirectoryPath();
         String storedModuleRootDirectory = settingsState.getModulesDirectoryPath();
         String storedModuleSrcDirectory = settingsState.getModuleSrcDirectoryPath();
         String storedInertiaPageRootPath = settingsState.getInertiaPageRootPath();
+        boolean storedSuppressRealTimeFacadeWarnings = settingsState.isSuppressRealTimeFacadeWarnings();
 
         return !Objects.equals(currentProjectType, storedProjectType)
             || !Objects.equals(currentProjectRootDirectory, storedProjectRootDirectory)
             || !Objects.equals(currentModuleRootDirectory, storedModuleRootDirectory)
             || !Objects.equals(currentModuleSrcDirectory, storedModuleSrcDirectory)
-            || !Objects.equals(currentInertiaPageRootPath, storedInertiaPageRootPath);
+            || !Objects.equals(currentInertiaPageRootPath, storedInertiaPageRootPath)
+            || !Objects.equals(currentSuppressRealTimeFacadeWarnings, storedSuppressRealTimeFacadeWarnings);
     }
 
     @Override
@@ -67,6 +70,7 @@ public class SettingConfigurable implements Configurable {
         settingsState.setModulesDirectoryPath(settingsComponent.getModulesDirectoryPath());
         settingsState.setModuleSrcDirectoryPath(settingsComponent.getModuleSrcDirectoryPath());
         settingsState.setInertiaPageRootPath(settingsComponent.getInertiaPageRootPath());
+        settingsState.setSuppressRealTimeFacadeWarnings(settingsComponent.suppressRealTimeFacadeWarnings());
     }
 
     @Override
@@ -76,6 +80,7 @@ public class SettingConfigurable implements Configurable {
         settingsComponent.setModulesDirectoryPathTextField(settingsState.getModulesDirectoryPath());
         settingsComponent.setModuleSrcDirectoryPathTextField(settingsState.getModuleSrcDirectoryPath());
         settingsComponent.setInertiaPageRootPath(settingsState.getInertiaPageRootPath());
+        settingsComponent.setSuppressRealTimeFacadeWarnings(settingsState.isSuppressRealTimeFacadeWarnings());
     }
 
     @Override
