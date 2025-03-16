@@ -29,7 +29,7 @@ public class LivewirePropertyDataBindingGoToDeclarationHandler implements GotoDe
         }
 
         XmlAttributeValue attributeValue = PsiTreeUtil.getParentOfType(psiElement, XmlAttributeValue.class, false);
-        if (attributeValue != null && attributeValue.getParent() instanceof XmlAttribute xmlAttribute && xmlAttribute.getName().equals("wire:model")) {
+        if (attributeValue != null && attributeValue.getParent() instanceof XmlAttribute xmlAttribute && xmlAttribute.getName().startsWith("wire:model")) {
             PsiFile originalFile = psiElement.getContainingFile();
 
             List<PsiElement> resolvedProperties = LivewirePropertyProvider.resolveProperty(

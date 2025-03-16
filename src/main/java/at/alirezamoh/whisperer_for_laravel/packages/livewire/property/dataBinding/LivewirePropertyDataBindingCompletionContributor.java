@@ -6,6 +6,7 @@ import com.intellij.codeInsight.completion.*;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.ide.highlighter.HtmlFileType;
 import com.intellij.openapi.project.Project;
+import com.intellij.patterns.ElementPattern;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.patterns.XmlPatterns;
 import com.intellij.psi.PsiElement;
@@ -19,22 +20,30 @@ import java.util.List;
 
 public class LivewirePropertyDataBindingCompletionContributor extends CompletionContributor {
     public LivewirePropertyDataBindingCompletionContributor() {
+        ElementPattern<? extends XmlAttribute> wireModelAttributePattern =
+            PlatformPatterns.psiElement(XmlAttribute.class)
+                .withName(
+                    "wire:model",
+                    "wire:model.live",
+                    "wire:model.blur",
+                    "wire:model.change",
+                    "wire:model.lazy",
+                    "wire:model.debounce.[?]ms",
+                    "wire:model.throttle.[?]ms",
+                    "wire:model.number",
+                    "wire:model.boolean",
+                    "wire:model.fill"
+                );
         extend(
             CompletionType.BASIC,
             PlatformPatterns.or(
                 PlatformPatterns.psiElement().inside(XmlPatterns.xmlAttributeValue()).withParent(
                     PlatformPatterns.psiElement(XmlAttributeValue.class)
-                        .withParent(
-                            PlatformPatterns.psiElement(XmlAttribute.class)
-                                .withName("wire:model")
-                        )
+                        .withParent(wireModelAttributePattern)
                 ).inVirtualFile(PlatformPatterns.virtualFile().ofType(BladeFileType.INSTANCE)),
                 PlatformPatterns.psiElement().inside(XmlPatterns.xmlAttributeValue()).withParent(
                     PlatformPatterns.psiElement(XmlAttributeValue.class)
-                        .withParent(
-                            PlatformPatterns.psiElement(XmlAttribute.class)
-                                .withName("wire:model")
-                        )
+                        .withParent(wireModelAttributePattern)
                 ).inVirtualFile(PlatformPatterns.virtualFile().ofType(HtmlFileType.INSTANCE))
             ),
             new CompletionProvider<>() {

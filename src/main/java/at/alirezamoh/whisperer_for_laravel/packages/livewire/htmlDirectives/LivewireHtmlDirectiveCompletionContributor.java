@@ -1,8 +1,11 @@
 package at.alirezamoh.whisperer_for_laravel.packages.livewire.htmlDirectives;
 import at.alirezamoh.whisperer_for_laravel.packages.livewire.LivewireUtil;
+import at.alirezamoh.whisperer_for_laravel.packages.livewire.property.utils.LivewirePropertyProvider;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.codeInsight.completion.*;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
+import com.intellij.ide.highlighter.HtmlFileType;
 import com.intellij.lang.injection.InjectedLanguageManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.patterns.PlatformPatterns;
@@ -11,6 +14,8 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiLanguageInjectionHost;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.psi.xml.XmlAttribute;
+import com.intellij.psi.xml.XmlAttributeValue;
 import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.blade.BladeFileType;
 import com.jetbrains.php.lang.psi.elements.Method;
@@ -80,6 +85,18 @@ public class LivewireHtmlDirectiveCompletionContributor extends CompletionContri
         "dot",
         "passive",
         "capture"
+    );
+
+    private final List<String> WIRE_MODEL_KEYS = List.of(
+        "live",
+        "blur",
+        "change",
+        "lazy",
+        "debounce.[?]ms",
+        "throttle.[?]ms",
+        "number",
+        "boolean",
+        "fill"
     );
 
     public LivewireHtmlDirectiveCompletionContributor() {
@@ -220,6 +237,16 @@ public class LivewireHtmlDirectiveCompletionContributor extends CompletionContri
                 PsiElementUtils.buildPrioritizedLookupElement(lookupElementBuilder, 1000)
             );
         }
+
+        if (psiElement.getText().startsWith("wire:model")) {
+            for (String key : WIRE_MODEL_KEYS) {
+                LookupElementBuilder lookupElementBuilder = PsiElementUtils.buildSimpleLookupElement(key);
+
+                completionResultSet.addElement(
+                    PsiElementUtils.buildPrioritizedLookupElement(lookupElementBuilder, 1000)
+                );
+            }
+        }
     }
 
     private void buildSuggestions(@NotNull CompletionResultSet completionResultSet) {
@@ -235,7 +262,7 @@ public class LivewireHtmlDirectiveCompletionContributor extends CompletionContri
 
     /**
      * Returns a new CompletionResultSet with a prefix matcher based on the text after the last dot symbol
-     * This method checks if the current PSI element's text contains a dot symbol (|).
+     * This method checks if the current PSI element's text contains a dot symbol (.).
      * If it does, it creates a new CompletionResultSet with a prefix matcher that matches
      * the text after the last dot symbol. This allows for accurate completion suggestions
      * when the user is typing validation rules separated by dots
