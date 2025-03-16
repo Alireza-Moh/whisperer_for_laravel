@@ -1,11 +1,8 @@
 package at.alirezamoh.whisperer_for_laravel.packages.livewire.htmlDirectives;
 import at.alirezamoh.whisperer_for_laravel.packages.livewire.LivewireUtil;
-import at.alirezamoh.whisperer_for_laravel.packages.livewire.property.utils.LivewirePropertyProvider;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
-import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.codeInsight.completion.*;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
-import com.intellij.ide.highlighter.HtmlFileType;
 import com.intellij.lang.injection.InjectedLanguageManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.patterns.PlatformPatterns;
@@ -14,8 +11,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiLanguageInjectionHost;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.psi.xml.XmlAttribute;
-import com.intellij.psi.xml.XmlAttributeValue;
 import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.blade.BladeFileType;
 import com.jetbrains.php.lang.psi.elements.Method;
@@ -27,8 +22,6 @@ import java.util.Objects;
 
 public class LivewireHtmlDirectiveCompletionContributor extends CompletionContributor {
     private final List<String> DIRECTIVES = List.of(
-        "wire:click",
-        "wire:submit",
         "wire:navigate",
         "wire:model",
         "wire:loading",
@@ -41,18 +34,85 @@ public class LivewireHtmlDirectiveCompletionContributor extends CompletionContri
         "wire:offline",
         "wire:ignore",
         "wire:replace",
-        "wire:stream",
-        "wire:keydown",
-        "wire:keyup",
-        "wire:mouseenter"
-    );
-    
-    private final List<String> KEY_DIRECTIVES = List.of(
-        "wire:keydown",
-        "wire:keyup"
+        "wire:stream"
     );
 
-    private final List<String> KEYS = List.of(
+    private final List<String> ACTION_DIRECTIVES = List.of(
+        "wire:keydown",
+        "wire:submit",
+        "wire:click",
+        "wire:keydown",
+        "wire:keyup",
+        "wire:mouseenter",
+        "wire:load",
+        "wire:unload",
+        "wire:beforeunload",
+        "wire:resize",
+        "wire:scroll",
+        "wire:error",
+        "wire:abort",
+        "wire:copy",
+        "wire:cut",
+        "wire:paste",
+        "wire:play",
+        "wire:playing",
+        "wire:pause",
+        "wire:ended",
+        "wire:volumechange",
+        "wire:loadstart",
+        "wire:loadeddata",
+        "wire:loadedmetadata",
+        "wire:timeupdate",
+        "wire:durationchange",
+        "wire:progress",
+        "wire:suspend",
+        "wire:waiting",
+        "wire:reset",
+        "wire:change",
+        "wire:input",
+        "wire:invalid",
+        "wire:formdata",
+        "wire:focus",
+        "wire:blur",
+        "wire:focusin",
+        "wire:focusout",
+        "wire:dblclick",
+        "wire:mousedown",
+        "wire:mouseup",
+        "wire:mousemove",
+        "wire:mouseover",
+        "wire:mouseout",
+        "wire:mouseleave",
+        "wire:contextmenu",
+        "wire:auxclick",
+        "wire:wheel",
+        "wire:keypress",
+        "wire:touchstart",
+        "wire:touchend",
+        "wire:touchmove",
+        "wire:touchcancel",
+        "wire:pointerover",
+        "wire:pointerenter",
+        "wire:pointerdown",
+        "wire:pointermove",
+        "wire:pointerup",
+        "wire:pointercancel",
+        "wire:pointerout",
+        "wire:pointerleave",
+        "wire:drag",
+        "wire:dragstart",
+        "wire:dragend",
+        "wire:dragenter",
+        "wire:dragover",
+        "wire:dragleave",
+        "wire:drop",
+        "wire:animationstart",
+        "wire:animationend",
+        "wire:animationiteration",
+        "wire:transitionend"
+    );
+
+    private final List<String> MODIFIERS = List.of(
         "shift",
         "enter",
         "space",
@@ -87,7 +147,7 @@ public class LivewireHtmlDirectiveCompletionContributor extends CompletionContri
         "capture"
     );
 
-    private final List<String> WIRE_MODEL_KEYS = List.of(
+    private final List<String> WIRE_MODEL_MODIFIERS = List.of(
         "live",
         "blur",
         "change",
@@ -230,7 +290,7 @@ public class LivewireHtmlDirectiveCompletionContributor extends CompletionContri
             completionResultSet = resultOnPipe;
         }
 
-        for (String key : KEYS) {
+        for (String key : MODIFIERS) {
             LookupElementBuilder lookupElementBuilder = PsiElementUtils.buildSimpleLookupElement(key);
 
             completionResultSet.addElement(
@@ -239,7 +299,7 @@ public class LivewireHtmlDirectiveCompletionContributor extends CompletionContri
         }
 
         if (psiElement.getText().startsWith("wire:model")) {
-            for (String key : WIRE_MODEL_KEYS) {
+            for (String key : WIRE_MODEL_MODIFIERS) {
                 LookupElementBuilder lookupElementBuilder = PsiElementUtils.buildSimpleLookupElement(key);
 
                 completionResultSet.addElement(
@@ -251,6 +311,15 @@ public class LivewireHtmlDirectiveCompletionContributor extends CompletionContri
 
     private void buildSuggestions(@NotNull CompletionResultSet completionResultSet) {
         for (String directive : DIRECTIVES) {
+            LookupElementBuilder lookupElementBuilder = PsiElementUtils.buildSimpleLookupElement(directive)
+                .withInsertHandler(new XmlAttributeInsertHandler());
+
+            completionResultSet.addElement(
+                PsiElementUtils.buildPrioritizedLookupElement(lookupElementBuilder, 100)
+            );
+        }
+
+        for (String directive : ACTION_DIRECTIVES) {
             LookupElementBuilder lookupElementBuilder = PsiElementUtils.buildSimpleLookupElement(directive)
                 .withInsertHandler(new XmlAttributeInsertHandler());
 
