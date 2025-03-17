@@ -176,7 +176,7 @@ public class PluginUtils {
      * @param project The current project
      * @return A {@link PsiFile} handle for "composer.json", or {@code null} if not found
      */
-    private static @Nullable PsiFile getComposerFile(Project project) {
+    public static @Nullable PsiFile getComposerFile(Project project) {
 
         return DirectoryUtils.getFileByName(project, "/composer.json");
     }

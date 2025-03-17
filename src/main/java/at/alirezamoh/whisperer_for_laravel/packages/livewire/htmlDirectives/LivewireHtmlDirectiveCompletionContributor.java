@@ -112,6 +112,19 @@ public class LivewireHtmlDirectiveCompletionContributor extends CompletionContri
         "wire:transitionend"
     );
 
+    private final List<String> THIRD_PARTY_TRIX_TEXT_EDITOR_ACTION_DIRECTIVES = List.of(
+        "wire:trix-before-initialize",
+        "wire:trix-initialize",
+        "wire:trix-change",
+        "wire:trix-selection-change",
+        "wire:trix-focus",
+        "wire:trix-blur",
+        "wire:trix-paste",
+        "wire:trix-file-accept",
+        "wire:trix-attachment-add",
+        "wire:trix-attachment-remove"
+    );
+
     private final List<String> MODIFIERS = List.of(
         "shift",
         "enter",
@@ -175,7 +188,7 @@ public class LivewireHtmlDirectiveCompletionContributor extends CompletionContri
                         return;
                     }
 
-                    buildSuggestions(completionResultSet);
+                    buildSuggestions(completionResultSet, project);
                 }
             }
         );
@@ -215,7 +228,7 @@ public class LivewireHtmlDirectiveCompletionContributor extends CompletionContri
 
                     Method renderMethod = PsiTreeUtil.getParentOfType(stringLiteralExpression, Method.class);
                     if (renderMethod != null && "render".equals(renderMethod.getName())) {
-                        buildSuggestions(completionResultSet);
+                        buildSuggestions(completionResultSet, project);
                     }
                 }
             }
@@ -309,7 +322,7 @@ public class LivewireHtmlDirectiveCompletionContributor extends CompletionContri
         }
     }
 
-    private void buildSuggestions(@NotNull CompletionResultSet completionResultSet) {
+    private void buildSuggestions(@NotNull CompletionResultSet completionResultSet, Project project) {
         for (String directive : DIRECTIVES) {
             LookupElementBuilder lookupElementBuilder = PsiElementUtils.buildSimpleLookupElement(directive)
                 .withInsertHandler(new XmlAttributeInsertHandler());
@@ -326,6 +339,17 @@ public class LivewireHtmlDirectiveCompletionContributor extends CompletionContri
             completionResultSet.addElement(
                 PsiElementUtils.buildPrioritizedLookupElement(lookupElementBuilder, 100)
             );
+        }
+
+        if (LivewireUtil.doesProjectUseTrixPackage(project)) {
+            for (String directive : THIRD_PARTY_TRIX_TEXT_EDITOR_ACTION_DIRECTIVES) {
+                LookupElementBuilder lookupElementBuilder = PsiElementUtils.buildSimpleLookupElement(directive)
+                    .withInsertHandler(new XmlAttributeInsertHandler());
+
+                completionResultSet.addElement(
+                    PsiElementUtils.buildPrioritizedLookupElement(lookupElementBuilder, 100)
+                );
+            }
         }
     }
 
