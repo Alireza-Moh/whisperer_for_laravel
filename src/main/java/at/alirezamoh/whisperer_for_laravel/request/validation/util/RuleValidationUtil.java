@@ -4,12 +4,15 @@ import at.alirezamoh.whisperer_for_laravel.request.requestField.util.RequestFiel
 import at.alirezamoh.whisperer_for_laravel.support.utils.MethodUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PhpClassUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
+import com.intellij.codeInsight.completion.CompletionParameters;
+import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.jetbrains.php.lang.psi.elements.ArrayCreationExpression;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.impl.MethodImpl;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -57,10 +60,61 @@ public class RuleValidationUtil {
 
         if (methodReference != null) {
             return isInsideRequestMethod(psiElement, methodReference, project)
-                || isInsideValidatorMethod(psiElement, methodReference, project);
+                || isInsideValidatorMethod(psiElement, methodReference, project)
+                || isInsideLivewireValidateMethod(psiElement, methodReference, project);
         }
 
         return isInsideRulesMethod(psiElement);
+    }
+
+    public static boolean isInsideLivewireValidateMethod(PsiElement psiElement, MethodReference methodReference, Project project) {
+        return PhpClassUtils.isCorrectRelatedClass(methodReference, project, "\\Livewire\\Component")
+            && RequestFieldUtils.VALIDATION_METHODS.contains(methodReference.getName())
+            && isRuleParam(methodReference, psiElement)
+            && isInsideArrayValue(psiElement);
+    }
+
+    public static boolean isRuleParam(MethodReference method, PsiElement position) {
+        Integer paramPositions = RULES_METHODS.get(method.getName());
+
+        if (paramPositions == null) {
+            return false;
+        }
+
+        return MethodUtils.findParamIndex(position, false) == paramPositions;
+    }
+
+    /**
+     * Creates completion validation rules and adds them to the result set
+     *
+     * @param result The completion result set
+     */
+    public static void createLookUpElement(@NotNull CompletionResultSet result) {
+        for (String key : RuleValidationUtil.RULES) {
+            result.addElement(PsiElementUtils.buildSimpleLookupElement(key));
+        }
+    }
+
+    /**
+     * Returns a new CompletionResultSet with a prefix matcher based on the text after the last pipe symbol
+     * This method checks if the current PSI element's text contains a pipe symbol (|).
+     * If it does, it creates a new CompletionResultSet with a prefix matcher that matches
+     * the text after the last pipe symbol. This allows for accurate completion suggestions
+     * when the user is typing validation rules separated by pipes
+     * @return The new CompletionResultSet with a prefix matcher, or null if no pipe symbol is found
+     */
+    public static CompletionResultSet getCompletionResultSetOnPipe(PsiElement psiElement, CompletionResultSet currentCompletionResult, CompletionParameters completionParameters) {
+        String text = psiElement.getText();
+        CompletionResultSet newCompletionResult = null;
+
+        if (text.contains("|")) {
+            int pipeIndex = text.lastIndexOf('|', completionParameters.getOffset() - psiElement.getTextRange().getStartOffset() - 1);
+            String newText = text.substring(pipeIndex + 1, completionParameters.getOffset() - psiElement.getTextRange().getStartOffset());
+
+            newCompletionResult = currentCompletionResult.withPrefixMatcher(newText);
+        }
+
+        return newCompletionResult;
     }
 
     private static boolean isInsideRequestMethod(PsiElement psiElement, MethodReference methodReference, Project project) {
@@ -100,15 +154,5 @@ public class RuleValidationUtil {
         else {
             return PsiElementUtils.isAssocArray(psiElement, 10) && PsiElementUtils.isInArrayValue(psiElement, 10);
         }
-    }
-
-    public static boolean isRuleParam(MethodReference method, PsiElement position) {
-        Integer paramPositions = RULES_METHODS.get(method.getName());
-
-        if (paramPositions == null) {
-            return false;
-        }
-
-        return MethodUtils.findParamIndex(position, false) == paramPositions;
     }
 }

@@ -38,12 +38,6 @@ public class RouteReference extends PsiReferenceBase<PsiElement> implements PsiP
         this.project = element.getProject();
     }
 
-    /**
-     * Resolves the route name reference to the corresponding PSI element
-     * This method searches for the route name in route files and, if applicable,
-     * in module service providers
-     * @return The resolved route or null
-     */
     @Override
     public @Nullable PsiElement resolve() {
         return null;
@@ -76,6 +70,12 @@ public class RouteReference extends PsiReferenceBase<PsiElement> implements PsiP
         return variants.toArray();
     }
 
+    /**
+     * Resolves the route name reference to the corresponding PSI element
+     * This method searches for the route name in route files and, if applicable,
+     * in module service providers
+     * @return The resolved route or null
+     */
     @Override
     public ResolveResult @NotNull [] multiResolve(boolean b) {
         String routeName = StrUtils.removeQuotes(myElement.getText());

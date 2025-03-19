@@ -1,4 +1,4 @@
-package at.alirezamoh.whisperer_for_laravel.request.validation;
+package at.alirezamoh.whisperer_for_laravel.packages.livewire.validation;
 
 import at.alirezamoh.whisperer_for_laravel.request.validation.util.RuleValidationUtil;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
@@ -12,10 +12,10 @@ import org.jetbrains.annotations.NotNull;
 
 
 /**
- * Contributes completion suggestions for Laravel validation rules
+ * Contributes completion suggestions for Laravel validation rules in livewire attribute "Validation"
  */
-public class RuleValidationCompletionContributor extends CompletionContributor {
-    RuleValidationCompletionContributor() {
+public class RuleValidationInLivewireAttributeCompletionContributor extends CompletionContributor {
+    RuleValidationInLivewireAttributeCompletionContributor() {
         extend(
             CompletionType.BASIC,
             PlatformPatterns.or(
@@ -33,7 +33,7 @@ public class RuleValidationCompletionContributor extends CompletionContributor {
                         return;
                     }
 
-                    if (RuleValidationUtil.isInsideCorrectMethod(psiElement, project)) {
+                    if (LivewireValidationUtil.isInsideCorrectAttribute(psiElement, 0)) {
                         CompletionResultSet resultOnPipe = RuleValidationUtil.getCompletionResultSetOnPipe(psiElement, completionResultSet, completionParameters);
                         if (resultOnPipe != null) {
                             completionResultSet = resultOnPipe;
