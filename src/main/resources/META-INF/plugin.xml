@@ -17,6 +17,8 @@
             <li>Laravel packages support: InertiaJs</li>
         </ul>
 
+        <a href="https://alireza-moh.github.io/whisperer_for_laravel_docs/">Documentation</a><br>
+
         <h3>Contributions:</h3>
         <p>Contributions are always welcome! If you encounter any issues, feel free to open an issue on the <a href="https://github.com/Alireza-Moh/whisperer_for_laravel">GitHub Issues page</a>. If you want to contribute to the project, do not hesitate</p>
         ]]>
@@ -25,11 +27,18 @@
 
     <change-notes>
         <![CDATA[
-            <ul>
-                <li>Bug fix: Validates Laravel framework installation based on the specified version.</li>
-                <li>Removes unused libraries</li>
-            </ul>
-        ]]>
+        <ul>
+            <li>Fixes bugs.</li>
+            <li>Adds setting to toggle facade suppression warnings.</li>
+            <li>Suppresses real-time facade warnings.</li>
+            <li>Adds support for field.rule completion in FormRequest messages method.</li>
+            <li>Adds support for real-time facade method and class completion and navigation.</li>
+            <li>Adds support for policy completion and navigation.</li>
+            <li>Enhances Inertia support by adding page completion for test method `Inertia\Testing\AssertableInertia::component()`.</li>
+            <li>Adds local scope methods to code generation.</li>
+            <li>Adds support for generating a database factory when creating models.</li>
+        </ul>
+    ]]>
     </change-notes>
 
 
@@ -39,7 +48,7 @@
     <depends>com.intellij.modules.platform</depends>
     <depends>com.jetbrains.php.blade</depends>
 
-    <version>1.1.6</version>
+    <version>1.2.2</version>
 
     <extensions defaultExtensionNs="com.intellij">
         <notificationGroup id="NotificationGroup" displayType="BALLOON"/>
@@ -50,6 +59,8 @@
         <fileBasedIndex implementation="at.alirezamoh.whisperer_for_laravel.indexes.TableIndex"/>
         <fileBasedIndex implementation="at.alirezamoh.whisperer_for_laravel.indexes.ConfigIndex"/>
         <fileBasedIndex implementation="at.alirezamoh.whisperer_for_laravel.indexes.ServiceProviderIndex"/>
+        <fileBasedIndex implementation="at.alirezamoh.whisperer_for_laravel.indexes.ModelFactoryIndex"/>
+        <fileBasedIndex implementation="at.alirezamoh.whisperer_for_laravel.indexes.PolicyIndex"/>
 
         <projectConfigurable parentId="language" instance="at.alirezamoh.whisperer_for_laravel.settings.SettingConfigurable" id="whisperer_for_laravel_settings" displayName="Whisperer For Laravel" nonDefaultProject="true"/>
         <projectService serviceImplementation="at.alirezamoh.whisperer_for_laravel.settings.SettingsState"/>
@@ -71,6 +82,8 @@
         <completion.contributor language="XML" implementationClass="at.alirezamoh.whisperer_for_laravel.blade.component.BladeXComponentCompletionContributor"/>
         <completion.contributor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.request.requestField.RequestFieldCompletionContributor"/>
         <completion.contributor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.routing.namespace.RouteNamespaceCompletionContributor"/>
+        <completion.contributor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.request.validation.RequestMessageCompletionContributor"/>
+        <completion.contributor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.facade.RealTimeFacadeMethodCompletionContributor"/>
         <completion.contributor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.packages.livewire.property.LivewirePropertyCompletionContributor"/>
         <completion.contributor language="XML" implementationClass="at.alirezamoh.whisperer_for_laravel.packages.livewire.property.LivewirePropertyInInlineCompletionContributor"/>
         <completion.contributor language="XML" implementationClass="at.alirezamoh.whisperer_for_laravel.packages.livewire.property.dataBinding.LivewirePropertyDataBindingCompletionContributor"/>
@@ -82,6 +95,9 @@
         <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.blade.component.BladeXComponentGotoDeclarationHandler"/>
         <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.request.validation.RuleValidationGotoDeclarationHandler"/>
         <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.request.requestField.RequestFieldGotoDeclarationHandler"/>
+        <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.eloquent.ModelFactoryGotoDeclarationHandler"/>
+        <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.facade.RealTimeFacadeMethodGotoDeclarationHandler"/>
+        <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.facade.RealTimeFacadeClassGotoDeclarationHandler"/>
         <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.packages.livewire.property.LivewirePropertyGotoDeclarationHandler"/>
         <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.packages.livewire.property.dataBinding.LivewirePropertyDataBindingGoToDeclarationHandler"/>
         <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.packages.livewire.actions.LivewireActionDataBindingGoToDeclarationHandler"/>
@@ -91,93 +107,102 @@
         <errorHandler implementation="com.intellij.diagnostic.JetBrainsMarketplaceErrorReportSubmitter"/>
 
         <lang.inspectionSuppressor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.request.requestField.RequestFieldSuppressor"/>
+        <lang.inspectionSuppressor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.facade.RealTimeFacadeSuppressor"/>
+
+        <annotator language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.packages.inertia.annotator.InertiaPageExistenceAnnotator"/>
+
+        <codeInsight.lineMarkerProvider language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.eloquent.EloquentModelLineMarker"/>
         <lang.inspectionSuppressor language="XML" implementationClass="at.alirezamoh.whisperer_for_laravel.packages.livewire.htmlDirectives.supressor.LivewireHtmlDirectiveSuppressor" />
     </extensions>
 
     <actions>
         <group id="at.alirezamoh.whisperer_for_laravel.Actions" class="at.alirezamoh.whisperer_for_laravel.actions.StartPluginAction" text="Whisperer For Laravel" popup="true" description="The start point of the plugin">
             <add-to-group group-id="MainMenu" anchor="last"/>
-            <group id="at.alirezamoh.whisperer_for_laravel.AllCodeGenerationActionsGroupAction" popup="true" icon="/icons/laravelIcon.svg" text="All Available Code Creation Templates">
-                <action id="at.alirezamoh.whisperer_for_laravel.EloquentAction" class="at.alirezamoh.whisperer_for_laravel.actions.EloquentAction" text="Create Eloquent Model From Template" icon="/icons/laravelIcon.svg">
+            <group id="at.alirezamoh.whisperer_for_laravel.AllCodeGenerationActionsGroupAction" popup="true" icon="/icons/laravelIcon.svg" text="All Available Code Generation Templates">
+                <action id="at.alirezamoh.whisperer_for_laravel.EloquentAction" class="at.alirezamoh.whisperer_for_laravel.actions.EloquentAction" text="Generate Eloquent Model From Template" icon="/icons/laravelIcon.svg">
                 </action>
 
-                <action id="at.alirezamoh.whisperer_for_laravel.MigrationAction" class="at.alirezamoh.whisperer_for_laravel.actions.MigrationAction" text="Create Migration From Template" icon="/icons/laravelIcon.svg">
+                <action id="at.alirezamoh.whisperer_for_laravel.MigrationAction" class="at.alirezamoh.whisperer_for_laravel.actions.MigrationAction" text="Generate Migration From Template" icon="/icons/laravelIcon.svg">
                 </action>
 
-                <action id="at.alirezamoh.whisperer_for_laravel.ControllerAction" class="at.alirezamoh.whisperer_for_laravel.actions.ControllerAction" text="Create Controller From Template" icon="/icons/laravelIcon.svg">
+                <action id="at.alirezamoh.whisperer_for_laravel.ControllerAction" class="at.alirezamoh.whisperer_for_laravel.actions.ControllerAction" text="Generate Controller From Template" icon="/icons/laravelIcon.svg">
                 </action>
 
-                <action id="at.alirezamoh.whisperer_for_laravel.DBSeederAction" class="at.alirezamoh.whisperer_for_laravel.actions.DBSeederAction" text="Create Database Seeder From Template" icon="/icons/laravelIcon.svg">
+                <action id="at.alirezamoh.whisperer_for_laravel.DBSeederAction" class="at.alirezamoh.whisperer_for_laravel.actions.DBSeederAction" text="Generate Database Seeder From Template" icon="/icons/laravelIcon.svg">
                 </action>
 
-                <action id="at.alirezamoh.whisperer_for_laravel.ConfigAction" class="at.alirezamoh.whisperer_for_laravel.actions.ConfigAction" text="Create Config File From Template" icon="/icons/laravelIcon.svg">
+                <action id="at.alirezamoh.whisperer_for_laravel.ConfigAction" class="at.alirezamoh.whisperer_for_laravel.actions.ConfigAction" text="Generate Config File From Template" icon="/icons/laravelIcon.svg">
                 </action>
 
-                <action id="at.alirezamoh.whisperer_for_laravel.BladeComponentAction" class="at.alirezamoh.whisperer_for_laravel.actions.BladeComponentAction" text="Create Blade Component From Template" icon="/icons/laravelIcon.svg">
+                <action id="at.alirezamoh.whisperer_for_laravel.BladeComponentAction" class="at.alirezamoh.whisperer_for_laravel.actions.BladeComponentAction" text="Generate Blade Component From Template" icon="/icons/laravelIcon.svg">
                 </action>
 
-                <action id="at.alirezamoh.whisperer_for_laravel.ConsoleAction" class="at.alirezamoh.whisperer_for_laravel.actions.ConsoleAction" text="Create Console Command From Template" icon="/icons/laravelIcon.svg">
+                <action id="at.alirezamoh.whisperer_for_laravel.ConsoleAction" class="at.alirezamoh.whisperer_for_laravel.actions.ConsoleAction" text="Generate Console Command From Template" icon="/icons/laravelIcon.svg">
                 </action>
 
-                <action id="at.alirezamoh.whisperer_for_laravel.ViewAction" class="at.alirezamoh.whisperer_for_laravel.actions.ViewAction" text="Create View File From Template" icon="/icons/laravelIcon.svg">
+                <action id="at.alirezamoh.whisperer_for_laravel.ViewAction" class="at.alirezamoh.whisperer_for_laravel.actions.ViewAction" text="Generate View File From Template" icon="/icons/laravelIcon.svg">
                 </action>
 
-                <action id="at.alirezamoh.whisperer_for_laravel.JobAction" class="at.alirezamoh.whisperer_for_laravel.actions.JobAction" text="Create Job From Template" icon="/icons/laravelIcon.svg">
+                <action id="at.alirezamoh.whisperer_for_laravel.JobAction" class="at.alirezamoh.whisperer_for_laravel.actions.JobAction" text="Generate Job From Template" icon="/icons/laravelIcon.svg">
                 </action>
 
-                <action id="at.alirezamoh.whisperer_for_laravel.ValidationRuleAction" class="at.alirezamoh.whisperer_for_laravel.actions.ValidationRuleAction" text="Create Validation Rule" icon="/icons/laravelIcon.svg">
+                <action id="at.alirezamoh.whisperer_for_laravel.ValidationRuleAction" class="at.alirezamoh.whisperer_for_laravel.actions.ValidationRuleAction" text="Generate Validation Rule" icon="/icons/laravelIcon.svg">
                 </action>
 
-                <action id="at.alirezamoh.whisperer_for_laravel.PolicyAction" class="at.alirezamoh.whisperer_for_laravel.actions.PolicyAction" text="Create Policy From Template" icon="/icons/laravelIcon.svg">
+                <action id="at.alirezamoh.whisperer_for_laravel.PolicyAction" class="at.alirezamoh.whisperer_for_laravel.actions.PolicyAction" text="Generate Policy From Template" icon="/icons/laravelIcon.svg">
                 </action>
 
-                <action id="at.alirezamoh.whisperer_for_laravel.ObserverAction" class="at.alirezamoh.whisperer_for_laravel.actions.ObserverAction" text="Create Observer From Template" icon="/icons/laravelIcon.svg">
+                <action id="at.alirezamoh.whisperer_for_laravel.ObserverAction" class="at.alirezamoh.whisperer_for_laravel.actions.ObserverAction" text="Generate Observer From Template" icon="/icons/laravelIcon.svg">
                 </action>
 
-                <action id="at.alirezamoh.whisperer_for_laravel.MailableAction" class="at.alirezamoh.whisperer_for_laravel.actions.MailableAction" text="Create Mailable From Template" icon="/icons/laravelIcon.svg">
+                <action id="at.alirezamoh.whisperer_for_laravel.MailableAction" class="at.alirezamoh.whisperer_for_laravel.actions.MailableAction" text="Generate Mailable From Template" icon="/icons/laravelIcon.svg">
                 </action>
 
-                <action id="at.alirezamoh.whisperer_for_laravel.ExceptionAction" class="at.alirezamoh.whisperer_for_laravel.actions.ExceptionAction" text="Create Exception From Template" icon="/icons/laravelIcon.svg">
+                <action id="at.alirezamoh.whisperer_for_laravel.ExceptionAction" class="at.alirezamoh.whisperer_for_laravel.actions.ExceptionAction" text="Generate Exception From Template" icon="/icons/laravelIcon.svg">
                 </action>
 
-                <action id="at.alirezamoh.whisperer_for_laravel.EventListenerAction" class="at.alirezamoh.whisperer_for_laravel.actions.EventListenerAction" text="Create Event Listener From Template" icon="/icons/laravelIcon.svg">
+                <action id="at.alirezamoh.whisperer_for_laravel.EventListenerAction" class="at.alirezamoh.whisperer_for_laravel.actions.EventListenerAction" text="Generate Event Listener From Template" icon="/icons/laravelIcon.svg">
                 </action>
 
-                <action id="at.alirezamoh.whisperer_for_laravel.MiddlewareAction" class="at.alirezamoh.whisperer_for_laravel.actions.MiddlewareAction" text="Create Middleware From Template" icon="/icons/laravelIcon.svg">
+                <action id="at.alirezamoh.whisperer_for_laravel.MiddlewareAction" class="at.alirezamoh.whisperer_for_laravel.actions.MiddlewareAction" text="Generate Middleware From Template" icon="/icons/laravelIcon.svg">
                 </action>
 
-                <action id="at.alirezamoh.whisperer_for_laravel.JsonResourceAction" class="at.alirezamoh.whisperer_for_laravel.actions.JsonResourceAction" text="Create Json Resource From Template" icon="/icons/laravelIcon.svg">
+                <action id="at.alirezamoh.whisperer_for_laravel.JsonResourceAction" class="at.alirezamoh.whisperer_for_laravel.actions.JsonResourceAction" text="Generate Json Resource From Template" icon="/icons/laravelIcon.svg">
                 </action>
 
-                <action id="at.alirezamoh.whisperer_for_laravel.JsonResourceCollectionAction" class="at.alirezamoh.whisperer_for_laravel.actions.JsonResourceCollectionAction" text="Create Json Resource Collection From Template" icon="/icons/laravelIcon.svg">
+                <action id="at.alirezamoh.whisperer_for_laravel.JsonResourceCollectionAction" class="at.alirezamoh.whisperer_for_laravel.actions.JsonResourceCollectionAction" text="Generate Json Resource Collection From Template" icon="/icons/laravelIcon.svg">
                 </action>
 
-                <action id="at.alirezamoh.whisperer_for_laravel.FormRequestAction" class="at.alirezamoh.whisperer_for_laravel.actions.FormRequestAction" text="Create Form Request From Template" icon="/icons/laravelIcon.svg">
+                <action id="at.alirezamoh.whisperer_for_laravel.FormRequestAction" class="at.alirezamoh.whisperer_for_laravel.actions.FormRequestAction" text="Generate Form Request From Template" icon="/icons/laravelIcon.svg">
                 </action>
 
-                <action id="at.alirezamoh.whisperer_for_laravel.EloquentScopeAction" class="at.alirezamoh.whisperer_for_laravel.actions.EloquentScopeAction" text="Create Eloquent Scope From Template" icon="/icons/laravelIcon.svg">
+                <action id="at.alirezamoh.whisperer_for_laravel.EloquentScopeAction" class="at.alirezamoh.whisperer_for_laravel.actions.EloquentScopeAction" text="Generate Eloquent Scope From Template" icon="/icons/laravelIcon.svg">
                 </action>
 
-                <action id="at.alirezamoh.whisperer_for_laravel.EloquentCastAction" class="at.alirezamoh.whisperer_for_laravel.actions.EloquentCastAction" text="Create Eloquent Cast From Template" icon="/icons/laravelIcon.svg">
+                <action id="at.alirezamoh.whisperer_for_laravel.EloquentCastAction" class="at.alirezamoh.whisperer_for_laravel.actions.EloquentCastAction" text="Generate Eloquent Cast From Template" icon="/icons/laravelIcon.svg">
                 </action>
 
-                <action id="at.alirezamoh.whisperer_for_laravel.BroadcastingChannelAction" class="at.alirezamoh.whisperer_for_laravel.actions.BroadcastingChannelAction" text="Create Broadcasting Channel From Template" icon="/icons/laravelIcon.svg">
+                <action id="at.alirezamoh.whisperer_for_laravel.BroadcastingChannelAction" class="at.alirezamoh.whisperer_for_laravel.actions.BroadcastingChannelAction" text="Generate Broadcasting Channel From Template" icon="/icons/laravelIcon.svg">
                 </action>
 
-                <action id="at.alirezamoh.whisperer_for_laravel.DbFactoryAction" class="at.alirezamoh.whisperer_for_laravel.actions.DbFactoryAction" text="Create Database Factory From Template" icon="/icons/laravelIcon.svg">
+                <action id="at.alirezamoh.whisperer_for_laravel.DbFactoryAction" class="at.alirezamoh.whisperer_for_laravel.actions.DbFactoryAction" text="Generate Database Factory From Template" icon="/icons/laravelIcon.svg">
                 </action>
 
-                <action id="at.alirezamoh.whisperer_for_laravel.ViewComposerAction" class="at.alirezamoh.whisperer_for_laravel.actions.ViewComposerAction" text="Create View Composer From Template" icon="/icons/laravelIcon.svg">
+                <action id="at.alirezamoh.whisperer_for_laravel.ViewComposerAction" class="at.alirezamoh.whisperer_for_laravel.actions.ViewComposerAction" text="Generate View Composer From Template" icon="/icons/laravelIcon.svg">
+                </action>
+
+                <action id="at.alirezamoh.whisperer_for_laravel.InertiaPageAction" class="at.alirezamoh.whisperer_for_laravel.actions.InertiaPageAction" text="Generate Inertia Page Template" icon="/icons/laravelIcon.svg">
                 </action>
 
                 <action id="at.alirezamoh.whisperer_for_laravel.actions.LivewireComponentAction" class="at.alirezamoh.whisperer_for_laravel.actions.LivewireComponentAction" text="Create Livewire Component From Template" icon="/icons/laravelIcon.svg">
                 </action>
             </group>
 
-            <action id="at.alirezamoh.whisperer_for_laravel.ActionChooserAction" class="at.alirezamoh.whisperer_for_laravel.actions.ActionChooserAction" text="Search For Code Creation Templates" icon="/icons/laravelIcon.svg">
+            <action id="at.alirezamoh.whisperer_for_laravel.ActionChooserAction" class="at.alirezamoh.whisperer_for_laravel.actions.ActionChooserAction" text="Search For Code Generation Templates" icon="/icons/laravelIcon.svg">
+                <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt G"/>
             </action>
 
-            <action id="at.alirezamoh.whisperer_for_laravel.GenerateHelperMethodsAction" class="at.alirezamoh.whisperer_for_laravel.actions.GenerateHelperMethodsAction" text="Create Helper Methods For Eloquent/DB" icon="/icons/laravelIcon.svg">
+            <action id="at.alirezamoh.whisperer_for_laravel.GenerateHelperMethodsAction" class="at.alirezamoh.whisperer_for_laravel.actions.GenerateHelperMethodsAction" text="Generate Helper Doc For Eloquent/DB" icon="/icons/laravelIcon.svg">
             </action>
 
             <separator />

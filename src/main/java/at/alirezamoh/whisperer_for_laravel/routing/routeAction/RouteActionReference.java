@@ -5,9 +5,7 @@ import at.alirezamoh.whisperer_for_laravel.support.utils.*;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.psi.PsiDirectory;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiReferenceBase;
+import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.Method;
@@ -15,15 +13,12 @@ import com.jetbrains.php.lang.psi.elements.PhpClass;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * This class resolves references controller actions and provides completion
  */
-public class RouteActionReference extends PsiReferenceBase<PsiElement> {
+public class RouteActionReference extends PsiReferenceBase<PsiElement> implements PsiPolyVariantReference {
     /**
      * The current project
      */
@@ -52,15 +47,45 @@ public class RouteActionReference extends PsiReferenceBase<PsiElement> {
      */
     @Override
     public @Nullable PsiElement resolve() {
+        return null;
+    }
+
+    @Override
+    public ResolveResult @NotNull [] multiResolve(boolean b) {
         String targetAction = StrUtils.removeQuotes(myElement.getText());
+
+        if (!targetAction.contains("@")) {
+            return new ResolveResult[0];
+        }
 
         for (Map.Entry<String, PsiElement> entry : getAllControllersWithActions().entrySet()) {
             if (entry.getKey().equals(targetAction)) {
-                return entry.getValue();
+                return new ResolveResult[] { new PsiElementResolveResult(entry.getValue()) };
             }
         }
 
-        return null;
+        String[] parts = targetAction.split("@");
+
+        if (parts.length != 2) {
+            return new ResolveResult[0];
+        }
+
+        String fullController = parts[0].trim();
+        String methodName = parts[1].trim();
+        int lastIndex = fullController.lastIndexOf('\\');
+        String controllerName = (lastIndex != -1) ? fullController.substring(lastIndex + 1) : fullController;
+
+        Collection<PhpClass> controllers = PhpIndexUtils.getPhpClassesByName(controllerName, project);
+        List<PsiElementResolveResult> foundedVariants = new ArrayList<>();
+        for (PhpClass controller : controllers) {
+            Method method = controller.findMethodByName(methodName);
+
+            if (method != null) {
+                foundedVariants.add(new PsiElementResolveResult(method));
+            }
+        }
+
+        return foundedVariants.toArray(new ResolveResult[0]);
     }
 
     /**

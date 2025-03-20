@@ -1,6 +1,8 @@
 package at.alirezamoh.whisperer_for_laravel.config.util;
 
 import at.alirezamoh.whisperer_for_laravel.config.visitors.ArrayReturnPsiRecursiveVisitor;
+import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
+import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
@@ -13,7 +15,7 @@ public class ConfigUtil {
         ArrayReturnPsiRecursiveVisitor visitor = new ArrayReturnPsiRecursiveVisitor(dirName);
         configFile.acceptChildren(visitor);
 
-        variants.put(dirName, null);
+        variants.put(dirName, "");
         variants.putAll(visitor.getVariants());
     }
 
@@ -21,6 +23,11 @@ public class ConfigUtil {
         String basePath = project.getBasePath();
         if (basePath == null) {
             return "";
+        }
+
+        SettingsState settingsState = SettingsState.getInstance(project);
+        if (!settingsState.isProjectDirectoryEmpty()) {
+            basePath = basePath + "/" + StrUtils.addSlashes(settingsState.getProjectDirectoryPath(), true, true);
         }
 
         String fullPath = file.getPath();

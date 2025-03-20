@@ -87,13 +87,7 @@ final public class RequestFieldUtils {
         if (baseFormRequest != null && PhpClassUtils.isChildOf(phpClass, baseFormRequest)) {
             Method rulesMethod = phpClass.findMethodByName("rules");
             if (rulesMethod != null) {
-                PhpReturn phpReturn = PsiTreeUtil.findChildOfType(rulesMethod, PhpReturn.class);
-                if (phpReturn != null) {
-                    ArrayCreationExpression array = PsiTreeUtil.findChildOfType(phpReturn, ArrayCreationExpression.class);
-                    if (array != null) {
-                        return PsiTreeUtil.findChildrenOfType(array, ArrayHashElement.class);
-                    }
-                }
+                return getRulesAsArray(rulesMethod);
             }
         }
 
@@ -101,7 +95,24 @@ final public class RequestFieldUtils {
     }
 
     /**
-     * Extracts validation rules from a method if it references a validation method.
+     * Retrieves the "rules" defined in a FormRequest class
+     *
+     * @param rulesMethod the rules method
+     * @return a collection of rules or null if not found
+     */
+    public static @Nullable Collection<ArrayHashElement> getRulesAsArray(Method rulesMethod) {
+        PhpReturn phpReturn = PsiTreeUtil.findChildOfType(rulesMethod, PhpReturn.class);
+        if (phpReturn != null) {
+            ArrayCreationExpression array = PsiTreeUtil.findChildOfType(phpReturn, ArrayCreationExpression.class);
+            if (array != null) {
+                return PsiTreeUtil.findChildrenOfType(array, ArrayHashElement.class);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Analyzes the given method to extract validation rules defined through calls to known validation methods
      *
      * @param method the method to analyze
      * @return a collection of ArrayHashElements representing the validation rules
@@ -113,7 +124,8 @@ final public class RequestFieldUtils {
 
         return PsiTreeUtil.findChildrenOfType(method, MethodReference.class).stream()
             .filter(methodReference -> {
-                if (!VALIDATION_METHODS.contains(methodReference.getName())) {
+                String methodName = methodReference.getName();
+                if (methodName == null || !VALIDATION_METHODS.contains(methodName)) {
                     return false;
                 }
 
@@ -167,6 +179,14 @@ final public class RequestFieldUtils {
         return false;
     }
 
+    /**
+     * Get all the rules from the rules method
+     *
+     * @param phpClass the PHP class to resolve the rules from
+     * @param project the current project
+     * @param contextElement the current context element
+     * @return a collection of ArrayHashElements representing the rules
+     */
     public static Collection<ArrayHashElement> resolveRulesFromVariable(PhpClass phpClass, Project project, PsiElement contextElement) {
         if (!(phpClass instanceof PhpClassImpl phpClassImpl)) {
             return List.of();
@@ -183,6 +203,11 @@ final public class RequestFieldUtils {
         return rules;
     }
 
+    /**
+     * Process the rules and add them to the completion result set
+     * @param rules the validation rules
+     * @param resultSet the completion result set
+     */
     public static void processRules(Collection<ArrayHashElement> rules, CompletionResultSet resultSet) {
         if (rules == null) return;
 
@@ -196,6 +221,13 @@ final public class RequestFieldUtils {
         });
     }
 
+    /**
+     * Resolves the PHP class from a given element
+     *
+     * @param element the element to resolve
+     * @param project the current project
+     * @return the resolved PHP class or null if not found
+     */
     public static @Nullable PhpClassImpl resolvePhpClass(PsiElement element, Project project) {
         if (element instanceof VariableImpl variable) {
             PhpClassImpl phpClass = resolveRequestClass(variable, project);
@@ -235,14 +267,26 @@ final public class RequestFieldUtils {
         MethodReference methodReference = MethodUtils.resolveMethodReference(psiElement, 10);
 
         return methodReference != null
+            && methodReference.getName() != null
             && PhpClassUtils.isCorrectRelatedClass(methodReference, project, REQUEST_CLASSES)
             && REQUEST_METHODS.containsKey(methodReference.getName())
             && isFieldParam(methodReference, psiElement);
     }
 
-    public static boolean isFieldParam(MethodReference method, PsiElement position) {
-        Integer paramPositions = REQUEST_METHODS.get(method.getName());
+    /**
+     * Checks if the given method reference is a request method to get field
+     *
+     * @param method the method reference to check
+     * @param position the current PSI element
+     * @return true or false
+     */
+    private static boolean isFieldParam(MethodReference method, PsiElement position) {
+        String methodName = method.getName();
+        if (methodName == null) {
+            return false;
+        }
 
+        Integer paramPositions = REQUEST_METHODS.get(methodName);
         if (paramPositions == null) {
             return false;
         }

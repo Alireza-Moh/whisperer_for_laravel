@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "at.alirezamoh.whisperer-for-laravel"
-version = "1.1.6"
+version = "1.2.2"
 
 repositories {
     mavenCentral()
@@ -33,7 +33,7 @@ tasks {
     }
 
     patchPluginXml {
-        sinceBuild.set("232")
+        sinceBuild.set("241")
         untilBuild.set("243.*")
     }
 

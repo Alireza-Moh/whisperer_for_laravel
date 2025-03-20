@@ -1,6 +1,7 @@
 package at.alirezamoh.whisperer_for_laravel.actions;
 
 import at.alirezamoh.whisperer_for_laravel.actions.models.ControllerModel;
+import at.alirezamoh.whisperer_for_laravel.actions.models.DbFactoryModel;
 import at.alirezamoh.whisperer_for_laravel.actions.models.MigrationModel;
 import at.alirezamoh.whisperer_for_laravel.actions.models.EloquentModel;
 import at.alirezamoh.whisperer_for_laravel.actions.views.EloquentView;
@@ -31,6 +32,10 @@ public class EloquentAction extends BaseAction {
 
             if (eloquentView.withMigration()) {
                 createMigration(eloquentView, eloquentModel, project);
+            }
+
+            if (eloquentView.withFactory()) {
+                createFactory(eloquentView, eloquentModel, project);
             }
         }
     }
@@ -66,6 +71,25 @@ public class EloquentAction extends BaseAction {
         this.create(
             migrationModel,
             "migration.ftl",
+            true,
+            project
+        );
+    }
+
+    private void createFactory(EloquentView eloquentView, EloquentModel eloquentModel, Project project) {
+        DbFactoryModel factoryModel = new DbFactoryModel(
+            SettingsState.getInstance(project),
+            eloquentView.getFactoryName(),
+            eloquentModel.getUnformattedModuleFullPath(),
+            eloquentModel.getFormattedModuleFullPath(),
+            eloquentModel.getNamespace() + "\\" + eloquentModel.getName()
+        );
+
+        factoryModel.setModel(eloquentModel);
+
+        this.create(
+            factoryModel,
+            "dbFactory.ftl",
             true,
             project
         );

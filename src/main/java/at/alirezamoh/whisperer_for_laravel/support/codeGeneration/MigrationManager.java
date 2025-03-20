@@ -7,18 +7,14 @@ import at.alirezamoh.whisperer_for_laravel.actions.models.dataTables.Relation;
 import at.alirezamoh.whisperer_for_laravel.actions.models.dataTables.Table;
 import at.alirezamoh.whisperer_for_laravel.indexes.TableIndex;
 import at.alirezamoh.whisperer_for_laravel.support.codeGeneration.vistors.MigrationVisitor;
-import at.alirezamoh.whisperer_for_laravel.support.utils.LaravelPaths;
-import at.alirezamoh.whisperer_for_laravel.support.utils.MethodUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.*;
 import at.alirezamoh.whisperer_for_laravel.support.providers.ModelProvider;
-import at.alirezamoh.whisperer_for_laravel.support.utils.PhpClassUtils;
-import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.jetbrains.php.lang.psi.PhpFile;
+import com.jetbrains.php.lang.psi.elements.Parameter;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.impl.*;
 import org.jetbrains.annotations.Nullable;
@@ -83,7 +79,7 @@ public class MigrationManager {
                 laravelModel.setFields(table.fields());
 
                 List<Relation> relations = new ArrayList<>();
-                for (com.jetbrains.php.lang.psi.elements.Method method : resolveAllRelations(modelClass, project)) {
+                for (com.jetbrains.php.lang.psi.elements.Method method : collectModelRelations(modelClass, project)) {
                     Map.Entry<String, PhpClass> methodNameAndRelatedModel = findRelationships(method);
                     if (methodNameAndRelatedModel != null) {
                         relations.add(
@@ -103,6 +99,8 @@ public class MigrationManager {
                 }
                 laravelModel.setRelations(relations);
                 createLaravelModelHelperMethods(laravelModel);
+                addLocalScopeMethods(modelClass, laravelModel);
+
                 models.add(laravelModel);
             }
         }
@@ -124,31 +122,35 @@ public class MigrationManager {
      * Searches for migration files and extracts tables
      */
     private void searchForMigrations() {
-        Collection<VirtualFile> files = new ArrayList<>();
-
         FileBasedIndex fileBasedIndex = FileBasedIndex.getInstance();
+        Set<String> keys = new HashSet<>();
 
-        Collection<String> tables = fileBasedIndex.getAllKeys(TableIndex.INDEX_ID, project);
+        FileBasedIndex.getInstance().processAllKeys(
+            TableIndex.INDEX_ID,
+            key -> {
+                keys.add(key);
+                return true;
+            },
+            project
+        );
 
-        for (String table : tables) {
-            files.addAll(
-                fileBasedIndex.getContainingFiles(
-                    TableIndex.INDEX_ID,
-                    table,
-                    GlobalSearchScope.allScope(project)
-                )
-            );
-        }
-
-        for (VirtualFile file : files) {
-            PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
-
-            if (psiFile != null) {
-                MigrationVisitor migrationVisitor = new MigrationVisitor();
-                psiFile.acceptChildren(migrationVisitor);
-                this.tables.addAll(migrationVisitor.getTables());
+        PsiManager psiManager = PsiManager.getInstance(project);
+        fileBasedIndex.processFilesContainingAnyKey(
+            TableIndex.INDEX_ID,
+            keys,
+            GlobalSearchScope.allScope(project),
+            null,
+            null,
+            file -> {
+                PsiFile psiFile = psiManager.findFile(file);
+                if (psiFile != null) {
+                    MigrationVisitor migrationVisitor = new MigrationVisitor();
+                    psiFile.acceptChildren(migrationVisitor);
+                    this.tables.addAll(migrationVisitor.getTables());
+                }
+                return true;
             }
-        }
+        );
     }
 
     /**
@@ -279,23 +281,7 @@ public class MigrationManager {
             }
 
             for (PhpClass phpClass : PhpClassUtils.getPhpClassesFromFile(phpFile)) {
-                String finalModelName = "";
-                String modelNameWithoutExtension = StrUtils.removePhpExtension(phpClass.getName());
-
-                if (StrUtils.isCamelCase(modelNameWithoutExtension)) {
-                    String[] parts = StrUtils.snake(modelNameWithoutExtension, "_").split("_");
-
-                    parts[parts.length - 1] = StringUtil.pluralize(parts[parts.length - 1]);
-
-                    finalModelName = String.join("_", parts);
-                }
-
-                com.jetbrains.php.lang.psi.elements.Field tableField = phpClass.findFieldByName("table", false);
-
-                if (
-                    StrUtils.lcFirst(finalModelName).equals(tableName)
-                    || (tableField != null && StrUtils.removeQuotes(tableField.getDefaultValuePresentation()).equals(tableName))
-                ) {
+                if (EloquentUtils.getTableName(phpClass).equals(tableName)) {
                     return phpClass;
                 }
             }
@@ -310,7 +296,7 @@ public class MigrationManager {
      * @param foundedMethod the relationship method defined in the eloquent model
      * @return an entry containing the method name and related PhpClass, or null if no relationship is found
      */
-    public @Nullable Map.Entry<String, PhpClass> findRelationships(com.jetbrains.php.lang.psi.elements.Method foundedMethod) {
+    private @Nullable Map.Entry<String, PhpClass> findRelationships(com.jetbrains.php.lang.psi.elements.Method foundedMethod) {
         return Arrays.stream(foundedMethod.getChildren())
             .filter(element -> element instanceof GroupStatementImpl)
             .flatMap(groupStatement -> Arrays.stream(groupStatement.getChildren()))
@@ -337,7 +323,7 @@ public class MigrationManager {
      * @param project the project
      * @return a list of relationships in the given model class
      */
-    public List<com.jetbrains.php.lang.psi.elements.Method> resolveAllRelations(PhpClass model, Project project) {
+    private List<com.jetbrains.php.lang.psi.elements.Method> collectModelRelations(PhpClass model, Project project) {
         List<com.jetbrains.php.lang.psi.elements.Method> relations = new ArrayList<>();
 
         for (com.jetbrains.php.lang.psi.elements.Method method : model.getOwnMethods()) {
@@ -356,7 +342,7 @@ public class MigrationManager {
      * @param project the project
      * @return true or false
      */
-    public boolean isRelationshipMethod(com.jetbrains.php.lang.psi.elements.Method method, Project project) {
+    private boolean isRelationshipMethod(com.jetbrains.php.lang.psi.elements.Method method, Project project) {
         return Arrays.stream(method.getChildren())
             .filter(element -> element instanceof GroupStatementImpl)
             .flatMap(element -> Arrays.stream(element.getChildren()))
@@ -367,8 +353,10 @@ public class MigrationManager {
             .anyMatch(methodReference -> {
                 List<PhpClassImpl> classes = MethodUtils.resolveMethodClasses(methodReference, project);
                 PhpClass relationClass = PhpClassUtils.getClassByFQN(project, LaravelPaths.LaravelClasses.Model);
+                String methodName = methodReference.getName();
 
-                return RELATION_METHODS.containsKey(methodReference.getName())
+                return methodName != null
+                    && RELATION_METHODS.containsKey(methodName)
                     && relationClass != null
                     && classes.stream().anyMatch(clazz -> PhpClassUtils.isChildOf(clazz, relationClass));
             });
@@ -380,7 +368,7 @@ public class MigrationManager {
      * @param foundedMethod the relationship method to analyze
      * @return the PhpClass of the related model, or null if no related model is found
      */
-    public @Nullable PhpClass findRelatedModelFromMethod(com.jetbrains.php.lang.psi.elements.Method foundedMethod) {
+    private @Nullable PhpClass findRelatedModelFromMethod(com.jetbrains.php.lang.psi.elements.Method foundedMethod) {
         return Arrays.stream(foundedMethod.getChildren())
             .filter(element -> element instanceof GroupStatementImpl)
             .flatMap(groupStatement -> Arrays.stream(groupStatement.getChildren()))
@@ -397,5 +385,24 @@ public class MigrationManager {
             .map(resolvedClass -> (PhpClass) resolvedClass)
             .findFirst()
             .orElse(null);
+    }
+
+    private void addLocalScopeMethods(PhpClass model, LaravelModel laravelModel) {
+        for (com.jetbrains.php.lang.psi.elements.Method method : model.getOwnMethods()) {
+            String methodName = method.getName();
+            if (methodName.startsWith("scope")) {
+                Method localScopeMethod = new Method(
+                    StrUtils.lcFirst(methodName.replace("scope", ""))
+                );
+                localScopeMethod.setReturnType(
+                    "\\Illuminate\\Database\\Eloquent\\Builder"
+                );
+                for (Parameter param : method.getParameters()) {
+                    localScopeMethod.addParameter(param.getName(), param.getType().toString(), "");
+                }
+
+                laravelModel.addMethod(localScopeMethod);
+            }
+        }
     }
 }

@@ -1,5 +1,6 @@
 package at.alirezamoh.whisperer_for_laravel.indexes;
 
+import at.alirezamoh.whisperer_for_laravel.support.utils.PhpClassUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.openapi.project.Project;
@@ -39,7 +40,7 @@ public class TableIndex extends FileBasedIndexExtension<String, Void> {
         return inputData -> {
             Project project = inputData.getProject();
 
-            if (!PluginUtils.isLaravelProject(project) && PluginUtils.isLaravelFrameworkNotInstalled(project)) {
+            if (PluginUtils.shouldNotCompleteOrNavigate(project)) {
                 return Collections.emptyMap();
             }
 
@@ -76,7 +77,7 @@ public class TableIndex extends FileBasedIndexExtension<String, Void> {
 
     @Override
     public int getVersion() {
-        return 1;
+        return 2;
     }
 
     @Override
@@ -89,13 +90,18 @@ public class TableIndex extends FileBasedIndexExtension<String, Void> {
         return true;
     }
 
+    @Override
+    public boolean traceKeyHashToVirtualFileMapping() {
+        return true;
+    }
+
     private boolean shouldScanMethod(MethodReference methodReference) {
-        PhpExpression schemaClassReference = methodReference.getClassReference();
+        ClassReferenceImpl schemaClassReference = PhpClassUtils.getClassReferenceImplFromMethodRef(methodReference);
 
         return isInsideUpMethod(methodReference)
             && isCreateOrTable(methodReference)
-            && schemaClassReference instanceof ClassReferenceImpl classReference
-            && Objects.equals(classReference.getFQN(), SCHEMA_CLASS);
+            && schemaClassReference != null
+            && Objects.equals(schemaClassReference.getFQN(), SCHEMA_CLASS);
     }
 
     private boolean isInsideUpMethod(MethodReference methodReference) {

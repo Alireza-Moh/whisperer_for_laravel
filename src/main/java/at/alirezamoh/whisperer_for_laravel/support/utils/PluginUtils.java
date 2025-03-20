@@ -2,6 +2,7 @@ package at.alirezamoh.whisperer_for_laravel.support.utils;
 
 import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.whisperer_for_laravel.support.ProjectDefaultPaths;
+import at.alirezamoh.whisperer_for_laravel.support.notification.Notify;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.intellij.openapi.diagnostic.Logger;
@@ -168,6 +169,10 @@ public class PluginUtils {
             LOG.error("Could not extract " + packageName + " from composer file", e);
             return false;
         }
+    }
+
+    public static boolean shouldNotCompleteOrNavigate(Project project) {
+        return !PluginUtils.isLaravelProject(project) || PluginUtils.isLaravelFrameworkNotInstalled(project);
     }
 
     /**

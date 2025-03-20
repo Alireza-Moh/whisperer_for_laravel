@@ -46,6 +46,11 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
      */
     private String inertiaPageRootPath;
 
+    /**
+     * Whether to suppress warnings for real-time facade methods: 'Undefined class', 'Undefined namespace'
+     */
+    private boolean suppressRealTimeFacadeWarnings;
+
     public static SettingsState getInstance(@NotNull Project foundedProject) {
         project = foundedProject;
         return foundedProject.getService(SettingsState.class);
@@ -108,6 +113,14 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
 
     public void setInertiaPageRootPath(String inertiaPageRootPath) {
         this.inertiaPageRootPath = inertiaPageRootPath;
+    }
+
+    public boolean isSuppressRealTimeFacadeWarnings() {
+        return suppressRealTimeFacadeWarnings;
+    }
+
+    public void setSuppressRealTimeFacadeWarnings(boolean suppressRealTimeFacadeWarnings) {
+        this.suppressRealTimeFacadeWarnings = suppressRealTimeFacadeWarnings;
     }
 
     public boolean isModuleApplication() {

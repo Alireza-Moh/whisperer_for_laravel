@@ -10,7 +10,6 @@ import at.alirezamoh.whisperer_for_laravel.support.codeGeneration.vistors.ClassM
 import at.alirezamoh.whisperer_for_laravel.support.utils.DirectoryUtils;
 import at.alirezamoh.whisperer_for_laravel.support.notification.Notify;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
-import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import at.alirezamoh.whisperer_for_laravel.support.TemplateLoader;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
@@ -61,7 +60,7 @@ public class GenerateHelperMethodsAction extends BaseAction {
     public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
         project = anActionEvent.getProject();
 
-        if (PluginUtils.isLaravelFrameworkNotInstalled(project)) {
+        if (PluginUtils.shouldNotCompleteOrNavigate(project)) {
             Notify.notifyWarning(project, "Laravel Framework is not installed");
             return;
         }
@@ -75,8 +74,8 @@ public class GenerateHelperMethodsAction extends BaseAction {
                         ApplicationManager.getApplication().invokeAndWait(() -> deletePluginVendorDir());
 
                         ApplicationManager.getApplication().runReadAction(() -> {
-                            createModelsHelperData(indicator);
-                            createBaseQueryBuilderMethods(indicator);
+                            createModelsHelperCode(indicator);
+                            createBaseQueryBuilderCode(indicator);
                         });
 
                         outputModelCreationResult();
@@ -103,14 +102,14 @@ public class GenerateHelperMethodsAction extends BaseAction {
         });
     }
 
-    private void createModelsHelperData(@NotNull ProgressIndicator indicator) {
+    private void createModelsHelperCode(@NotNull ProgressIndicator indicator) {
         indicator.setText("Loading models...");
 
         MigrationManager migrationManager = new MigrationManager(project);
-        List<LaravelModel> m = migrationManager.visit();
+        List<LaravelModel> allModels = migrationManager.visit();
 
-        if (!m.isEmpty()) {
-            Map<String, List<LaravelModel>> groupedModels = m.stream()
+        if (!allModels.isEmpty()) {
+            Map<String, List<LaravelModel>> groupedModels = allModels.stream()
                 .collect(Collectors.groupingBy(LaravelModel::getNamespaceName));
 
             groupedModels.forEach((namespace, modelsInNamespace) -> {
@@ -118,11 +117,11 @@ public class GenerateHelperMethodsAction extends BaseAction {
                 create(generation, "laravelModels.ftl");
             });
 
-            models = m;
+            models = allModels;
         }
     }
 
-    private void createBaseQueryBuilderMethods(@NotNull ProgressIndicator indicator) {
+    private void createBaseQueryBuilderCode(@NotNull ProgressIndicator indicator) {
         indicator.setText("Loading query builder methods...");
 
         ClassMethodLoader methodLoader = new ClassMethodLoader(project);

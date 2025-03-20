@@ -61,9 +61,15 @@ public class MiddlewareReference extends PsiReferenceBase<PsiElement> {
             if (targetMiddleware.startsWith("can:")) {
                 targetMiddleware = targetMiddleware.substring("can:".length());
             }
-            foundedElement = gateProcessor.findGateAbility(
-                PhpPsiElementFactory.createStringLiteralExpression(project, targetMiddleware, false)
+
+            List<PsiElement> foundedGates = gateProcessor.findGateAbility(
+                PhpPsiElementFactory.createStringLiteralExpression(project, targetMiddleware, false),
+                false
             );
+
+            if (!foundedGates.isEmpty()) {
+                foundedElement = foundedGates.get(0); // used get() because of java 17
+            }
         }
 
         return foundedElement;
@@ -84,7 +90,7 @@ public class MiddlewareReference extends PsiReferenceBase<PsiElement> {
         }
 
         GateProcessor gateProcessor = new GateProcessor(project);
-        for (String gate : gateProcessor.collectGates()) {
+        for (String gate : gateProcessor.collectGates(false)) {
             variants.add(
                 PsiElementUtils.buildSimpleLookupElement("can:" + gate)
             );

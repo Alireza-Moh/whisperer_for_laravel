@@ -34,7 +34,7 @@ public class ConfigIndex extends FileBasedIndexExtension<String, String> {
         return inputData -> {
             Project project = inputData.getProject();
 
-            if (!PluginUtils.isLaravelProject(project) && PluginUtils.isLaravelFrameworkNotInstalled(project)) {
+            if (PluginUtils.shouldNotCompleteOrNavigate(project)) {
                 return Collections.emptyMap();
             }
 
@@ -84,7 +84,7 @@ public class ConfigIndex extends FileBasedIndexExtension<String, String> {
 
     @Override
     public int getVersion() {
-        return 1;
+        return 2;
     }
 
     @Override
@@ -105,6 +105,11 @@ public class ConfigIndex extends FileBasedIndexExtension<String, String> {
 
     @Override
     public boolean dependsOnFileContent() {
+        return true;
+    }
+
+    @Override
+    public boolean traceKeyHashToVirtualFileMapping() {
         return true;
     }
 

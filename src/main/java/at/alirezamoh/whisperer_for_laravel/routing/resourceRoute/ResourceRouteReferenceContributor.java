@@ -45,7 +45,7 @@ public class ResourceRouteReferenceContributor extends PsiReferenceContributor {
                 public PsiReference @NotNull [] getReferencesByElement(@NotNull PsiElement psiElement, @NotNull ProcessingContext processingContext) {
                     Project project = psiElement.getProject();
 
-                    if (!PluginUtils.isLaravelProject(project) && PluginUtils.isLaravelFrameworkNotInstalled(project)) {
+                    if (PluginUtils.shouldNotCompleteOrNavigate(project)) {
                         return PsiReference.EMPTY_ARRAY;
                     }
 
@@ -97,7 +97,6 @@ public class ResourceRouteReferenceContributor extends PsiReferenceContributor {
         if (expectedParamIndex == null) {
             return false;
         }
-
         return MethodUtils.findParamIndex(position, false) == expectedParamIndex;
     }
 }

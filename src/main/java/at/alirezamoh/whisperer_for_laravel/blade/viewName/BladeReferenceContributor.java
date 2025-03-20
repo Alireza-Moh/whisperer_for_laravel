@@ -70,7 +70,7 @@ public class BladeReferenceContributor extends PsiReferenceContributor {
                 public PsiReference @NotNull [] getReferencesByElement(@NotNull PsiElement psiElement, @NotNull ProcessingContext processingContext) {
                     Project project = psiElement.getProject();
 
-                    if (!PluginUtils.isLaravelProject(project) && PluginUtils.isLaravelFrameworkNotInstalled(project)) {
+                    if (PluginUtils.shouldNotCompleteOrNavigate(project)) {
                         return PsiReference.EMPTY_ARRAY;
                     }
 
@@ -137,7 +137,8 @@ public class BladeReferenceContributor extends PsiReferenceContributor {
      * @return true or false
      */
     private boolean isExpectedFacadeMethod(String methodName, List<PhpClassImpl> resolvedClasses, PhpClass expectedClass, Map<String, Integer> methodMap) {
-        return methodMap.containsKey(methodName)
+        return methodName != null
+            && methodMap.containsKey(methodName)
             && expectedClass != null
             && resolvedClasses.stream().anyMatch(clazz -> PhpClassUtils.isChildOf(clazz, expectedClass));
     }
@@ -173,6 +174,10 @@ public class BladeReferenceContributor extends PsiReferenceContributor {
      * @return true or false
      */
     private boolean isExpectedParam(PsiElement position, String methodName, Map<String, Integer> methodMap) {
+        if (methodName == null) {
+            return false;
+        }
+
         Integer expectedParamIndex = methodMap.get(methodName);
         return expectedParamIndex != null && expectedParamIndex == MethodUtils.findParamIndex(position, false);
     }

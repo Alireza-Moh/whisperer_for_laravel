@@ -7,6 +7,10 @@
 
 Whisperer for Laravel is a PhpStorm plugin to help with Laravel development
 
+
+
+[Documentation](https://alireza-moh.github.io/whisperer_for_laravel_docs/)
+
 ## Features
 
 - **Code Creation from template**: Quickly generate laravel components such as Eloquent models, migrations, controllers, seeders, jobs, and more.

@@ -31,7 +31,7 @@ public class TableReferenceContributor extends PsiReferenceContributor {
                 public PsiReference @NotNull [] getReferencesByElement(@NotNull PsiElement psiElement, @NotNull ProcessingContext processingContext) {
                     Project project = psiElement.getProject();
 
-                    if (!PluginUtils.isLaravelProject(project) && PluginUtils.isLaravelFrameworkNotInstalled(project)) {
+                    if (PluginUtils.shouldNotCompleteOrNavigate(project)) {
                         return PsiReference.EMPTY_ARRAY;
                     }
 
@@ -96,9 +96,11 @@ public class TableReferenceContributor extends PsiReferenceContributor {
      * @return true or false
      */
     private boolean isTableParam(MethodReference method, PsiElement position) {
-        int paramIndex = MethodUtils.findParamIndex(position, false);
         Integer paramPosition = LaravelPaths.DB_TABLE_METHODS.get(method.getName());
 
-        return paramPosition == paramIndex;
+        if (paramPosition == null) {
+            return false;
+        }
+        return paramPosition == MethodUtils.findParamIndex(position, false);
     }
 }

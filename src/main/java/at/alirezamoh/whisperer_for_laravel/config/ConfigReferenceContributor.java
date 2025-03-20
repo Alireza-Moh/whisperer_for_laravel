@@ -56,7 +56,7 @@ public class ConfigReferenceContributor extends PsiReferenceContributor {
                     public PsiReference @NotNull [] getReferencesByElement(@NotNull PsiElement psiElement, @NotNull ProcessingContext processingContext) {
                         Project project = psiElement.getProject();
 
-                        if (!PluginUtils.isLaravelProject(project) && PluginUtils.isLaravelFrameworkNotInstalled(project)) {
+                        if (PluginUtils.shouldNotCompleteOrNavigate(project)) {
                             return PsiReference.EMPTY_ARRAY;
                         }
 
@@ -115,8 +115,11 @@ public class ConfigReferenceContributor extends PsiReferenceContributor {
                 ? ((MethodReference) reference).getName()
                 : ((FunctionReference) reference).getName();
 
-        Integer expectedParamIndex = CONFIG_METHODS.get(referenceName);
+        if (referenceName == null) {
+            return false;
+        }
 
+        Integer expectedParamIndex = CONFIG_METHODS.get(referenceName);
         if (expectedParamIndex == null) {
             return false;
         }

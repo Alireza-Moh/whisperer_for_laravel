@@ -1,5 +1,6 @@
 package at.alirezamoh.whisperer_for_laravel.indexes;
 
+import at.alirezamoh.whisperer_for_laravel.support.utils.PhpClassUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.openapi.project.Project;
@@ -63,7 +64,7 @@ public class RouteIndex extends FileBasedIndexExtension<String, Void> {
         return inputData -> {
             Project project = inputData.getProject();
 
-            if (!PluginUtils.isLaravelProject(project) && PluginUtils.isLaravelFrameworkNotInstalled(project)) {
+            if (PluginUtils.shouldNotCompleteOrNavigate(project)) {
                 return Collections.emptyMap();
             }
 
@@ -100,7 +101,7 @@ public class RouteIndex extends FileBasedIndexExtension<String, Void> {
 
     @Override
     public int getVersion() {
-        return 1;
+        return 2;
     }
 
     @Override
@@ -113,12 +114,18 @@ public class RouteIndex extends FileBasedIndexExtension<String, Void> {
         return true;
     }
 
-    private boolean isLaravelRouteMethod(MethodReference methodReference) {
-        PhpExpression routeClassReference = methodReference.getClassReference();
+    @Override
+    public boolean traceKeyHashToVirtualFileMapping() {
+        return true;
+    }
 
-        return routeClassReference instanceof ClassReferenceImpl classReferences
+    private boolean isLaravelRouteMethod(MethodReference methodReference) {
+        ClassReferenceImpl routeClassReference = PhpClassUtils.getClassReferenceImplFromMethodRef(methodReference);
+
+        return routeClassReference != null
             && ROUTE_METHODS.containsKey(methodReference.getName())
-            && ROUTE_NAMESPACES.contains(classReferences.getFQN());
+            && routeClassReference.getFQN() != null
+            && ROUTE_NAMESPACES.contains(routeClassReference.getFQN());
     }
 
     private @Nullable String extractRouteData(MethodReference methodReference) {

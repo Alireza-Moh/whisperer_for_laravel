@@ -7,6 +7,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class GateAbilityFinder extends PsiRecursiveElementWalkingVisitor {
     private PsiElement myElement;
@@ -27,7 +28,7 @@ public class GateAbilityFinder extends PsiRecursiveElementWalkingVisitor {
         super.visitElement(element);
     }
 
-    public PsiElement getFoundedAbility() {
+    public @Nullable PsiElement getFoundedAbility() {
         return foundedAbility;
     }
 
