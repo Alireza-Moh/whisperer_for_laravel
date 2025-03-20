@@ -157,13 +157,4 @@ public class RuleValidationUtil {
             return PsiElementUtils.isAssocArray(psiElement, 10) && PsiElementUtils.isInArrayValue(psiElement, 10);
         }
     }
-
-    public static boolean isRuleParam(MethodReference method, PsiElement position) {
-        Integer paramPositions = RULES_METHODS.get(method.getName());
-
-        if (paramPositions == null) {
-            return false;
-        }
-        return MethodUtils.findParamIndex(position, false) == paramPositions;
-    }
 }
