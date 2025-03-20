@@ -24,7 +24,7 @@ public class LivewireHtmlDirectiveSuppressor implements InspectionSuppressor {
     public boolean isSuppressedFor(@NotNull PsiElement psiElement, @NotNull String s) {
         Project project = psiElement.getProject();
 
-        if (LivewireUtil.doNotCompleteOrNavigate(project) && !suppressedXMLInspections.contains(s)) {
+        if (LivewireUtil.shouldNotCompleteOrNavigate(project) && !suppressedXMLInspections.contains(s)) {
             return false;
         }
 

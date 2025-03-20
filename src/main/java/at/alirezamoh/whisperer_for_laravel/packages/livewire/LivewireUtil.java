@@ -1,5 +1,6 @@
 package at.alirezamoh.whisperer_for_laravel.packages.livewire;
 
+import at.alirezamoh.whisperer_for_laravel.support.utils.DirectoryUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
 import com.intellij.json.psi.JsonFile;
 import com.intellij.lang.injection.InjectedLanguageManager;
@@ -10,11 +11,8 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiLanguageInjectionHost;
 import com.intellij.psi.PsiManager;
-import com.jetbrains.php.composer.ComposerConfigUtils;
-import com.jetbrains.php.composer.InstalledPackageData;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 import java.util.Objects;
 
 public class LivewireUtil {
@@ -22,10 +20,13 @@ public class LivewireUtil {
 
     private static final String LIVEWIRE_PACKAGE_NAME = "livewire/livewire";
 
-    public static boolean doNotCompleteOrNavigate(Project project) {
+    private static final String INERTIA_PACKAGE_DIRECTORY_PATH_IN_VENDOR = "/vendor/livewire/livewire/src";
+
+    public static boolean shouldNotCompleteOrNavigate(Project project) {
         return !PluginUtils.isLaravelProject(project)
-            && PluginUtils.isLaravelFrameworkNotInstalled(project)
-            && !doesProjectUseLivewirePackage(project);
+            || !PluginUtils.isLaravelFrameworkNotInstalled(project)
+            || !PluginUtils.doesPackageExistsInComposerFile(project, LIVEWIRE_PACKAGE_NAME)
+            || DirectoryUtils.getDirectory(project, INERTIA_PACKAGE_DIRECTORY_PATH_IN_VENDOR) == null;
     }
 
     public static @Nullable PsiLanguageInjectionHost getFromPsiLanguageInjectionHost(Project project, PsiElement element) {
@@ -38,22 +39,6 @@ public class LivewireUtil {
         PsiLanguageInjectionHost injectionHost = getFromPsiLanguageInjectionHost(project, element);
 
         return Objects.requireNonNullElse(injectionHost, element).getContainingFile();
-    }
-
-    public static boolean doesProjectUseLivewirePackage(Project project) {
-        PsiFile psiFile = PluginUtils.getComposerFile(project);
-        if (psiFile == null) {
-            return false;
-        }
-
-        List<InstalledPackageData> packages = ComposerConfigUtils.getInstalledPackagesFromConfig(psiFile.getVirtualFile());
-        for (InstalledPackageData packageData : packages) {
-            if (packageData.getName().equals(LIVEWIRE_PACKAGE_NAME)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     public static boolean doesProjectUseTrixPackage(Project project) {

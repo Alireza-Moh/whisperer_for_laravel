@@ -26,7 +26,6 @@ public class LivewirePropertyCompletionUtil {
      * @param resultSet  The result set where lookup elements should be added.
      * @param hostFilter A predicate that determines if the {@link PsiLanguageInjectionHost} is valid.
      * @param propertyCollector A processor that collects {@link LookupElementBuilder} items
-     *                          (for example, calling {@code LivewirePropertyProvider.collectProperties}).
      */
     public static void addCompletionsIfHostMatches(
         @NotNull CompletionParameters parameters,
@@ -37,8 +36,7 @@ public class LivewirePropertyCompletionUtil {
         PsiElement position = parameters.getPosition().getOriginalElement();
         Project project = position.getProject();
 
-        // Abort if we should not complete or navigate
-        if (LivewireUtil.doNotCompleteOrNavigate(project)) {
+        if (LivewireUtil.shouldNotCompleteOrNavigate(project)) {
             return;
         }
 

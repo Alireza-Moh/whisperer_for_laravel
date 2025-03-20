@@ -1,5 +1,6 @@
 package at.alirezamoh.whisperer_for_laravel.packages.livewire.validation;
 
+import at.alirezamoh.whisperer_for_laravel.request.validation.util.RuleValidationUtil;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
@@ -15,10 +16,6 @@ import com.jetbrains.php.lang.psi.elements.ArrayHashElement;
 import com.jetbrains.php.lang.psi.elements.PhpAttribute;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 
 public class RequestMessageForLivewirePropertyCompletionContributor extends CompletionContributor {
@@ -58,7 +55,8 @@ public class RequestMessageForLivewirePropertyCompletionContributor extends Comp
 
                             if (key instanceof StringLiteralExpression fieldName) {
                                 String fieldNameOutQuoted = StrUtils.removeQuotes(fieldName.getText());
-                                extractValidationRules(rule.getValue()).forEach(ruleString -> {
+
+                                RuleValidationUtil.extractValidationRules(rule.getValue()).forEach(ruleString -> {
                                     completionResultSet.addElement(
                                         PsiElementUtils.buildSimpleLookupElement(fieldNameOutQuoted + "." + ruleString)
                                     );
@@ -69,32 +67,5 @@ public class RequestMessageForLivewirePropertyCompletionContributor extends Comp
                 }
             }
         );
-    }
-
-    /**
-     * Extracts validation rules from an array or a string
-     *
-     * @param valueElement The value element containing validation rules
-     * @return A list of extracted validation rules
-     */
-    private static List<String> extractValidationRules(PsiElement valueElement) {
-        List<String> rulesList = new ArrayList<>();
-
-        if (valueElement instanceof StringLiteralExpression stringLiteral) {
-            String[] rules = StrUtils.removeQuotes(stringLiteral.getText()).split("\\|");
-            rulesList.addAll(Arrays.asList(rules));
-        } else if (valueElement instanceof ArrayCreationExpression valueArray) {
-            for (PsiElement child : valueArray.getChildren()) {
-                for (PsiElement child2 : child.getChildren()) {
-                    if (child2 instanceof StringLiteralExpression childStringLiteral) {
-                        rulesList.add(
-                            StrUtils.removeQuotes(childStringLiteral.getText())
-                        );
-                    }
-                }
-            }
-        }
-
-        return rulesList;
     }
 }

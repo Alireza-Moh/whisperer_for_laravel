@@ -52,7 +52,7 @@ public class LivewirePropertyDataBindingCompletionContributor extends Completion
                     PsiElement position = parameters.getPosition().getOriginalElement();
 
                     Project project = position.getProject();
-                    if (LivewireUtil.doNotCompleteOrNavigate(project)) {
+                    if (LivewireUtil.shouldNotCompleteOrNavigate(project)) {
                         return;
                     }
 

@@ -1,7 +1,7 @@
 package at.alirezamoh.whisperer_for_laravel.packages.inertia.annotator;
 
 import at.alirezamoh.whisperer_for_laravel.actions.models.InertiaPageModel;
-import at.alirezamoh.whisperer_for_laravel.packages.inertia.InertiaPageCollector;
+import at.alirezamoh.whisperer_for_laravel.packages.inertia.InertiaUtil;
 import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.whisperer_for_laravel.support.TemplateLoader;
 import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
@@ -70,7 +70,7 @@ public class CreateInertiaPageIntention extends BaseIntentionAction {
      */
     @Override
     public void invoke(@NotNull Project project, Editor editor, PsiFile psiFile) throws IncorrectOperationException {
-        List<String> options = InertiaPageCollector.getInertiaPaths(project);
+        List<String> options = InertiaUtil.getInertiaPaths(project);
         if (options == null) {
             return;
         }

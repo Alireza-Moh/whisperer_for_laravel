@@ -1,7 +1,7 @@
 package at.alirezamoh.whisperer_for_laravel.actions.views;
 
 import at.alirezamoh.whisperer_for_laravel.actions.models.InertiaPageModel;
-import at.alirezamoh.whisperer_for_laravel.packages.inertia.InertiaPageCollector;
+import at.alirezamoh.whisperer_for_laravel.packages.inertia.InertiaUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.ValidationInfo;
@@ -94,7 +94,7 @@ public class InertiaPageView extends BaseDialog {
         contentPane.setLayout(new GridBagLayout());
 
         inertiaPageNameTextField = new JTextField();
-        resourcePageDirectoryComboBox = new ComboBox<>(InertiaPageCollector.getInertiaPaths(project).toArray(new String[0]));
+        resourcePageDirectoryComboBox = new ComboBox<>(InertiaUtil.getInertiaPaths(project).toArray(new String[0]));
         pageVariantComboBox = new ComboBox<>(new String[]{"Options API", "Composition API"});
         pageTypeComboBox = new ComboBox<>(new String[]{".vue", ".jsx"});
 

@@ -11,10 +11,7 @@ import com.jetbrains.php.lang.psi.elements.impl.MethodImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 /**
  * Utility class to extract validation rules from FormRequest classes
@@ -22,7 +19,7 @@ import java.util.List;
  */
 public class ValidationFieldAndRuleExtractor {
     /**
-     * Extracts validation rules and adds completion suggestions for message overrides
+     * Extracts validation rules and adds completion suggestions for messages
      *
      * @param psiElement The PSI element in the `messages()` method
      * @param result     The completion result set to populate
@@ -46,7 +43,7 @@ public class ValidationFieldAndRuleExtractor {
 
                 if (key instanceof StringLiteralExpression fieldName) {
                     String fieldNameOutQuoted = StrUtils.removeQuotes(fieldName.getText());
-                    extractValidationRules(rule.getValue()).forEach(ruleString -> {
+                    RuleValidationUtil.extractValidationRules(rule.getValue()).forEach(ruleString -> {
                         result.addElement(
                             PsiElementUtils.buildSimpleLookupElement(fieldNameOutQuoted + "." + ruleString)
                         );
@@ -73,32 +70,5 @@ public class ValidationFieldAndRuleExtractor {
         }
 
         return null;
-    }
-
-    /**
-     * Extracts validation rules from an array or a string
-     *
-     * @param valueElement The value element containing validation rules
-     * @return A list of extracted validation rules
-     */
-    private static List<String> extractValidationRules(PsiElement valueElement) {
-        List<String> rulesList = new ArrayList<>();
-
-        if (valueElement instanceof StringLiteralExpression stringLiteral) {
-            String[] rules = StrUtils.removeQuotes(stringLiteral.getText()).split("\\|");
-            rulesList.addAll(Arrays.asList(rules));
-        } else if (valueElement instanceof ArrayCreationExpression valueArray) {
-            for (PsiElement child : valueArray.getChildren()) {
-                for (PsiElement child2 : child.getChildren()) {
-                    if (child2 instanceof StringLiteralExpression childStringLiteral) {
-                        rulesList.add(
-                            StrUtils.removeQuotes(childStringLiteral.getText())
-                        );
-                    }
-                }
-            }
-        }
-
-        return rulesList;
     }
 }

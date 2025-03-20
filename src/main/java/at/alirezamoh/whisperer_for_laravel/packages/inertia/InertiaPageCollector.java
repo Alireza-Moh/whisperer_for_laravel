@@ -59,36 +59,6 @@ public class InertiaPageCollector {
     }
 
     /**
-     * Retrieves the available Inertia paths from the project settings
-     *
-     * @param project The current project
-     * @return A list of inertia paths or an empty list if none are set
-     */
-    public static List<String> getInertiaPaths(@NotNull Project project) {
-        SettingsState settingsState = SettingsState.getInstance(project);
-        String inertiaPaths = settingsState.getInertiaPageRootPath();
-        if (inertiaPaths == null) {
-            return new ArrayList<>();
-        }
-
-        String[] paths = inertiaPaths.split(";");
-        return Arrays.stream(paths)
-            .filter(path -> !path.isEmpty())
-            .toList();
-    }
-
-    /**
-     * Check if the project is using the inertia package
-     * @param project The current project
-     */
-    public static boolean doNotCompleteOrNavigate(Project project) {
-        return !PluginUtils.isLaravelProject(project)
-            || PluginUtils.isLaravelFrameworkNotInstalled(project)
-            || !PluginUtils.doesPackageExistsInComposerFile(project, "inertiajs/inertia-laravel")
-            || DirectoryUtils.getDirectory(project, "/vendor/inertiajs/inertia-laravel") == null;
-    }
-
-    /**
      * Recursively collect pages from the given directory
      *
      * @param dir        The directory to scan

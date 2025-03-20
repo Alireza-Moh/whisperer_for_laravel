@@ -184,7 +184,7 @@ public class LivewireHtmlDirectiveCompletionContributor extends CompletionContri
                 protected void addCompletions(@NotNull CompletionParameters completionParameters, @NotNull ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
 
                     Project project = completionParameters.getPosition().getProject();
-                    if (LivewireUtil.doNotCompleteOrNavigate(project)) {
+                    if (LivewireUtil.shouldNotCompleteOrNavigate(project)) {
                         return;
                     }
 
@@ -203,7 +203,7 @@ public class LivewireHtmlDirectiveCompletionContributor extends CompletionContri
                 protected void addCompletions(@NotNull CompletionParameters completionParameters, @NotNull ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
                     PsiElement position = completionParameters.getPosition();
                     Project project = position.getProject();
-                    if (LivewireUtil.doNotCompleteOrNavigate(project)) {
+                    if (LivewireUtil.shouldNotCompleteOrNavigate(project)) {
                         return;
                     }
 
@@ -246,7 +246,7 @@ public class LivewireHtmlDirectiveCompletionContributor extends CompletionContri
 
                     PsiElement psiElement = completionParameters.getPosition();
                     Project project = psiElement.getProject();
-                    if (LivewireUtil.doNotCompleteOrNavigate(project)) {
+                    if (LivewireUtil.shouldNotCompleteOrNavigate(project)) {
                         return;
                     }
 
@@ -265,7 +265,7 @@ public class LivewireHtmlDirectiveCompletionContributor extends CompletionContri
                 protected void addCompletions(@NotNull CompletionParameters completionParameters, @NotNull ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
                     PsiElement position = completionParameters.getPosition();
                     Project project = position.getProject();
-                    if (LivewireUtil.doNotCompleteOrNavigate(project)) {
+                    if (LivewireUtil.shouldNotCompleteOrNavigate(project)) {
                         return;
                     }
 

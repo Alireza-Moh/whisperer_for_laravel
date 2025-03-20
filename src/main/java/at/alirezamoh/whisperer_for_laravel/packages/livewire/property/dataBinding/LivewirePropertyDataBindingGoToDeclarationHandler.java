@@ -24,7 +24,7 @@ public class LivewirePropertyDataBindingGoToDeclarationHandler implements GotoDe
 
         Project project = psiElement.getProject();
 
-        if (LivewireUtil.doNotCompleteOrNavigate(project)) {
+        if (LivewireUtil.shouldNotCompleteOrNavigate(project)) {
             return null;
         }
 

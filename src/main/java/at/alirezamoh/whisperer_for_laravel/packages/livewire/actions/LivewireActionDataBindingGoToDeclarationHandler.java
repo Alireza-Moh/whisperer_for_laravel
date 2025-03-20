@@ -32,7 +32,7 @@ public class LivewireActionDataBindingGoToDeclarationHandler implements GotoDecl
 
         Project project = psiElement.getProject();
 
-        if (LivewireUtil.doNotCompleteOrNavigate(project)) {
+        if (LivewireUtil.shouldNotCompleteOrNavigate(project)) {
             return null;
         }
 

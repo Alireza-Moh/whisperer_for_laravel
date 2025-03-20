@@ -30,7 +30,7 @@ public class LivewirePropertyGotoDeclarationHandler implements GotoDeclarationHa
 
         Project project = sourceElement.getProject();
 
-        if (LivewireUtil.doNotCompleteOrNavigate(project)) {
+        if (LivewireUtil.shouldNotCompleteOrNavigate(project)) {
             return null;
         }
 
