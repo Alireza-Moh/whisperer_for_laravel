@@ -65,4 +65,8 @@ final public class ProjectDefaultPaths {
     public static final String LARAVEL_VALIDATION_RULES = "/vendor/laravel/framework/src/Illuminate/Validation/Concerns/ValidatesAttributes.php";
 
     public static final String LARAVEL_VENDOR_FRAMEWORK_PATH = "/vendor/laravel/framework/";
+
+    public static final String LIVEWIRE_COMPONENT_CLASS_PATH = "/Livewire/";
+
+    public static final String LIVEWIRE_COMPONENT_VIEW_PATH = "/resources/views/livewire/";
 }

@@ -1,6 +1,8 @@
 package at.alirezamoh.whisperer_for_laravel.support.utils;
 
 import at.alirezamoh.whisperer_for_laravel.support.WhispererForLaravelIcon;
+import com.intellij.codeInsight.completion.PrioritizedLookupElement;
+import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
@@ -16,9 +18,9 @@ import org.jetbrains.annotations.Nullable;
 
 public class PsiElementUtils {
     /**
-     * Builds a LookupElementBuilder for a config key
+     * Builds a LookupElementBuilder
      *
-     * @param key The config key
+     * @param key The key
      * @return The LookupElementBuilder
      */
     public static @NotNull LookupElementBuilder buildSimpleLookupElement(String key) {
@@ -27,6 +29,19 @@ public class PsiElementUtils {
             .withLookupString(key)
             .bold()
             .withIcon(WhispererForLaravelIcon.LARAVEL_ICON);
+    }
+
+    /**
+     * Builds a LookupElementBuilder
+     *
+     * @param lookupElementBuilder The key
+     * @return The LookupElementBuilder
+     */
+    public static @NotNull LookupElement buildPrioritizedLookupElement(LookupElementBuilder lookupElementBuilder, int priority) {
+        return PrioritizedLookupElement.withPriority(
+            lookupElementBuilder,
+            priority
+        );
     }
 
     /**

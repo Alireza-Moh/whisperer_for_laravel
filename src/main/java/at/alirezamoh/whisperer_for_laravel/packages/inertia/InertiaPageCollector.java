@@ -84,7 +84,7 @@ public class InertiaPageCollector {
     public static boolean doNotCompleteOrNavigate(Project project) {
         return !PluginUtils.isLaravelProject(project)
             || PluginUtils.isLaravelFrameworkNotInstalled(project)
-            || !PluginUtils.doesPackageExists(project, "inertiajs/inertia-laravel")
+            || !PluginUtils.doesPackageExistsInComposerFile(project, "inertiajs/inertia-laravel")
             || DirectoryUtils.getDirectory(project, "/vendor/inertiajs/inertia-laravel") == null;
     }
 
