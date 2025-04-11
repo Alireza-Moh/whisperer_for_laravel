@@ -68,16 +68,16 @@ public class PhpClassUtils {
     /**
      * Checks if a PHP class is a child (or descendant) of another PHP class
      *
-     * @param phpClass the PhpClass to check
-     * @param clazz the potential parent PhpClass
+     * @param phpClassToCheck the PhpClass to check
+     * @param parentPhpClass the parent PhpClass
      * @return true or false
      */
-    public static boolean isChildOf(PhpClassImpl phpClass, PhpClass clazz) {
-        if (phpClass.getFQN().equals(clazz.getFQN())) {
+    public static boolean isChildOf(PhpClassImpl phpClassToCheck, PhpClass parentPhpClass) {
+        if (phpClassToCheck.getFQN().equals(parentPhpClass.getFQN())) {
             return true;
         }
 
-        PhpClass superClass = phpClass.getSuperClass();
+        PhpClass superClass = phpClassToCheck.getSuperClass();
         if (superClass == null) {
             return false;
         }
@@ -87,10 +87,10 @@ public class PhpClassUtils {
             if (original == null) {
                 return false;
             }
-            return isChildOf((PhpClassImpl) original, clazz);
+            return isChildOf((PhpClassImpl) original, parentPhpClass);
         }
 
-        return superClass instanceof PhpClassImpl && isChildOf((PhpClassImpl) superClass, clazz);
+        return superClass instanceof PhpClassImpl && isChildOf((PhpClassImpl) superClass, parentPhpClass);
     }
 
     /**
