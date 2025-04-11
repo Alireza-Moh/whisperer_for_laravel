@@ -113,6 +113,8 @@
 
         <codeInsight.lineMarkerProvider language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.eloquent.EloquentModelLineMarker"/>
         <lang.inspectionSuppressor language="XML" implementationClass="at.alirezamoh.whisperer_for_laravel.packages.livewire.htmlDirectives.supressor.LivewireHtmlDirectiveSuppressor" />
+        <codeInsight.lineMarkerProvider language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.packages.livewire.component.LivewireComponentClassLineMarker"/>
+        <codeInsight.lineMarkerProvider language="XML" implementationClass="at.alirezamoh.whisperer_for_laravel.packages.livewire.component.LivewireComponentBladeFileLineMarker"/>
     </extensions>
 
     <actions>
