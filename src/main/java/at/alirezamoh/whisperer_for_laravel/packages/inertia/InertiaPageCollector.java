@@ -92,9 +92,9 @@ public class InertiaPageCollector {
         for (PsiFile psiFile : files) {
             String fileName = psiFile.getName();
 
-            if (fileName.endsWith(".vue") || fileName.endsWith(".jsx")) {
+            if (fileName.endsWith(".vue") || fileName.endsWith(".jsx") || fileName.endsWith(".tsx")) {
                 String pageName = parentPath.isEmpty() ? "" : parentPath + "/";
-                pageName += fileName.replaceFirst("\\.(vue|jsx)$", "");
+                pageName += fileName.replaceFirst("\\.(vue|jsx|tsx)$", "");
 
                 if (withFile) {
                     pages.add(new InertiaPage(pageName, psiFile));
