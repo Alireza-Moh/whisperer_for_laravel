@@ -14,7 +14,7 @@
             <li>Code Generation Templates</li>
             <li>Completions for: Route, validation, request fields, gates, config, views and a lot more</li>
             <li>Blade components support</li>
-            <li>Laravel packages support: InertiaJs</li>
+            <li>Laravel packages support: InertiaJs, Livewire</li>
         </ul>
 
         <a href="https://alireza-moh.github.io/whisperer_for_laravel_docs/">Documentation</a><br>
@@ -31,7 +31,8 @@
                 <li>Fixes bugs.</li>
                 <li>Adds support for PHPStorm 2025.</li>
                 <li>Adds `.tsx` file support for better InertiaJS page completion</li>
-                <li>Introduces Livewire support</li>
+                <li>Adds Livewire support</li>
+                <li>Adds table-completion support for [assertDatabaseHas(), assertDatabaseEmpty(), assertDatabaseCount(), assertDatabaseMissing()] methods.</li>
             </ul>
     ]]>
     </change-notes>
