@@ -2,14 +2,17 @@ package at.alirezamoh.whisperer_for_laravel.support.utils;
 
 import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.whisperer_for_laravel.support.ProjectDefaultPaths;
-import at.alirezamoh.whisperer_for_laravel.support.notification.Notify;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
+import com.jetbrains.php.composer.ComposerConfigUtils;
+import com.jetbrains.php.composer.InstalledPackageData;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class PluginUtils {
     private final static Logger LOG = Logger.getInstance("Whisper-For-Laravel-Plugin");
@@ -145,32 +148,6 @@ public class PluginUtils {
         return StrUtils.removeDoubleSlashes(defaultPath);
     }
 
-    /**
-     * Determines whether the given package exists in the project by inspecting
-     * the "composer.json" file
-     *
-     * @param project The current project
-     * @return true or false
-     */
-    public static boolean doesPackageExists(Project project, String packageName) {
-        PsiFile composerFile = getComposerFile(project);
-        if (composerFile == null) {
-            return false;
-        }
-
-        try {
-            String fileContent = composerFile.getText();
-
-            JsonObject jsonObject = JsonParser.parseString(fileContent).getAsJsonObject();
-            JsonObject require = jsonObject.getAsJsonObject("require");
-
-            return require != null && require.has(packageName);
-        } catch (Exception e) {
-            LOG.error("Could not extract " + packageName + " from composer file", e);
-            return false;
-        }
-    }
-
     public static boolean shouldNotCompleteOrNavigate(Project project) {
         return !PluginUtils.isLaravelProject(project) || PluginUtils.isLaravelFrameworkNotInstalled(project);
     }
@@ -181,7 +158,32 @@ public class PluginUtils {
      * @param project The current project
      * @return A {@link PsiFile} handle for "composer.json", or {@code null} if not found
      */
-    private static @Nullable PsiFile getComposerFile(Project project) {
+    public static @Nullable PsiFile getComposerFile(Project project) {
+
         return DirectoryUtils.getFileByName(project, "/composer.json");
+    }
+
+    /**
+     * Determines whether the given package exists in the project by inspecting
+     * the "composer.json" file
+     *
+     * @param project The current project
+     * @return true or false
+     */
+    public static boolean doesPackageExistsInComposerFile(Project project, String packageName) {
+        PsiFile psiFile = PluginUtils.getComposerFile(project);
+        if (psiFile == null) {
+            LOG.error("Could not find composer.json file");
+            return false;
+        }
+
+        List<InstalledPackageData> packages = ComposerConfigUtils.getInstalledPackagesFromConfig(psiFile.getVirtualFile());
+        for (InstalledPackageData packageData : packages) {
+            if (packageData.getName().equals(packageName)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

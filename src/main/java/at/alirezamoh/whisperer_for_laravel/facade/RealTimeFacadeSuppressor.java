@@ -7,8 +7,7 @@ import com.intellij.codeInspection.SuppressQuickFix;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.jetbrains.php.lang.inspections.PhpUndefinedClassInspection;
-import com.jetbrains.php.lang.inspections.PhpUndefinedNamespaceInspection;
+import com.jetbrains.php.lang.inspections.*;
 import com.jetbrains.php.lang.psi.elements.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -29,12 +28,13 @@ public class RealTimeFacadeSuppressor implements InspectionSuppressor {
     @Override
     public boolean isSuppressedFor(@NotNull PsiElement psiElement, @NotNull String s) {
         Project project = psiElement.getProject();
-        if (PluginUtils.shouldNotCompleteOrNavigate(project) || !suppressedPhpInspections.contains(s)) {
+        SettingsState settingsState = SettingsState.getInstance(project);
+
+        if (!settingsState.isSuppressRealTimeFacadeWarnings()) {
             return false;
         }
 
-        SettingsState settingsState = SettingsState.getInstance(project);
-        if (!settingsState.isSuppressRealTimeFacadeWarnings()) {
+        if (PluginUtils.shouldNotCompleteOrNavigate(project) || !suppressedPhpInspections.contains(s)) {
             return false;
         }
 

@@ -2,6 +2,7 @@ package at.alirezamoh.whisperer_for_laravel.packages.inertia.annotator;
 
 import at.alirezamoh.whisperer_for_laravel.packages.inertia.InertiaMethodValidator;
 import at.alirezamoh.whisperer_for_laravel.packages.inertia.InertiaPageCollector;
+import at.alirezamoh.whisperer_for_laravel.packages.inertia.InertiaUtil;
 import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
@@ -33,7 +34,7 @@ public class InertiaPageExistenceAnnotator implements Annotator {
         }
 
         Project project = psiElement.getProject();
-        if (InertiaPageCollector.doNotCompleteOrNavigate(project)) {
+        if (InertiaUtil.shouldNotCompleteOrNavigate(project)) {
             return;
         }
 

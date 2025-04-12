@@ -11,6 +11,9 @@ import com.jetbrains.php.lang.psi.elements.ParameterList;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class TableReferenceContributor extends PsiReferenceContributor {
     /**
      * A list of fully qualified classes
@@ -20,6 +23,13 @@ public class TableReferenceContributor extends PsiReferenceContributor {
         "\\Illuminate\\Database\\Query\\Builder",
         "\\Illuminate\\Database\\Eloquent\\Builder"
     };
+
+    public static Map<String, Integer> DB_TABLE_TEST_METHODS = new HashMap<>() {{
+        put("assertDatabaseHas", 0);
+        put("assertDatabaseEmpty", 0);
+        put("assertDatabaseCount", 0);
+        put("assertDatabaseMissing", 0);
+    }};
 
     @Override
     public void registerReferenceProviders(@NotNull PsiReferenceRegistrar psiReferenceRegistrar) {
@@ -66,9 +76,11 @@ public class TableReferenceContributor extends PsiReferenceContributor {
     private boolean isInsideCorrectMethod(PsiElement psiElement) {
         MethodReference methodReference = MethodUtils.resolveMethodReference(psiElement, 10);
 
-        return methodReference != null && PhpClassUtils.isCorrectRelatedClass(methodReference, psiElement.getProject(), QUERY_BUILDERS)
+        return (methodReference != null
+            && PhpClassUtils.isCorrectRelatedClass(methodReference, psiElement.getProject(), QUERY_BUILDERS)
             && isTableMethod(methodReference)
-            && isTableParam(methodReference, psiElement);
+            && isTableParam(methodReference, psiElement))
+            || (methodReference != null && isTableTestMethod(methodReference, psiElement));
     }
 
     /**
@@ -102,5 +114,15 @@ public class TableReferenceContributor extends PsiReferenceContributor {
             return false;
         }
         return paramPosition == MethodUtils.findParamIndex(position, false);
+    }
+
+    private boolean isTableTestMethod(MethodReference methodReference, PsiElement position) {
+        String methodName = methodReference.getName();
+
+        if (methodName == null) {
+            return false;
+        }
+
+        return DB_TABLE_TEST_METHODS.containsKey(methodName) && isTableParam(methodReference, position);
     }
 }

@@ -59,36 +59,6 @@ public class InertiaPageCollector {
     }
 
     /**
-     * Retrieves the available Inertia paths from the project settings
-     *
-     * @param project The current project
-     * @return A list of inertia paths or an empty list if none are set
-     */
-    public static List<String> getInertiaPaths(@NotNull Project project) {
-        SettingsState settingsState = SettingsState.getInstance(project);
-        String inertiaPaths = settingsState.getInertiaPageRootPath();
-        if (inertiaPaths == null) {
-            return new ArrayList<>();
-        }
-
-        String[] paths = inertiaPaths.split(";");
-        return Arrays.stream(paths)
-            .filter(path -> !path.isEmpty())
-            .toList();
-    }
-
-    /**
-     * Check if the project is using the inertia package
-     * @param project The current project
-     */
-    public static boolean doNotCompleteOrNavigate(Project project) {
-        return !PluginUtils.isLaravelProject(project)
-            || PluginUtils.isLaravelFrameworkNotInstalled(project)
-            || !PluginUtils.doesPackageExists(project, "inertiajs/inertia-laravel")
-            || DirectoryUtils.getDirectory(project, "/vendor/inertiajs/inertia-laravel") == null;
-    }
-
-    /**
      * Recursively collect pages from the given directory
      *
      * @param dir        The directory to scan
@@ -122,9 +92,9 @@ public class InertiaPageCollector {
         for (PsiFile psiFile : files) {
             String fileName = psiFile.getName();
 
-            if (fileName.endsWith(".vue") || fileName.endsWith(".jsx")) {
+            if (fileName.endsWith(".vue") || fileName.endsWith(".jsx") || fileName.endsWith(".tsx")) {
                 String pageName = parentPath.isEmpty() ? "" : parentPath + "/";
-                pageName += fileName.replaceFirst("\\.(vue|jsx)$", "");
+                pageName += fileName.replaceFirst("\\.(vue|jsx|tsx)$", "");
 
                 if (withFile) {
                     pages.add(new InertiaPage(pageName, psiFile));

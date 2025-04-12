@@ -18,7 +18,7 @@ public class InertiaReferenceContributor extends PsiReferenceContributor {
 
                 @Override
                 public PsiReference @NotNull [] getReferencesByElement(@NotNull PsiElement psiElement, @NotNull ProcessingContext processingContext) {
-                    if (InertiaPageCollector.doNotCompleteOrNavigate(psiElement.getProject())) {
+                    if (InertiaUtil.shouldNotCompleteOrNavigate(psiElement.getProject())) {
                         return PsiReference.EMPTY_ARRAY;
                     }
 

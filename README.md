@@ -7,9 +7,9 @@
 
 Whisperer for Laravel is a PhpStorm plugin to help with Laravel development
 
-
-
 [Documentation](https://alireza-moh.github.io/whisperer_for_laravel_docs/)
+
+[Plugin](https://plugins.jetbrains.com/plugin/26042-whisperer-for-laravel)
 
 ## Features
 
@@ -57,6 +57,8 @@ Whisperer for Laravel provides a wide range of code creation templates. Access t
 - Broadcasting Channel
 - Database Factory
 - View Composer
+- Livewire Component
+- Inertia Page
 ---
 
 # Contributions

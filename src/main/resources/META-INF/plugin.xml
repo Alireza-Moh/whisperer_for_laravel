@@ -14,7 +14,7 @@
             <li>Code Generation Templates</li>
             <li>Completions for: Route, validation, request fields, gates, config, views and a lot more</li>
             <li>Blade components support</li>
-            <li>Laravel packages support: InertiaJs</li>
+            <li>Laravel packages support: InertiaJs, Livewire</li>
         </ul>
 
         <a href="https://alireza-moh.github.io/whisperer_for_laravel_docs/">Documentation</a><br>
@@ -27,17 +27,13 @@
 
     <change-notes>
         <![CDATA[
-        <ul>
-            <li>Fixes bugs.</li>
-            <li>Adds setting to toggle facade suppression warnings.</li>
-            <li>Suppresses real-time facade warnings.</li>
-            <li>Adds support for field.rule completion in FormRequest messages method.</li>
-            <li>Adds support for real-time facade method and class completion and navigation.</li>
-            <li>Adds support for policy completion and navigation.</li>
-            <li>Enhances Inertia support by adding page completion for test method `Inertia\Testing\AssertableInertia::component()`.</li>
-            <li>Adds local scope methods to code generation.</li>
-            <li>Adds support for generating a database factory when creating models.</li>
-        </ul>
+            <ul>
+                <li>Fixes bugs.</li>
+                <li>Adds support for PHPStorm 2025.</li>
+                <li>Adds `.tsx` file support for better InertiaJS page completion</li>
+                <li>Adds Livewire support</li>
+                <li>Adds table-completion support for [assertDatabaseHas(), assertDatabaseEmpty(), assertDatabaseCount(), assertDatabaseMissing()] methods.</li>
+            </ul>
     ]]>
     </change-notes>
 
@@ -48,7 +44,7 @@
     <depends>com.intellij.modules.platform</depends>
     <depends>com.jetbrains.php.blade</depends>
 
-    <version>1.2.2</version>
+    <version>1.3.0</version>
 
     <extensions defaultExtensionNs="com.intellij">
         <notificationGroup id="NotificationGroup" displayType="BALLOON"/>
@@ -76,6 +72,7 @@
         <psi.referenceContributor language="PHP" implementation="at.alirezamoh.whisperer_for_laravel.routing.middleware.MiddlewareReferenceContributor"/>
         <psi.referenceContributor language="PHP" implementation="at.alirezamoh.whisperer_for_laravel.routing.routeAction.RouteActionReferenceContributor"/>
         <psi.referenceContributor language="PHP" implementation="at.alirezamoh.whisperer_for_laravel.routing.resourceRoute.ResourceRouteReferenceContributor"/>
+        <psi.referenceContributor language="PHP" implementation="at.alirezamoh.whisperer_for_laravel.packages.livewire.validation.LivewirePropertyInValidationReferenceContributor"/>
 
         <completion.contributor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.request.validation.RuleValidationCompletionContributor"/>
         <completion.contributor language="XML" implementationClass="at.alirezamoh.whisperer_for_laravel.blade.component.BladeXComponentCompletionContributor"/>
@@ -83,6 +80,13 @@
         <completion.contributor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.routing.namespace.RouteNamespaceCompletionContributor"/>
         <completion.contributor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.request.validation.RequestMessageCompletionContributor"/>
         <completion.contributor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.facade.RealTimeFacadeMethodCompletionContributor"/>
+        <completion.contributor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.packages.livewire.property.LivewirePropertyCompletionContributor"/>
+        <completion.contributor language="XML" implementationClass="at.alirezamoh.whisperer_for_laravel.packages.livewire.property.LivewirePropertyInInlineCompletionContributor"/>
+        <completion.contributor language="XML" implementationClass="at.alirezamoh.whisperer_for_laravel.packages.livewire.property.dataBinding.LivewirePropertyDataBindingCompletionContributor"/>
+        <completion.contributor language="XML" implementationClass="at.alirezamoh.whisperer_for_laravel.packages.livewire.htmlDirectives.LivewireHtmlDirectiveCompletionContributor"/>
+        <completion.contributor language="XML" implementationClass="at.alirezamoh.whisperer_for_laravel.packages.livewire.actions.LivewireActionDataBindingCompletionContributor"/>
+        <completion.contributor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.packages.livewire.validation.RuleValidationInLivewireAttributeCompletionContributor"/>
+        <completion.contributor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.packages.livewire.validation.RequestMessageForLivewirePropertyCompletionContributor"/>
 
         <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.blade.component.BladeXComponentGotoDeclarationHandler"/>
         <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.request.validation.RuleValidationGotoDeclarationHandler"/>
@@ -90,6 +94,9 @@
         <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.eloquent.ModelFactoryGotoDeclarationHandler"/>
         <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.facade.RealTimeFacadeMethodGotoDeclarationHandler"/>
         <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.facade.RealTimeFacadeClassGotoDeclarationHandler"/>
+        <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.packages.livewire.property.LivewirePropertyGotoDeclarationHandler"/>
+        <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.packages.livewire.property.dataBinding.LivewirePropertyDataBindingGoToDeclarationHandler"/>
+        <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.packages.livewire.actions.LivewireActionDataBindingGoToDeclarationHandler"/>
 
         <codeInsight.template.postfixTemplateProvider language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.postfixes.dd.DDPostfixProvider" />
 
@@ -101,6 +108,9 @@
         <annotator language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.packages.inertia.annotator.InertiaPageExistenceAnnotator"/>
 
         <codeInsight.lineMarkerProvider language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.eloquent.EloquentModelLineMarker"/>
+        <lang.inspectionSuppressor language="XML" implementationClass="at.alirezamoh.whisperer_for_laravel.packages.livewire.htmlDirectives.supressor.LivewireHtmlDirectiveSuppressor" />
+        <codeInsight.lineMarkerProvider language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.packages.livewire.component.LivewireComponentClassLineMarker"/>
+        <codeInsight.lineMarkerProvider language="XML" implementationClass="at.alirezamoh.whisperer_for_laravel.packages.livewire.component.LivewireComponentBladeFileLineMarker"/>
     </extensions>
 
     <actions>
@@ -180,6 +190,9 @@
                 </action>
 
                 <action id="at.alirezamoh.whisperer_for_laravel.InertiaPageAction" class="at.alirezamoh.whisperer_for_laravel.actions.InertiaPageAction" text="Generate Inertia Page Template" icon="/icons/laravelIcon.svg">
+                </action>
+
+                <action id="at.alirezamoh.whisperer_for_laravel.actions.LivewireComponentAction" class="at.alirezamoh.whisperer_for_laravel.actions.LivewireComponentAction" text="Create Livewire Component From Template" icon="/icons/laravelIcon.svg">
                 </action>
             </group>
 
