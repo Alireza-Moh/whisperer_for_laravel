@@ -21,7 +21,7 @@ public class InertiaUtil {
      */
     public static boolean shouldNotCompleteOrNavigate(Project project) {
         return !PluginUtils.isLaravelProject(project)
-            || !PluginUtils.isLaravelFrameworkNotInstalled(project)
+            || PluginUtils.isLaravelFrameworkNotInstalled(project)
             || !PluginUtils.doesPackageExistsInComposerFile(project, INERTIA_PACKAGE_NAME)
             || DirectoryUtils.getDirectory(project, INERTIA_PACKAGE_DIRECTORY_PATH_IN_VENDOR) == null;
     }

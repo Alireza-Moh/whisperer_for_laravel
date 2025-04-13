@@ -24,7 +24,7 @@ public class LivewireUtil {
 
     public static boolean shouldNotCompleteOrNavigate(Project project) {
         return !PluginUtils.isLaravelProject(project)
-            || !PluginUtils.isLaravelFrameworkNotInstalled(project)
+            || PluginUtils.isLaravelFrameworkNotInstalled(project)
             || !PluginUtils.doesPackageExistsInComposerFile(project, LIVEWIRE_PACKAGE_NAME)
             || DirectoryUtils.getDirectory(project, INERTIA_PACKAGE_DIRECTORY_PATH_IN_VENDOR) == null;
     }
