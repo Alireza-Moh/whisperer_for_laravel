@@ -43,6 +43,7 @@
     <depends>com.jetbrains.php</depends>
     <depends>com.intellij.modules.platform</depends>
     <depends>com.jetbrains.php.blade</depends>
+    <depends>com.intellij.modules.json</depends>
 
     <version>1.3.0</version>
 
