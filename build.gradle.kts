@@ -18,6 +18,7 @@ dependencies {
         phpstorm("2024.3")
         bundledPlugin("com.jetbrains.php")
         bundledPlugin("com.jetbrains.php.blade")
+        bundledPlugin("com.intellij.modules.json")
 
         instrumentationTools()
     }
