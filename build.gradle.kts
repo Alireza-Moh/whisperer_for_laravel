@@ -21,9 +21,18 @@ dependencies {
         bundledPlugin("com.intellij.modules.json")
 
         instrumentationTools()
+        pluginVerifier()
     }
 
     implementation("org.freemarker:freemarker:2.3.33")
+}
+
+intellijPlatform {
+    pluginVerification {
+        ides {
+            recommended()
+        }
+    }
 }
 
 tasks {
