@@ -58,6 +58,7 @@
         <fileBasedIndex implementation="at.alirezamoh.whisperer_for_laravel.indexes.ServiceProviderIndex"/>
         <fileBasedIndex implementation="at.alirezamoh.whisperer_for_laravel.indexes.ModelFactoryIndex"/>
         <fileBasedIndex implementation="at.alirezamoh.whisperer_for_laravel.indexes.PolicyIndex"/>
+        <fileBasedIndex implementation="at.alirezamoh.whisperer_for_laravel.indexes.TranslationIndex"/>
 
         <projectConfigurable parentId="language" instance="at.alirezamoh.whisperer_for_laravel.settings.SettingConfigurable" id="whisperer_for_laravel_settings" displayName="Whisperer For Laravel" nonDefaultProject="true"/>
         <projectService serviceImplementation="at.alirezamoh.whisperer_for_laravel.settings.SettingsState"/>
@@ -74,6 +75,7 @@
         <psi.referenceContributor language="PHP" implementation="at.alirezamoh.whisperer_for_laravel.routing.routeAction.RouteActionReferenceContributor"/>
         <psi.referenceContributor language="PHP" implementation="at.alirezamoh.whisperer_for_laravel.routing.resourceRoute.ResourceRouteReferenceContributor"/>
         <psi.referenceContributor language="PHP" implementation="at.alirezamoh.whisperer_for_laravel.packages.livewire.validation.LivewirePropertyInValidationReferenceContributor"/>
+        <psi.referenceContributor language="PHP" implementation="at.alirezamoh.whisperer_for_laravel.translation.TranslationReferenceContributor"/>
 
         <completion.contributor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.request.validation.RuleValidationCompletionContributor"/>
         <completion.contributor language="XML" implementationClass="at.alirezamoh.whisperer_for_laravel.blade.component.BladeXComponentCompletionContributor"/>
