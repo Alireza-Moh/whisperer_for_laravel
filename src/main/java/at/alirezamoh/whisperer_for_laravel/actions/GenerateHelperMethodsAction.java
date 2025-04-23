@@ -13,11 +13,13 @@ import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
 import at.alirezamoh.whisperer_for_laravel.support.TemplateLoader;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import org.jetbrains.annotations.NotNull;
+import com.intellij.openapi.diagnostic.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,6 +67,8 @@ public class GenerateHelperMethodsAction extends BaseAction {
             return;
         }
 
+        Logger logger = PluginUtils.getLOG();
+
         ApplicationManager.getApplication().invokeLater(() -> {
             new Task.Modal(project, "Generating Helper Methods", true) {
                 @Override
@@ -79,8 +83,11 @@ public class GenerateHelperMethodsAction extends BaseAction {
                         });
 
                         outputModelCreationResult();
+                    }  catch (ProcessCanceledException e) {
+                        logger.info("Helper code generation was canceled.");
+                        throw e;
                     } catch (Exception e) {
-                        PluginUtils.getLOG().error("Could not create helper code", e);
+                        logger.error("Could not create helper code", e);
                         Notify.notifyError(project, "Could not create helper code");
                     }
                 }

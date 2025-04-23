@@ -21,7 +21,7 @@ import java.util.List;
 
 /**
  * Suppresses inspections for fields defined in FormRequest rules
- * It suppresses "Property accessed via magic method" warning
+ * It suppresses the "Property accessed via magic method" warning
  */
 public class RequestFieldSuppressor implements InspectionSuppressor {
     private final List<String> suppressedPhpInspections = List.of(
