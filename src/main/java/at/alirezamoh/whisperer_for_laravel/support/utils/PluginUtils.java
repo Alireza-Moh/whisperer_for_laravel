@@ -2,17 +2,13 @@ package at.alirezamoh.whisperer_for_laravel.support.utils;
 
 import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.whisperer_for_laravel.support.ProjectDefaultPaths;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import at.alirezamoh.whisperer_for_laravel.support.caching.ComposerPackageCacheManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
-import com.jetbrains.php.composer.ComposerConfigUtils;
-import com.jetbrains.php.composer.InstalledPackageData;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 
 public class PluginUtils {
     private final static Logger LOG = Logger.getInstance("Whisper-For-Laravel-Plugin");
@@ -57,52 +53,9 @@ public class PluginUtils {
      * @return true or false
      */
     public static boolean isLaravelProject(Project project) {
-        PsiFile composerFile = getComposerFile(project);
-        if (composerFile == null) {
-            return false;
-        }
+        ComposerPackageCacheManager composerPackageCacheManager = ComposerPackageCacheManager.getInstance(project);
 
-        try {
-            String fileContent = composerFile.getText();
-
-            JsonObject jsonObject = JsonParser.parseString(fileContent).getAsJsonObject();
-            JsonObject require = jsonObject.getAsJsonObject("require");
-
-            return require != null && require.has("laravel/framework");
-        } catch (Exception e) {
-            LOG.error("Could not extract laravel/framework from composer file", e);
-            return false;
-        }
-    }
-
-    /**
-     * Retrieves the Laravel version from the project's composer.json file, if present
-     *
-     * @param project The current project
-     * @return The Laravel framework version (e.g., "9.2"), or {@code null} if not found or unreadable
-     */
-    public static @Nullable String laravelVersion(Project project) {
-        PsiFile composerFile = getComposerFile(project);
-
-        if (composerFile == null) {
-            return null;
-        }
-
-        try {
-            String fileContent = composerFile.getText();
-
-            JsonObject jsonObject = JsonParser.parseString(fileContent).getAsJsonObject();
-            JsonObject require = jsonObject.getAsJsonObject("require");
-
-            if (require != null && require.has("laravel/framework")) {
-                return require.get("laravel/framework").getAsString().replace("^", "");
-            }
-        } catch (Exception e) {
-            LOG.error("Could not extract laravel version", e);
-            return null;
-        }
-
-        return null;
+        return composerPackageCacheManager.isPackageInstalled("laravel/framework");
     }
 
     /**
@@ -171,19 +124,8 @@ public class PluginUtils {
      * @return true or false
      */
     public static boolean doesPackageExistsInComposerFile(Project project, String packageName) {
-        PsiFile psiFile = PluginUtils.getComposerFile(project);
-        if (psiFile == null) {
-            LOG.error("Could not find composer.json file");
-            return false;
-        }
+        ComposerPackageCacheManager composerPackageCacheManager = ComposerPackageCacheManager.getInstance(project);
 
-        List<InstalledPackageData> packages = ComposerConfigUtils.getInstalledPackagesFromConfig(psiFile.getVirtualFile());
-        for (InstalledPackageData packageData : packages) {
-            if (packageData.getName().equals(packageName)) {
-                return true;
-            }
-        }
-
-        return false;
+        return composerPackageCacheManager.isPackageInstalled(packageName);
     }
 }
