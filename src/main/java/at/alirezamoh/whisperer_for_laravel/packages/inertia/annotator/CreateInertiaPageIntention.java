@@ -34,11 +34,6 @@ public class CreateInertiaPageIntention extends BaseIntentionAction {
     private final String pagePath;
 
     /**
-     * The project settings
-     */
-    private SettingsState settingsState;
-
-    /**
      * @param pagePath The target page path
      */
     public CreateInertiaPageIntention(String pagePath) {
@@ -87,7 +82,7 @@ public class CreateInertiaPageIntention extends BaseIntentionAction {
         ComboBox<String> pageVariantComboBox = new ComboBox<>(new String[]{"Options API", "Composition API"});
         pageVariantComboBox.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        ComboBox<String> pageTypeComboBox = new ComboBox<>(new String[]{".vue", ".jsx"});
+        ComboBox<String> pageTypeComboBox = new ComboBox<>(new String[]{".vue", ".jsx", ".tsx"});
         pageTypeComboBox.setAlignmentX(Component.LEFT_ALIGNMENT);
 
 

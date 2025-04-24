@@ -8,16 +8,15 @@ import com.intellij.psi.*;
 import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.ParameterList;
+import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
+import com.jetbrains.php.lang.psi.elements.impl.MethodImpl;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class TableReferenceContributor extends PsiReferenceContributor {
-    /**
-     * A list of fully qualified classes
-     */
     private final static String[] QUERY_BUILDERS = {
         "\\Illuminate\\Support\\Facades\\DB",
         "\\Illuminate\\Database\\Query\\Builder",
@@ -29,6 +28,15 @@ public class TableReferenceContributor extends PsiReferenceContributor {
         put("assertDatabaseEmpty", 0);
         put("assertDatabaseCount", 0);
         put("assertDatabaseMissing", 0);
+    }};
+
+
+    private final static String RELATIONSHIP_CLASS = "\\Illuminate\\Database\\Eloquent\\Concerns\\HasRelationships";
+
+    public static Map<String, Integer> RELATIONSHIP_METHODS = new HashMap<>() {{
+        put("belongsToMany", 1);
+        put("morphToMany", 2);
+        put("morphedByMany", 2);
     }};
 
     @Override
@@ -79,8 +87,9 @@ public class TableReferenceContributor extends PsiReferenceContributor {
         return (methodReference != null
             && PhpClassUtils.isCorrectRelatedClass(methodReference, psiElement.getProject(), QUERY_BUILDERS)
             && isTableMethod(methodReference)
-            && isTableParam(methodReference, psiElement))
-            || (methodReference != null && isTableTestMethod(methodReference, psiElement));
+            && isTableParam(methodReference, psiElement, LaravelPaths.DB_TABLE_METHODS))
+            || (methodReference != null && isTableTestMethod(methodReference, psiElement))
+            || (methodReference != null && isRelationShipTestMethod(methodReference, psiElement));
     }
 
     /**
@@ -107,8 +116,8 @@ public class TableReferenceContributor extends PsiReferenceContributor {
      * @param position The string literal PSI element
      * @return true or false
      */
-    private boolean isTableParam(MethodReference method, PsiElement position) {
-        Integer paramPosition = LaravelPaths.DB_TABLE_METHODS.get(method.getName());
+    private boolean isTableParam(MethodReference method, PsiElement position, @NotNull Map<String, Integer> methodsToSearchIn) {
+        Integer paramPosition = methodsToSearchIn.get(method.getName());
 
         if (paramPosition == null) {
             return false;
@@ -123,6 +132,37 @@ public class TableReferenceContributor extends PsiReferenceContributor {
             return false;
         }
 
-        return DB_TABLE_TEST_METHODS.containsKey(methodName) && isTableParam(methodReference, position);
+        return DB_TABLE_TEST_METHODS.containsKey(methodName) && isTableParam(methodReference, position, LaravelPaths.DB_TABLE_METHODS);
+    }
+
+    private boolean isRelationShipTestMethod(MethodReference methodReference, PsiElement position) {
+        String methodName = methodReference.getName();
+
+        if (methodName == null) {
+            return false;
+        }
+
+        return isRelationShipClass(methodReference)
+            && RELATIONSHIP_METHODS.containsKey(methodName)
+            && isTableParam(methodReference, position, RELATIONSHIP_METHODS);
+    }
+
+    private boolean isRelationShipClass(MethodReference methodReference) {
+        PsiReference reference = methodReference.getReference();
+        if (reference == null) {
+            return false;
+        }
+
+        PsiElement resolved = reference.resolve();
+        if (resolved instanceof MethodImpl method) {
+            PhpClass phpClass = method.getContainingClass();
+            if (phpClass == null) {
+                return false;
+            }
+
+            return phpClass.getFQN().equals(RELATIONSHIP_CLASS);
+        }
+
+        return false;
     }
 }

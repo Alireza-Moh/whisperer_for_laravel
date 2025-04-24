@@ -14,8 +14,7 @@ import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.jetbrains.php.lang.psi.PhpFile;
-import com.jetbrains.php.lang.psi.elements.Parameter;
-import com.jetbrains.php.lang.psi.elements.PhpClass;
+import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.elements.impl.*;
 import org.jetbrains.annotations.Nullable;
 
@@ -76,7 +75,8 @@ public class MigrationManager {
                 laravelModel.setNamespaceName(StrUtils.addBackSlashes(modelClass.getNamespaceName(), true, true));
                 laravelModel.setModelName(modelClass.getName());
                 laravelModel.setTableName(tableName);
-                laravelModel.setFields(table.fields());
+
+                laravelModel.setFields(replaceFieldTypeByFromCasts(table, modelClass));
 
                 List<Relation> relations = new ArrayList<>();
                 for (com.jetbrains.php.lang.psi.elements.Method method : collectModelRelations(modelClass, project)) {
@@ -404,5 +404,26 @@ public class MigrationManager {
                 laravelModel.addMethod(localScopeMethod);
             }
         }
+    }
+
+    /**
+     * Replaces the field types in the table with the types defined in the model's casts
+     *
+     * @param table      the table to process
+     * @param modelClass the model class to check for casts
+     * @return a list of fields with updated types
+     */
+    private List<Field> replaceFieldTypeByFromCasts(Table table, PhpClass modelClass) {
+        List<Field> fields = table.fields();
+        Map<String, String> casts = ModelCastsResolver.resolveCasts(modelClass);
+        if (!casts.isEmpty()) {
+            for (Field field : fields) {
+                String castType = casts.get(field.getName());
+                if (castType != null) {
+                    field.setType(castType);
+                }
+            }
+        }
+        return fields;
     }
 }

@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "at.alirezamoh.whisperer-for-laravel"
-version = "1.3.0"
+version = "1.3.1"
 
 repositories {
     mavenCentral()
@@ -21,9 +21,18 @@ dependencies {
         bundledPlugin("com.intellij.modules.json")
 
         instrumentationTools()
+        pluginVerifier()
     }
 
     implementation("org.freemarker:freemarker:2.3.33")
+}
+
+intellijPlatform {
+    pluginVerification {
+        ides {
+            recommended()
+        }
+    }
 }
 
 tasks {
