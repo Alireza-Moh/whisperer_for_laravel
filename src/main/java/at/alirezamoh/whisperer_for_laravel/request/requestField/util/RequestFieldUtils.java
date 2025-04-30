@@ -232,7 +232,7 @@ final public class RequestFieldUtils {
         if (element instanceof VariableImpl variable) {
             PhpClassImpl phpClass = resolveRequestClass(variable, project);
 
-            if (phpClass == null) {
+            if (phpClass == null && variable.isValid()) {
                 Query<PsiReference> references = ReferencesSearch.search(variable.getOriginalElement(), GlobalSearchScope.projectScope(project), false);
 
                 for (PsiReference reference : references) {
@@ -271,6 +271,25 @@ final public class RequestFieldUtils {
             && PhpClassUtils.isCorrectRelatedClass(methodReference, project, REQUEST_CLASSES)
             && REQUEST_METHODS.containsKey(methodReference.getName())
             && isFieldParam(methodReference, psiElement);
+    }
+
+    /**
+     * Gets the parent element at a specific depth
+     *
+     * @param element the target element
+     * @return founded parent element or null
+     */
+    public static @Nullable PsiElement getNthParent(PsiElement element, int n) {
+        PsiElement current = element;
+
+        for (int i = 0; i < n; i++) {
+            if (current == null) {
+                return null;
+            }
+            current = current.getParent();
+        }
+
+        return current;
     }
 
     /**

@@ -15,6 +15,8 @@ public class Field {
 
     private RenameField renameField;
 
+    private boolean relation = false;
+
     public Field(String name) {
         this.name = name;
     }
@@ -23,6 +25,13 @@ public class Field {
         this.type = type;
         this.name = name;
         this.nullable = nullable;
+    }
+
+    public Field(String type, String name, boolean nullable, boolean relation) {
+        this.type = type;
+        this.name = name;
+        this.nullable = nullable;
+        this.relation = relation;
     }
 
     public Field(String type, String name, boolean nullable, boolean drop, boolean rename, @Nullable RenameField renameField) {
@@ -80,6 +89,14 @@ public class Field {
 
     public RenameField getRenameField() {
         return renameField;
+    }
+
+    public boolean isRelation() {
+        return relation;
+    }
+
+    public void setRelation(boolean relation) {
+        this.relation = relation;
     }
 }
 

@@ -36,7 +36,7 @@ public class Relation {
         this.arrayOrCollection = false;
 
         switch (this.type) {
-            case "HasMany", "MorphToMany", "MorphMany" -> this.arrayOrCollection = true;
+            case "hasMany", "hasManyThrough", "morphToMany", "morphMany" -> this.arrayOrCollection = true;
         }
     }
 }
