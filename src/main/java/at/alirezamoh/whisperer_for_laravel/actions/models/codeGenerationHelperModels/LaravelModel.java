@@ -98,6 +98,10 @@ public class LaravelModel {
         this.fields.add(field);
     }
 
+    public void addFields(List<Field> fields) {
+        this.fields.addAll(fields);
+    }
+
     public void addReadProperty(ReadProperty readProperty) {
         this.readProperties.add(readProperty);
     }

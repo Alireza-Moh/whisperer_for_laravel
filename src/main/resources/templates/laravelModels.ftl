@@ -12,7 +12,7 @@ namespace ${namespace} {
 <#list models as model>
   /**
 <#list model.fields as field>
-   * @property ${field.type}<#if field.nullable>|null</#if> $${field.name}
+   * @property ${field.type}<#if field.relation>[]</#if><#if field.nullable>|null</#if> $${field.name}
 </#list>
 <#list model.readProperties as readProperty>
    * @property-read ${readProperty.type} $${readProperty.name}
