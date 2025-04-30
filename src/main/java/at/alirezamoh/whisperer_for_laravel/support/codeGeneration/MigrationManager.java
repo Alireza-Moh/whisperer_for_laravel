@@ -79,13 +79,13 @@ public class MigrationManager {
                 laravelModel.setTableName(tableName);
 
                 laravelModel.setFields(replaceFieldTypeByFromCasts(table, modelClass));
+                createModelMagicMethods(laravelModel);
 
                 modelMethodRelationGenerator.setEloquentModelAsPhpClass(modelClass);
                 List<Relation> relations = modelMethodRelationGenerator.createMethodsFromModelRelations();
 
                 laravelModel.setRelations(relations);
                 laravelModel.addFields(modelMethodRelationGenerator.getRelationsAsFields());
-                createModelMagicMethods(laravelModel);
                 addLocalScopeMethods(modelClass, laravelModel);
                 addAggregateFields(relations, laravelModel);
 
