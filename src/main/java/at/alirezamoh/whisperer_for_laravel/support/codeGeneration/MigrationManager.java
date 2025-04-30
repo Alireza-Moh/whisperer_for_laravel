@@ -1,10 +1,9 @@
 package at.alirezamoh.whisperer_for_laravel.support.codeGeneration;
 
 import at.alirezamoh.whisperer_for_laravel.actions.models.codeGenerationHelperModels.LaravelModel;
+import at.alirezamoh.whisperer_for_laravel.actions.models.dataTables.*;
 import at.alirezamoh.whisperer_for_laravel.actions.models.dataTables.Field;
 import at.alirezamoh.whisperer_for_laravel.actions.models.dataTables.Method;
-import at.alirezamoh.whisperer_for_laravel.actions.models.dataTables.Relation;
-import at.alirezamoh.whisperer_for_laravel.actions.models.dataTables.Table;
 import at.alirezamoh.whisperer_for_laravel.indexes.TableIndex;
 import at.alirezamoh.whisperer_for_laravel.support.codeGeneration.vistors.MigrationVisitor;
 import at.alirezamoh.whisperer_for_laravel.support.utils.*;
@@ -15,6 +14,7 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.*;
+import com.jetbrains.php.lang.psi.elements.Parameter;
 import com.jetbrains.php.lang.psi.elements.impl.*;
 import org.jetbrains.annotations.Nullable;
 
@@ -437,8 +437,8 @@ public class MigrationManager {
     private void addAggregateFields(List<Relation> relations, LaravelModel laravelModel) {
         for (Relation relation : relations) {
             if (relation.isArrayOrCollection()) {
-                String aggregateName = relation.getName() + "_count";
-                laravelModel.addField(new Field("int", aggregateName, false));
+                String aggregateName = StrUtils.snake(relation.getName(), "_") + "_count";
+                laravelModel.addReadProperty(new ReadProperty(aggregateName, "int"));
             }
         }
     }

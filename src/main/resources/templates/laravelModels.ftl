@@ -14,6 +14,9 @@ namespace ${namespace} {
 <#list model.fields as field>
    * @property ${field.type}<#if field.nullable>|null</#if> $${field.name}
 </#list>
+<#list model.readProperties as readProperty>
+   * @property-read ${readProperty.type} $${readProperty.name}
+</#list>
 <#list model.methods as method>
    * @method static ${method.returnType} ${method.name}(<#list method.parameters as parameter>${parameter.toString()}<#if parameter?has_next>, </#if></#list>)
 </#list>
