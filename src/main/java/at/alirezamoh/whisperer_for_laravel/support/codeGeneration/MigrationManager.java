@@ -100,6 +100,7 @@ public class MigrationManager {
                 laravelModel.setRelations(relations);
                 createLaravelModelHelperMethods(laravelModel);
                 addLocalScopeMethods(modelClass, laravelModel);
+                addAggregateFields(relations, laravelModel);
 
                 models.add(laravelModel);
             }
@@ -425,5 +426,20 @@ public class MigrationManager {
             }
         }
         return fields;
+    }
+
+    /**
+     * Adds aggregate fields to the model based on the relations
+     *
+     * @param relations    the list of relations in the model
+     * @param laravelModel the Laravel model to add fields to
+     */
+    private void addAggregateFields(List<Relation> relations, LaravelModel laravelModel) {
+        for (Relation relation : relations) {
+            if (relation.isArrayOrCollection()) {
+                String aggregateName = relation.getName() + "_count";
+                laravelModel.addField(new Field("int", aggregateName, false));
+            }
+        }
     }
 }
