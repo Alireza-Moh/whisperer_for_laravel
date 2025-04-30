@@ -232,7 +232,7 @@ final public class RequestFieldUtils {
         if (element instanceof VariableImpl variable) {
             PhpClassImpl phpClass = resolveRequestClass(variable, project);
 
-            if (phpClass == null) {
+            if (phpClass == null && variable.isValid()) {
                 Query<PsiReference> references = ReferencesSearch.search(variable.getOriginalElement(), GlobalSearchScope.projectScope(project), false);
 
                 for (PsiReference reference : references) {
