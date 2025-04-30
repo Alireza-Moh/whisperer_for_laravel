@@ -14,6 +14,7 @@ import com.jetbrains.php.lang.psi.elements.impl.ArrayIndexImpl;
 import com.jetbrains.php.lang.psi.elements.impl.PhpClassImpl;
 import com.jetbrains.php.lang.psi.elements.impl.VariableImpl;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 
@@ -83,9 +84,12 @@ public class RequestFieldCompletionContributor extends CompletionContributor {
         );
     }
 
-    private PsiElement getTargetElement(PsiElement position) {
-        PsiElement parent = position.getParent().getParent().getParent();
-        if (parent instanceof ArrayAccessExpression arrayAccess) {
+    private @Nullable PsiElement getTargetElement(@Nullable PsiElement position) {
+        if (position == null) {
+            return null;
+        }
+
+        if (RequestFieldUtils.getNthParent(position, 3) instanceof ArrayAccessExpression arrayAccess) {
             return arrayAccess.getValue();
         }
 

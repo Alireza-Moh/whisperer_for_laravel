@@ -274,6 +274,25 @@ final public class RequestFieldUtils {
     }
 
     /**
+     * Gets the parent element at a specific depth
+     *
+     * @param element the target element
+     * @return founded parent element or null
+     */
+    public static @Nullable PsiElement getNthParent(PsiElement element, int n) {
+        PsiElement current = element;
+
+        for (int i = 0; i < n; i++) {
+            if (current == null) {
+                return null;
+            }
+            current = current.getParent();
+        }
+
+        return current;
+    }
+
+    /**
      * Checks if the given method reference is a request method to get field
      *
      * @param method the method reference to check
