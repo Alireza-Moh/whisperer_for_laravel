@@ -5,6 +5,7 @@ import at.alirezamoh.whisperer_for_laravel.support.utils.PhpClassUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.codeInsight.completion.CompletionResultSet;
+import com.intellij.codeInsight.completion.CompletionUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
@@ -233,19 +234,23 @@ final public class RequestFieldUtils {
             PhpClassImpl phpClass = resolveRequestClass(variable, project);
 
             if (phpClass == null && variable.isValid()) {
-                Query<PsiReference> references = ReferencesSearch.search(variable.getOriginalElement(), GlobalSearchScope.projectScope(project), false);
+                try {
+                    Query<PsiReference> references = ReferencesSearch.search(variable.getOriginalElement(), GlobalSearchScope.projectScope(project), false);
 
-                for (PsiReference reference : references) {
-                    PsiElement parent = reference.getElement().getParent();
-                    if (parent instanceof AssignmentExpression assignmentExpression) {
-                        PsiElement expression = assignmentExpression.getValue();
+                    for (PsiReference reference : references) {
+                        PsiElement parent = reference.getElement().getParent();
+                        if (parent instanceof AssignmentExpression assignmentExpression) {
+                            PsiElement expression = assignmentExpression.getValue();
 
-                        if (expression instanceof NewExpression newExpression) {
-                            return PhpClassUtils.getClassFromTypedElement(newExpression.getClassReference(), project);
-                        } else if (expression instanceof MethodReference methodReference) {
-                            return PhpClassUtils.getClassFromTypedElement(methodReference.getClassReference(), project);
+                            if (expression instanceof NewExpression newExpression) {
+                                return PhpClassUtils.getClassFromTypedElement(newExpression.getClassReference(), project);
+                            } else if (expression instanceof MethodReference methodReference) {
+                                return PhpClassUtils.getClassFromTypedElement(methodReference.getClassReference(), project);
+                            }
                         }
                     }
+                } catch (AssertionError ignored) {
+                    return null;
                 }
             }
 
