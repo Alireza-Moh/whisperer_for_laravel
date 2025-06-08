@@ -1,10 +1,10 @@
 plugins {
     id("java")
-    id("org.jetbrains.intellij.platform") version "2.1.0"
+    id("org.jetbrains.intellij.platform") version "2.6.0"
 }
 
 group = "at.alirezamoh.whisperer-for-laravel"
-version = "1.3.2"
+version = "1.3.3"
 
 repositories {
     mavenCentral()
@@ -15,12 +15,11 @@ repositories {
 
 dependencies {
     intellijPlatform {
-        phpstorm("2024.3")
+        phpstorm("2025.1")
         bundledPlugin("com.jetbrains.php")
         bundledPlugin("com.jetbrains.php.blade")
         bundledPlugin("com.intellij.modules.json")
-
-        instrumentationTools()
+        bundledPlugin("JavaScript")
         pluginVerifier()
     }
 
@@ -43,7 +42,7 @@ tasks {
     }
 
     patchPluginXml {
-        sinceBuild.set("241")
+        sinceBuild.set("242")
         untilBuild.set("251.*")
     }
 

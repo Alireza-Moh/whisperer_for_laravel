@@ -14,10 +14,9 @@ Whisperer for Laravel is a PhpStorm plugin to help with Laravel development
 ## Features
 
 - **Code Creation from template**: Quickly generate laravel components such as Eloquent models, migrations, controllers, seeders, jobs, and more.
-- **Code Completion**: Autocomplete for form requests, table names, Blade templates, routes, validation rules and others.
+- **Code Completion**: Autocomplete for form requests, config keys, table names, Blade templates, routes, validation rules and others.
 - **Eloquent Magic Fields & Methods/DB Methods**: Generate helper methods for Eloquent helper methods, fields and relations for more autocompletion
-- **Inertia.js Support**: Autocomplete and navigation for Inertia pages.
-- **Configs**: Autocompletion for config keys.
+- **Inertia.js and Livewire Support**.
 
 ---
 

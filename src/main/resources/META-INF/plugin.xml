@@ -38,8 +38,9 @@
     <depends>com.intellij.modules.platform</depends>
     <depends>com.jetbrains.php.blade</depends>
     <depends>com.intellij.modules.json</depends>
+    <depends>JavaScript</depends>
 
-    <version>1.3.2</version>
+    <version>1.3.3</version>
 
     <extensions defaultExtensionNs="com.intellij">
         <notificationGroup id="NotificationGroup" displayType="BALLOON"/>
