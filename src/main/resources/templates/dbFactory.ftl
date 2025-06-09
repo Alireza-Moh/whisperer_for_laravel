@@ -5,6 +5,12 @@ namespace ${namespace};
 use Illuminate\Database\Eloquent\Factories\Factory;
 <#if model??>use ${modelNamespace};</#if>
 
+
+<#if model??>
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<${model.name}>
+*/
+</#if>
 class ${name} extends Factory
 {
     <#if model??>protected $model = ${model.name}::class;</#if>

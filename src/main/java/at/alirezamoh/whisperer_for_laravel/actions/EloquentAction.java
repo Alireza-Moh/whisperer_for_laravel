@@ -9,6 +9,7 @@ import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class EloquentAction extends BaseAction {
     @Override
@@ -18,6 +19,11 @@ public class EloquentAction extends BaseAction {
 
         if (eloquentView.showAndGet()) {
             EloquentModel eloquentModel = eloquentView.getEloquentModel();
+            DbFactoryModel dbFactoryModel = createDbFactory(eloquentView, eloquentModel, project);
+
+            if (dbFactoryModel != null) {
+                eloquentModel.setDbFactoryModel(dbFactoryModel);
+            }
 
             this.create(
                 eloquentModel,
@@ -34,8 +40,8 @@ public class EloquentAction extends BaseAction {
                 createMigration(eloquentView, eloquentModel, project);
             }
 
-            if (eloquentView.withFactory()) {
-                createFactory(eloquentView, eloquentModel, project);
+            if (dbFactoryModel != null) {
+                createFactory(dbFactoryModel, project);
             }
         }
     }
@@ -76,22 +82,30 @@ public class EloquentAction extends BaseAction {
         );
     }
 
-    private void createFactory(EloquentView eloquentView, EloquentModel eloquentModel, Project project) {
-        DbFactoryModel factoryModel = new DbFactoryModel(
-            SettingsState.getInstance(project),
-            eloquentView.getFactoryName(),
-            eloquentModel.getUnformattedModuleFullPath(),
-            eloquentModel.getFormattedModuleFullPath(),
-            eloquentModel.getNamespace() + "\\" + eloquentModel.getName()
-        );
-
-        factoryModel.setModel(eloquentModel);
-
+    private void createFactory(DbFactoryModel factoryModel, Project project) {
         this.create(
             factoryModel,
             "dbFactory.ftl",
             true,
             project
         );
+    }
+
+    private @Nullable DbFactoryModel createDbFactory(EloquentView eloquentView, EloquentModel eloquentModel, Project project) {
+        if (eloquentView.withFactory()) {
+            DbFactoryModel dbFactoryModel = new DbFactoryModel(
+                SettingsState.getInstance(project),
+                eloquentView.getFactoryName(),
+                eloquentModel.getUnformattedModuleFullPath(),
+                eloquentModel.getFormattedModuleFullPath(),
+                eloquentModel.getNamespace() + "\\" + eloquentModel.getName()
+            );
+
+            dbFactoryModel.setModel(eloquentModel);
+
+            return dbFactoryModel;
+        }
+
+        return null;
     }
 }
