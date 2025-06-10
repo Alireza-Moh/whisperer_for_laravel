@@ -10,6 +10,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.lang.lexer.PhpTokenTypes;
+import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.impl.MethodImpl;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,6 +18,10 @@ import java.util.List;
 
 
 public class EloquentFieldInFactoryCompletionContributor extends CompletionContributor {
+    public static final String BASE_FACTORY_CLASS_NAMESPACE = "\\Illuminate\\Database\\Eloquent\\Factories\\Factory";
+
+    public static final String FACTORY_INIT_METHOD = "definition";
+
     EloquentFieldInFactoryCompletionContributor() {
         extend(
             CompletionType.BASIC,
@@ -35,8 +40,15 @@ public class EloquentFieldInFactoryCompletionContributor extends CompletionContr
                         return;
                     }
 
-                    if (isInsideMessagesMethod(psiElement)) {
-                        List<Field> fields = EloquentModelFieldExtractorInFactory.extract(psiElement, project);
+                    MethodImpl methodCall = PsiTreeUtil.getParentOfType(psiElement, MethodImpl.class);
+                    if (methodCall == null) {
+                        return;
+                    }
+
+                    PhpClass factoryClass = methodCall.getContainingClass();
+
+                    if (isInsideCorrectMethodMethod(methodCall, factoryClass, psiElement, project)) {
+                        List<Field> fields = EloquentModelFieldExtractorInFactory.extract(factoryClass, project);
 
                         if (fields == null) {
                             return;
@@ -58,11 +70,9 @@ public class EloquentFieldInFactoryCompletionContributor extends CompletionContr
     /**
      * Checks if the PSI element is inside a MethodImpl with the name 'definition'
      */
-    private boolean isInsideMessagesMethod(PsiElement psiElement) {
-        MethodImpl methodCall = PsiTreeUtil.getParentOfType(psiElement, MethodImpl.class);
-
-        return methodCall != null
-            && methodCall.getName().equals("definition")
+    private boolean isInsideCorrectMethodMethod(@NotNull MethodImpl methodCall, PhpClass factoryClass, PsiElement psiElement, Project project) {
+        return PhpClassUtils.isChildOfBaseClass(factoryClass, project, BASE_FACTORY_CLASS_NAMESPACE)
+            && methodCall.getName().equals(FACTORY_INIT_METHOD)
             && PsiElementUtils.isInsideArrayKey(psiElement);
     }
 }

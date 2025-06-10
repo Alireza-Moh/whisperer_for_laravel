@@ -198,4 +198,25 @@ public class PhpClassUtils {
         return classReference;
     }
 
+    /**
+     * Checks if the provided PhpClass is a factory class
+     * by checking if it extends the base factory class
+     *
+     * @param phpClass The PhpClass to check
+     * @return true or false
+     */
+    public static boolean isChildOfBaseClass(PhpClass phpClass, Project project, String ...baseClassNamespace) {
+        if (!(phpClass instanceof PhpClassImpl)) {
+            return false;
+        }
+
+        for (String classFQN : baseClassNamespace) {
+            PhpClass baseClass = PhpClassUtils.getClassByFQN(project, classFQN);
+
+            if (baseClass != null && PhpClassUtils.isChildOf((PhpClassImpl) phpClass, baseClass)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
