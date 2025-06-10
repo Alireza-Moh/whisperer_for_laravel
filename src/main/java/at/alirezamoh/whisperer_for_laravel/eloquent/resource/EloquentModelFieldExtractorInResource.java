@@ -73,7 +73,7 @@ public class EloquentModelFieldExtractorInResource {
      * @return A list of {@link Field} objects representing the model's fields
      */
     private @NotNull static List<Field> fetchFields(String eloquentModelFQN) {
-        return EloquentUtils.getFields(eloquentModelFQN, false, project);
+        return EloquentUtils.getFields(eloquentModelFQN, true, project);
     }
 
     /**
