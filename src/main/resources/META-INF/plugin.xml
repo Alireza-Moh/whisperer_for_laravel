@@ -84,6 +84,7 @@
         <completion.contributor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.packages.livewire.validation.RuleValidationInLivewireAttributeCompletionContributor"/>
         <completion.contributor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.packages.livewire.validation.RequestMessageForLivewirePropertyCompletionContributor"/>
         <completion.contributor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.eloquent.factroy.EloquentFieldInFactoryCompletionContributor"/>
+        <completion.contributor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.eloquent.resource.EloquentFieldInResourceCompletionContributor"/>
 
         <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.blade.component.BladeXComponentGotoDeclarationHandler"/>
         <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.request.validation.RuleValidationGotoDeclarationHandler"/>
