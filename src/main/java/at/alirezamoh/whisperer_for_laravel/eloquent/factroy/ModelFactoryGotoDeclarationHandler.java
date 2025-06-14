@@ -36,7 +36,7 @@ public class ModelFactoryGotoDeclarationHandler implements GotoDeclarationHandle
             return null;
         }
 
-        PhpClass model = PhpClassUtils.getPhpClassFromMethodRef(methodReference);
+        PhpClass model = PhpClassUtils.getCachedPhpClassFromMethodRef(methodReference);
         if (model == null) {
             return null;
         }

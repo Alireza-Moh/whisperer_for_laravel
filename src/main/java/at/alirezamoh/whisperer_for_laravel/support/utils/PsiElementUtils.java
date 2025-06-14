@@ -298,4 +298,23 @@ public class PsiElementUtils {
     public static boolean isInsideArrayKey(PsiElement psiElement) {
         return PsiElementUtils.isAssocArray(psiElement, 10) && isInArrayKey(psiElement, 10);
     }
+
+    /**
+     * Gets the parent element at a specific depth
+     *
+     * @param element the target element
+     * @return founded parent element or null
+     */
+    public static @Nullable PsiElement getNthParent(PsiElement element, int n) {
+        PsiElement current = element;
+
+        for (int i = 0; i < n; i++) {
+            if (current == null) {
+                return null;
+            }
+            current = current.getParent();
+        }
+
+        return current;
+    }
 }

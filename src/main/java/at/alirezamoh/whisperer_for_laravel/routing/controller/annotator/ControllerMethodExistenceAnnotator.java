@@ -73,7 +73,7 @@ public class ControllerMethodExistenceAnnotator implements Annotator {
             }
 
             for (PsiElement subElement : phpPsiElement.getChildren()) {
-                PhpClass phpClass = PhpClassUtils.getPhpClassFromClassConstant(subElement);
+                PhpClass phpClass = PhpClassUtils.getCachedPhpClassFromClassConstant(subElement);
 
                 if (phpClass != null) {
                     return new ResolvedController(

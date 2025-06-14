@@ -1,5 +1,6 @@
 package at.alirezamoh.whisperer_for_laravel.routing.middleware;
 
+import at.alirezamoh.whisperer_for_laravel.routing.RouteUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.MethodUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PhpClassUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
@@ -28,11 +29,6 @@ public class MiddlewareReferenceContributor extends PsiReferenceContributor {
         put("middleware", 0);
         put("withoutMiddleware", 0);
     }};
-
-    /**
-     * Route class
-     */
-    private final String[] ROUTE_NAMESPACES = {"\\Illuminate\\Routing\\Route", "\\Illuminate\\Support\\Facades\\Route", "\\Route"};
 
     @Override
     public void registerReferenceProviders(@NotNull PsiReferenceRegistrar psiReferenceRegistrar) {
@@ -83,7 +79,7 @@ public class MiddlewareReferenceContributor extends PsiReferenceContributor {
 
         return method != null
             && isMiddlewareParam(method, psiElement)
-            && PhpClassUtils.isCorrectRelatedClass(method, project, ROUTE_NAMESPACES);
+            && PhpClassUtils.isCorrectRelatedClass(method, project, RouteUtils.getRouteNamespacesAsArray());
     }
 
     /**

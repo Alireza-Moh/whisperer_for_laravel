@@ -6,9 +6,7 @@ import at.alirezamoh.whisperer_for_laravel.support.utils.PhpClassUtils;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiReference;
 import com.jetbrains.php.lang.psi.elements.*;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +50,7 @@ public class ModelRelatedFilesCollector {
             PsiElement defaultValue = eventField.getDefaultValue();
             if (defaultValue instanceof ArrayCreationExpression arrayCreationExpression) {
                 for (ArrayHashElement hashElement : arrayCreationExpression.getHashElements()) {
-                    PsiFile containingFile = getContainingFileFromClassConstant(hashElement.getValue());
+                    PsiFile containingFile = PhpClassUtils.getContainingFileFromClassConstant(hashElement.getValue());
                     if (containingFile != null) {
                         files.add(containingFile);
                     }
@@ -67,7 +65,7 @@ public class ModelRelatedFilesCollector {
                 if (parameter instanceof ArrayCreationExpression arrayCreationExpression) {
                     for (PsiElement child : arrayCreationExpression.getChildren()) {
                         if (child instanceof PhpPsiElement psiElement) {
-                            PsiFile containingFile = getContainingFileFromClassConstant(psiElement.getFirstChild());
+                            PsiFile containingFile = PhpClassUtils.getContainingFileFromClassConstant(psiElement.getFirstChild());
                             if (containingFile != null) {
                                 files.add(containingFile);
                             }
@@ -76,32 +74,5 @@ public class ModelRelatedFilesCollector {
                 }
             }
         }
-    }
-
-    /**
-     * Helper method to process an element expected to be a ClassConstantReference.
-     * If found, it resolves the reference and adds the containing file to the list.
-     *
-     * @param element the PSI element to process
-     */
-    public static @Nullable PsiFile getContainingFileFromClassConstant(@Nullable PsiElement element) {
-        if (element == null) {
-            return null;
-        }
-
-        if (element instanceof ClassConstantReference classConstantReference) {
-            PhpExpression reference = classConstantReference.getClassReference();
-            if (reference instanceof ClassReference classReference) {
-                PsiReference psiReference = classReference.getReference();
-                if (psiReference != null) {
-                    PsiElement resolved = psiReference.resolve();
-                    if (resolved instanceof PhpClass resolvedPhpClass) {
-                        return resolvedPhpClass.getContainingFile();
-                    }
-                }
-            }
-        }
-
-        return null;
     }
 }

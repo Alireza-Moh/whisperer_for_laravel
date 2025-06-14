@@ -1,5 +1,6 @@
 package at.alirezamoh.whisperer_for_laravel.routing.routeAction;
 
+import at.alirezamoh.whisperer_for_laravel.routing.RouteUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.MethodUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PhpClassUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
@@ -14,33 +15,10 @@ import com.jetbrains.php.lang.psi.elements.ParameterList;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * This class allows the IDE to recognize and resolve controllers with its methods
  */
 public class RouteActionReferenceContributor extends PsiReferenceContributor {
-    /**
-     * The names of the route methods
-     */
-    public static Map<String, Integer> ROUTE_METHODS = new HashMap<>() {{
-        put("get", 1);
-        put("post", 1);
-        put("put", 1);
-        put("delete", 1);
-        put("patch", 1);
-        put("options", 1);
-        put("any", 1);
-        put("match", 1);
-        put("fallback", 0);
-    }};
-
-    /**
-     * Route class
-     */
-    private final String[] ROUTE_NAMESPACES = {"\\Illuminate\\Routing\\Route", "\\Illuminate\\Support\\Facades\\Route", "\\Route"};
-
     @Override
     public void registerReferenceProviders(@NotNull PsiReferenceRegistrar psiReferenceRegistrar) {
         psiReferenceRegistrar.registerReferenceProvider(
@@ -90,7 +68,7 @@ public class RouteActionReferenceContributor extends PsiReferenceContributor {
 
         return method != null
             && isRouteActionParam(method, psiElement)
-            && PhpClassUtils.isCorrectRelatedClass(method, project, ROUTE_NAMESPACES);
+            && PhpClassUtils.isCorrectRelatedClass(method, project, RouteUtils.getRouteNamespacesAsArray());
     }
 
     /**
@@ -100,7 +78,7 @@ public class RouteActionReferenceContributor extends PsiReferenceContributor {
      * @return True or false
      */
     private boolean isRouteActionParam(MethodReference methodReference, PsiElement position) {
-        Integer expectedParamIndex = ROUTE_METHODS.get(methodReference.getName());
+        Integer expectedParamIndex = RouteUtils.ROUTE_METHODS.get(methodReference.getName());
         if (expectedParamIndex == null) {
             return false;
         }

@@ -10,7 +10,6 @@ import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.ParameterList;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
-import com.jetbrains.php.lang.psi.elements.impl.MethodImpl;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -89,7 +88,7 @@ public class TableReferenceContributor extends PsiReferenceContributor {
             && isTableMethod(methodReference)
             && isTableParam(methodReference, psiElement, LaravelPaths.DB_TABLE_METHODS))
             || (methodReference != null && isTableTestMethod(methodReference, psiElement))
-            || (methodReference != null && isRelationShipTestMethod(methodReference, psiElement));
+            || (methodReference != null && isRelationshipTestMethod(methodReference, psiElement));
     }
 
     /**
@@ -135,34 +134,21 @@ public class TableReferenceContributor extends PsiReferenceContributor {
         return DB_TABLE_TEST_METHODS.containsKey(methodName) && isTableParam(methodReference, position, LaravelPaths.DB_TABLE_METHODS);
     }
 
-    private boolean isRelationShipTestMethod(MethodReference methodReference, PsiElement position) {
+    private boolean isRelationshipTestMethod(MethodReference methodReference, PsiElement position) {
         String methodName = methodReference.getName();
 
         if (methodName == null) {
             return false;
         }
 
-        return isRelationShipClass(methodReference)
+        return isRelationshipClass(methodReference)
             && RELATIONSHIP_METHODS.containsKey(methodName)
             && isTableParam(methodReference, position, RELATIONSHIP_METHODS);
     }
 
-    private boolean isRelationShipClass(MethodReference methodReference) {
-        PsiReference reference = methodReference.getReference();
-        if (reference == null) {
-            return false;
-        }
+    private boolean isRelationshipClass(MethodReference methodReference) {
+        PhpClass phpClass = PhpClassUtils.getCachedContainingPhpClassFromMethodRef(methodReference);
 
-        PsiElement resolved = reference.resolve();
-        if (resolved instanceof MethodImpl method) {
-            PhpClass phpClass = method.getContainingClass();
-            if (phpClass == null) {
-                return false;
-            }
-
-            return phpClass.getFQN().equals(RELATIONSHIP_CLASS);
-        }
-
-        return false;
+        return phpClass != null && phpClass.getFQN().equals(RELATIONSHIP_CLASS);
     }
 }

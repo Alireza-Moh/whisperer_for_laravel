@@ -2,20 +2,31 @@ package at.alirezamoh.whisperer_for_laravel.support.utils;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiReference;
+import com.intellij.psi.util.CachedValueProvider;
+import com.intellij.psi.util.CachedValuesManager;
+import com.intellij.psi.util.ParameterizedCachedValue;
+import com.intellij.psi.util.PsiModificationTracker;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.elements.impl.ClassReferenceImpl;
+import com.jetbrains.php.lang.psi.elements.impl.MethodImpl;
 import com.jetbrains.php.lang.psi.elements.impl.PhpClassAliasImpl;
 import com.jetbrains.php.lang.psi.elements.impl.PhpClassImpl;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 public class PhpClassUtils {
+    private static final Logger log = LoggerFactory.getLogger(PhpClassUtils.class);
+
     /**
      * Retrieves all public methods of a given PHP class excluding constructor
      *
@@ -140,6 +151,13 @@ public class PhpClassUtils {
             .orElse(null);
     }
 
+    /**
+     * Retrieves a PhpClass from a PhpFile by its class name
+     *
+     * @param phpFile the PhpFile to search in
+     * @param className the name of the class to find
+     * @return the PhpClass if found, or null if not found
+     */
     public static @Nullable PhpClass getPhpClassFromFile(PhpFile phpFile, String className) {
         for (PhpNamedElement topLevelElement : phpFile.getTopLevelDefs().values()) {
             if (topLevelElement instanceof PhpClass clazz && clazz.getName().equals(className)) {
@@ -150,6 +168,12 @@ public class PhpClassUtils {
         return null;
     }
 
+    /**
+     * Retrieves all PhpClasses defined in a given PhpFile
+     *
+     * @param phpFile the PhpFile to search in
+     * @return a collection of PhpClass instances found in the file
+     */
     public static Collection<PhpClass> getPhpClassesFromFile(PhpFile phpFile) {
         Collection<PhpClass> classes = new ArrayList<>();
 
@@ -162,29 +186,30 @@ public class PhpClassUtils {
         return classes;
     }
 
-    public static @Nullable PhpClass getPhpClassFromMethodRef(MethodReference methodReference) {
+    /**
+     * Retrieves the PhpClass from a MethodReference element.
+     * If the element is not a MethodReference or cannot be resolved, returns null.
+     *
+     * @param methodReference the PSI element to check
+     * @return the resolved PhpClass or null if not found
+     */
+    public static @Nullable PhpClass getCachedPhpClassFromMethodRef(MethodReference methodReference) {
         if (methodReference == null) {
             return null;
         }
 
-        ClassReferenceImpl classReference = getClassReferenceImplFromMethodRef(methodReference);
-        if (classReference == null) {
-            return null;
-        }
-
-        PsiReference reference = classReference.getReference();
-        if (reference == null) {
-            return null;
-        }
-
-        PsiElement resolved = reference.resolve();
-        if (!(resolved instanceof PhpClass possiblePhpClass)) {
-            return null;
-        }
-
-        return possiblePhpClass;
+        return CachedValuesManager.getCachedValue(methodReference, () ->
+            CachedValueProvider.Result.create(resolvePhpClassFromMethodRef(methodReference), PsiModificationTracker.MODIFICATION_COUNT)
+        );
     }
 
+    /**
+     * Retrieves the ClassReferenceImpl from a MethodReference element.
+     * If the element is not a MethodReference or does not have a class reference, returns null.
+     *
+     * @param methodReference the PSI element to check
+     * @return the ClassReferenceImpl or null if not found
+     */
     public static @Nullable ClassReferenceImpl getClassReferenceImplFromMethodRef(MethodReference methodReference) {
         if (methodReference == null) {
             return null;
@@ -218,5 +243,137 @@ public class PhpClassUtils {
             }
         }
         return false;
+    }
+
+    /**
+     * Retrieves the PhpClass from a ClassConstantReference element.
+     * If the element is not a ClassConstantReference or cannot be resolved, returns null.
+     *
+     * @param classConstant the PSI element to check
+     * @return the resolved PhpClass or null if not found
+     */
+    public static @Nullable PhpClass getCachedPhpClassFromClassConstant(@Nullable PsiElement classConstant) {
+        if (classConstant == null) {
+            return null;
+        }
+
+        return CachedValuesManager.getCachedValue(classConstant, () ->
+            CachedValueProvider.Result.create(resolvePhpClass(classConstant), PsiModificationTracker.MODIFICATION_COUNT)
+        );
+    }
+
+    /**
+     * Retrieves the file where a ClassConstantReference is defined.
+     * If the element is not a ClassConstantReference or cannot be resolved, returns null.
+     *
+     * @param element the PSI element to check
+     * @return the containing PsiFile or null if not found
+     */
+    public static @Nullable PsiFile getContainingFileFromClassConstant(@Nullable PsiElement element) {
+        PhpClass resolvedPhpClass = getCachedPhpClassFromClassConstant(element);
+        if (resolvedPhpClass == null) {
+            return null;
+        }
+
+        return resolvedPhpClass.getContainingFile();
+    }
+
+    /**
+     * Retrieves the containing PhpClass from a MethodReference element.
+     * If the element is not a MethodReference or cannot be resolved, returns null.
+     *
+     * @param methodReference the PSI element to check
+     * @return the containing PhpClass or null if not found
+     */
+    public static @Nullable PhpClass getCachedContainingPhpClassFromMethodRef(MethodReference methodReference) {
+        if (methodReference == null) {
+            return null;
+        }
+
+        return CachedValuesManager.getCachedValue(methodReference, () ->
+            CachedValueProvider.Result.create(
+                doGetContainingPhpClassFromMethodRef(methodReference),
+                PsiModificationTracker.MODIFICATION_COUNT
+            )
+        );
+
+    }
+
+    /**
+     * Resolves the PhpClass from a ClassConstantReference element.
+     * If the element is not a ClassConstantReference or cannot be resolved, returns null.
+     *
+     * @param classConstant the PSI element to check
+     * @return the resolved PhpClass or null if not found
+     */
+    private static @Nullable PhpClass resolvePhpClass(@NotNull PsiElement classConstant) {
+        if (!(classConstant instanceof ClassConstantReference classConstantReference)) {
+            return null;
+        }
+
+        PhpExpression reference = classConstantReference.getClassReference();
+        if (!(reference instanceof ClassReference classReference)) {
+            return null;
+        }
+
+        return getPhpClassFromPsiReference(classReference);
+    }
+
+    /**
+     * Retrieves the PhpClass from a ClassReference element.
+     * If the element is not a ClassReference or cannot be resolved, returns null.
+     *
+     * @param classReference the PSI element to check
+     * @return the resolved PhpClass or null if not found
+     */
+    private static @Nullable PhpClass getPhpClassFromPsiReference(@NotNull ClassReference classReference) {
+        PsiReference psiReference = classReference.getReference();
+        if (psiReference == null) {
+            return null;
+        }
+
+        PsiElement resolved = psiReference.resolve();
+        if (resolved instanceof PhpClass resolvedPhpClass) {
+            return resolvedPhpClass;
+        }
+
+        return null;
+    }
+
+    /**
+     * Resolves the PhpClass from a MethodReference element.
+     * If the element is not a MethodReference or cannot be resolved, returns null.
+     *
+     * @param methodReference the PSI element to check
+     * @return the resolved PhpClass or null if not found
+     */
+    private static @Nullable PhpClass resolvePhpClassFromMethodRef(MethodReference methodReference) {
+        ClassReferenceImpl classReference = getClassReferenceImplFromMethodRef(methodReference);
+        if (classReference == null) {
+            return null;
+        }
+
+        return getPhpClassFromPsiReference(classReference);
+    }
+
+    /**
+     * Retrieves the containing PhpClass from a MethodReference element.
+     * If the element is not a MethodReference or cannot be resolved, returns null.
+     *
+     * @param methodReference the PSI element to check
+     * @return the containing PhpClass or null if not found
+     */
+    private static @Nullable PhpClass doGetContainingPhpClassFromMethodRef(MethodReference methodReference) {
+        PsiReference reference = methodReference.getReference();
+        if (reference == null) {
+            return null;
+        }
+
+        PsiElement resolved = reference.resolve();
+        if (!(resolved instanceof MethodImpl method)) {
+            return null;
+        }
+
+        return method.getContainingClass();
     }
 }
