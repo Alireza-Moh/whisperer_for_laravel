@@ -27,9 +27,11 @@
     <change-notes>
         <![CDATA[
             <ul>
-                <li>Fixes bugs.</li>
-                <li>Adds aggregate field generation for Laravel models.</li>
-                <li>Improves generated code for Eloquent models.</li>
+                <li>Adds caching for better performance.</li>
+                <li>Adds support for autocomplete of Eloquent fields in factory and resource classes</li>
+                <li>Adds support for checking if route names exist.</li>
+                <li>Adds support for checking if controller methods used in routes exist with quick fixes</li>
+                <li>Adds support for generating helper code when creating new Eloquent models through the plugin.</li>
             </ul>
         ]]>
     </change-notes>
@@ -40,7 +42,7 @@
     <depends>com.intellij.modules.json</depends>
     <depends>JavaScript</depends>
 
-    <version>1.3.3</version>
+    <version>1.4.0</version>
 
     <extensions defaultExtensionNs="com.intellij">
         <notificationGroup id="NotificationGroup" displayType="BALLOON"/>
