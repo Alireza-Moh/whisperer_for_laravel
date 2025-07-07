@@ -10,6 +10,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.elements.impl.ArrayHashElementImpl;
 import org.jetbrains.annotations.NotNull;
@@ -161,31 +162,6 @@ public class PsiElementUtils {
     }
 
     /**
-     * Checks if the given PSI element is a key in an array [key => value]
-     *
-     * @param element  The PSI element to check
-     * @param maxDepth Maximum number of parents to traverse up the PSI tree
-     * @return true or false
-     */
-    public static boolean isInArrayKey(PsiElement element, int maxDepth) {
-        PsiElement currentElement = element;
-        int currentDepth = 0;
-
-        while (currentElement != null && currentDepth < maxDepth) {
-            if (currentElement instanceof ArrayHashElementImpl arrayHashElement) {
-                if (arrayHashElement.getKey() == element) {
-                    return true;
-                }
-            }
-
-            currentElement = currentElement.getParent();
-            currentDepth++;
-        }
-
-        return false;
-    }
-
-    /**
      * Determines if the given PSI element is part of an associative array
      *
      * @param element  The PSI element to check
@@ -316,5 +292,51 @@ public class PsiElementUtils {
         }
 
         return current;
+    }
+
+    /**
+     * Checks if the given PSI element is a key in an array [key => value]
+     *
+     * @param element  The PSI element to check
+     * @param maxDepth Maximum number of parents to traverse up the PSI tree
+     * @return true or false
+     */
+    private static boolean isInArrayKey(@Nullable PsiElement element, int maxDepth) {
+        if (element == null) {
+            return false;
+        }
+
+        PsiElement currentElement = element;
+        int currentDepth = 0;
+        while (currentElement != null && currentDepth < maxDepth) {
+            if (currentElement instanceof ArrayHashElementImpl arrayHashElement) {
+                if (arrayHashElement.getKey() == element) {
+                    return true;
+                }
+            }
+
+            currentElement = currentElement.getParent();
+            currentDepth++;
+        }
+
+        PsiElement prevSibling = element.getPrevSibling();
+        if (prevSibling == null) {
+            prevSibling = element.getParent();
+        }
+
+        PsiElement sibling = prevSibling;
+        while (sibling != null) {
+            if (sibling instanceof ArrayHashElementImpl) {
+                return true;
+            }
+
+            if (sibling instanceof ArrayCreationExpression) {
+                return false;
+            }
+
+            sibling = sibling.getPrevSibling();
+        }
+
+        return false;
     }
 }
