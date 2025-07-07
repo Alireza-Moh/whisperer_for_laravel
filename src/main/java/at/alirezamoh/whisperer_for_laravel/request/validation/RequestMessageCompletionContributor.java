@@ -53,12 +53,8 @@ public class RequestMessageCompletionContributor extends CompletionContributor {
         return (
             methodCall != null
             && methodCall.getName().equals("messages")
-            && isInsideArrayKey(psiElement)
+            && PsiElementUtils.isInsideArrayKey(psiElement)
         )
-            || PsiElementUtils.isRegularArray(psiElement, 5);
-    }
-
-    private boolean isInsideArrayKey(PsiElement psiElement) {
-        return PsiElementUtils.isAssocArray(psiElement, 10) && PsiElementUtils.isInArrayKey(psiElement, 10);
+        || PsiElementUtils.isRegularArray(psiElement, 5);
     }
 }

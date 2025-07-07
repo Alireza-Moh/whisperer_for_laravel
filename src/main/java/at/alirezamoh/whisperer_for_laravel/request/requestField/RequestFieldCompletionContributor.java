@@ -3,6 +3,7 @@ package at.alirezamoh.whisperer_for_laravel.request.requestField;
 import at.alirezamoh.whisperer_for_laravel.request.requestField.util.RequestFieldUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.MethodUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
 import com.intellij.codeInsight.completion.*;
 import com.intellij.openapi.project.Project;
 import com.intellij.patterns.PlatformPatterns;
@@ -89,7 +90,7 @@ public class RequestFieldCompletionContributor extends CompletionContributor {
             return null;
         }
 
-        if (RequestFieldUtils.getNthParent(position, 3) instanceof ArrayAccessExpression arrayAccess) {
+        if (PsiElementUtils.getNthParent(position, 3) instanceof ArrayAccessExpression arrayAccess) {
             return arrayAccess.getValue();
         }
 

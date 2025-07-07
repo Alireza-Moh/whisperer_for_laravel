@@ -60,7 +60,7 @@ public class RequestFieldSuppressor implements InspectionSuppressor {
             return false;
         }
 
-        PhpClassImpl phpClass = RequestFieldUtils.resolveRequestClass(variable, project);
+        PhpClassImpl phpClass = RequestFieldUtils.resolveCachedRequestClass(variable, project);
         if (phpClass == null) {
             return false;
         }

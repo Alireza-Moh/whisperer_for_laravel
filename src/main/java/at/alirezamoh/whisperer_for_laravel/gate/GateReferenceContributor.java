@@ -9,12 +9,9 @@ import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
-import com.jetbrains.php.lang.psi.elements.impl.MethodImpl;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class GateReferenceContributor extends PsiReferenceContributor {
@@ -129,21 +126,8 @@ public class GateReferenceContributor extends PsiReferenceContributor {
     }
 
     private boolean isAuthMethod(MethodReference methodReference) {
-        PsiReference reference = methodReference.getReference();
-        if (reference == null) {
-            return false;
-        }
+        PhpClass phpClass = PhpClassUtils.getCachedContainingPhpClassFromMethodRef(methodReference);
 
-        PsiElement resolved = reference.resolve();
-        if (resolved instanceof MethodImpl method) {
-            PhpClass phpClass = method.getContainingClass();
-            if (phpClass == null) {
-                return false;
-            }
-
-            return phpClass.getFQN().equals(AUTH);
-        }
-
-        return false;
+        return phpClass != null && phpClass.getFQN().equals(AUTH);
     }
 }

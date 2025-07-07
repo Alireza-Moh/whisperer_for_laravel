@@ -287,4 +287,34 @@ public class PsiElementUtils {
     public static @Nullable PsiFile resolvePsiFile(@NotNull VirtualFile file, @NotNull Project project) {
         return PsiManager.getInstance(project).findFile(file);
     }
+
+    /**
+     * Checks if the PSI element is inside an associative array key
+     * This is used to determine if the current element is a key in an array [key => value]
+     *
+     * @param psiElement The PSI element to check
+     * @return true or false
+     */
+    public static boolean isInsideArrayKey(PsiElement psiElement) {
+        return PsiElementUtils.isAssocArray(psiElement, 10) && isInArrayKey(psiElement, 10);
+    }
+
+    /**
+     * Gets the parent element at a specific depth
+     *
+     * @param element the target element
+     * @return founded parent element or null
+     */
+    public static @Nullable PsiElement getNthParent(PsiElement element, int n) {
+        PsiElement current = element;
+
+        for (int i = 0; i < n; i++) {
+            if (current == null) {
+                return null;
+            }
+            current = current.getParent();
+        }
+
+        return current;
+    }
 }

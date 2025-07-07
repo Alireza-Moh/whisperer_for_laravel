@@ -5,12 +5,14 @@ import at.alirezamoh.whisperer_for_laravel.support.utils.PhpClassUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.codeInsight.completion.CompletionResultSet;
-import com.intellij.codeInsight.completion.CompletionUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.searches.ReferencesSearch;
+import com.intellij.psi.util.CachedValueProvider;
+import com.intellij.psi.util.CachedValuesManager;
+import com.intellij.psi.util.PsiModificationTracker;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.Query;
 import com.jetbrains.php.lang.psi.elements.*;
@@ -60,20 +62,17 @@ final public class RequestFieldUtils {
      * @param project the current project
      * @return the resolved PhpClassImpl instance or null if not found
      */
-    public static PhpClassImpl resolveRequestClass(Variable variable, Project project) {
-        PhpClassImpl phpClass = PhpClassUtils.getClassFromTypedElement(variable, project);
-
-        if (phpClass == null) {
-            PsiReference reference = variable.getReference();
-            if (reference != null) {
-                PsiElement resolved = reference.resolve();
-                if (resolved instanceof PhpClass requestClass) {
-                    phpClass = (PhpClassImpl) requestClass;
-                }
-            }
+    public static @Nullable PhpClassImpl resolveCachedRequestClass(Variable variable, Project project) {
+        if (variable == null) {
+            return null;
         }
 
-        return phpClass;
+        return CachedValuesManager.getCachedValue(variable, () ->
+            CachedValueProvider.Result.create(
+                doResolveRequestClass(variable, project),
+                PsiModificationTracker.MODIFICATION_COUNT
+            )
+        );
     }
 
     /**
@@ -135,7 +134,7 @@ final public class RequestFieldUtils {
                     return false;
                 }
 
-                PhpClassImpl phpClass = resolveRequestClass(variable, variable.getProject());
+                PhpClassImpl phpClass = resolveCachedRequestClass(variable, variable.getProject());
                 return phpClass != null && phpClass.getFQN().equals(REQUEST);
             })
             .flatMap(methodReference -> {
@@ -231,7 +230,7 @@ final public class RequestFieldUtils {
      */
     public static @Nullable PhpClassImpl resolvePhpClass(PsiElement element, Project project) {
         if (element instanceof VariableImpl variable) {
-            PhpClassImpl phpClass = resolveRequestClass(variable, project);
+            PhpClassImpl phpClass = resolveCachedRequestClass(variable, project);
 
             if (phpClass == null && variable.isValid()) {
                 try {
@@ -279,25 +278,6 @@ final public class RequestFieldUtils {
     }
 
     /**
-     * Gets the parent element at a specific depth
-     *
-     * @param element the target element
-     * @return founded parent element or null
-     */
-    public static @Nullable PsiElement getNthParent(PsiElement element, int n) {
-        PsiElement current = element;
-
-        for (int i = 0; i < n; i++) {
-            if (current == null) {
-                return null;
-            }
-            current = current.getParent();
-        }
-
-        return current;
-    }
-
-    /**
      * Checks if the given method reference is a request method to get field
      *
      * @param method the method reference to check
@@ -316,5 +296,28 @@ final public class RequestFieldUtils {
         }
 
         return MethodUtils.findParamIndex(position, false) == paramPositions;
+    }
+
+    /**
+     * Resolves the request class from a variable $this
+     *
+     * @param variable the variable to resolve
+     * @param project the current project
+     * @return the resolved PhpClassImpl instance or null if not found
+     */
+    private static @Nullable PhpClassImpl doResolveRequestClass(Variable variable, Project project) {
+        PhpClassImpl phpClass = PhpClassUtils.getClassFromTypedElement(variable, project);
+
+        if (phpClass == null) {
+            PsiReference reference = variable.getReference();
+            if (reference != null) {
+                PsiElement resolved = reference.resolve();
+                if (resolved instanceof PhpClass requestClass && requestClass instanceof PhpClassImpl phpClassImpl) {
+                    phpClass = phpClassImpl;
+                }
+            }
+        }
+
+        return phpClass;
     }
 }

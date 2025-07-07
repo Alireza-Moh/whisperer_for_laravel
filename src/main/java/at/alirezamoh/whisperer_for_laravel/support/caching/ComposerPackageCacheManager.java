@@ -8,6 +8,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiManager;
 import com.intellij.psi.util.CachedValue;
 import com.intellij.psi.util.CachedValueProvider;
 import com.intellij.psi.util.CachedValuesManager;
@@ -15,8 +16,6 @@ import com.intellij.psi.util.PsiModificationTracker;
 import com.jetbrains.php.composer.ComposerConfigUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.*;
@@ -27,7 +26,6 @@ import java.util.*;
  */
 @Service(Service.Level.PROJECT)
 public final class ComposerPackageCacheManager {
-    private static final Logger log = LoggerFactory.getLogger(ComposerPackageCacheManager.class);
     /**
      * All founded composer packages
      */
@@ -56,16 +54,35 @@ public final class ComposerPackageCacheManager {
 
     private void buildCache(Project project) {
         packages = CachedValuesManager.getManager(project).createCachedValue(() -> {
-            Map<String, String> packageMap = loadPackages(project);
-            return CachedValueProvider.Result.create(packageMap, PsiModificationTracker.MODIFICATION_COUNT);
+            PsiFile composerPsi = PluginUtils.getComposerFile(project);
+            if (composerPsi == null) {
+                return CachedValueProvider.Result.create(Collections.emptyMap(), PsiModificationTracker.MODIFICATION_COUNT);
+            }
+
+            VirtualFile composerJsonFile = composerPsi.getVirtualFile();
+            if (composerJsonFile == null) {
+                return CachedValueProvider.Result.create(Collections.emptyMap(), composerPsi);
+            }
+
+            VirtualFile lockFile = ComposerConfigUtils.findLockFile(composerJsonFile);
+            PsiFile lockPsi = null;
+            if (lockFile != null) {
+                lockPsi = PsiManager.getInstance(project).findFile(lockFile);
+            }
+
+            Object dependency = lockPsi != null ? lockPsi : composerPsi;
+
+            return CachedValueProvider.Result.create(
+                loadPackages(composerPsi, lockFile),
+                dependency
+            );
         }, false);
     }
 
     /**
      * Loads the installed packages from the composer.json file or form the lock file
      */
-    private @NotNull Map<String, String> loadPackages(@NotNull Project project) {
-        PsiFile composerPsi = PluginUtils.getComposerFile(project);
+    private @NotNull Map<String, String> loadPackages(PsiFile composerPsi, VirtualFile lockFile) {
         if (composerPsi == null) {
             return Collections.emptyMap();
         }
@@ -74,7 +91,6 @@ public final class ComposerPackageCacheManager {
             return Collections.emptyMap();
         }
 
-        VirtualFile lockFile = ComposerConfigUtils.findLockFile(composerJson);
         if (lockFile != null) {
             return loadPackagesFromLock(lockFile);
         } else {

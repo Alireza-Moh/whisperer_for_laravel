@@ -27,9 +27,11 @@
     <change-notes>
         <![CDATA[
             <ul>
-                <li>Fixes bugs.</li>
-                <li>Adds aggregate field generation for Laravel models.</li>
-                <li>Improves generated code for Eloquent models.</li>
+                <li>Adds caching for better performance.</li>
+                <li>Adds support for autocomplete of Eloquent fields in factory and resource classes</li>
+                <li>Adds support for checking if route names exist.</li>
+                <li>Adds support for checking if controller methods used in routes exist with quick fixes</li>
+                <li>Adds support for generating helper code when creating new Eloquent models through the plugin.</li>
             </ul>
         ]]>
     </change-notes>
@@ -40,7 +42,7 @@
     <depends>com.intellij.modules.json</depends>
     <depends>JavaScript</depends>
 
-    <version>1.3.3</version>
+    <version>1.4.0</version>
 
     <extensions defaultExtensionNs="com.intellij">
         <notificationGroup id="NotificationGroup" displayType="BALLOON"/>
@@ -83,11 +85,13 @@
         <completion.contributor language="XML" implementationClass="at.alirezamoh.whisperer_for_laravel.packages.livewire.actions.LivewireActionDataBindingCompletionContributor"/>
         <completion.contributor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.packages.livewire.validation.RuleValidationInLivewireAttributeCompletionContributor"/>
         <completion.contributor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.packages.livewire.validation.RequestMessageForLivewirePropertyCompletionContributor"/>
+        <completion.contributor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.eloquent.factroy.EloquentFieldInFactoryCompletionContributor"/>
+        <completion.contributor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.eloquent.resource.EloquentFieldInResourceCompletionContributor"/>
 
         <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.blade.component.BladeXComponentGotoDeclarationHandler"/>
         <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.request.validation.RuleValidationGotoDeclarationHandler"/>
         <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.request.requestField.RequestFieldGotoDeclarationHandler"/>
-        <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.eloquent.ModelFactoryGotoDeclarationHandler"/>
+        <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.eloquent.factroy.ModelFactoryGotoDeclarationHandler"/>
         <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.facade.RealTimeFacadeMethodGotoDeclarationHandler"/>
         <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.facade.RealTimeFacadeClassGotoDeclarationHandler"/>
         <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.packages.livewire.property.LivewirePropertyGotoDeclarationHandler"/>
@@ -102,6 +106,8 @@
         <lang.inspectionSuppressor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.facade.RealTimeFacadeSuppressor"/>
 
         <annotator language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.packages.inertia.annotator.InertiaPageExistenceAnnotator"/>
+        <annotator language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.routing.controller.annotator.ControllerMethodExistenceAnnotator"/>
+        <annotator language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.routing.routeName.annotator.RouteExistenceAnnotator"/>
 
         <codeInsight.lineMarkerProvider language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.eloquent.EloquentModelLineMarker"/>
         <lang.inspectionSuppressor language="XML" implementationClass="at.alirezamoh.whisperer_for_laravel.packages.livewire.htmlDirectives.supressor.LivewireHtmlDirectiveSuppressor" />
