@@ -6,7 +6,6 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.util.CachedValueProvider;
 import com.intellij.psi.util.CachedValuesManager;
-import com.intellij.psi.util.ParameterizedCachedValue;
 import com.intellij.psi.util.PsiModificationTracker;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.PhpFile;
@@ -199,7 +198,7 @@ public class PhpClassUtils {
         }
 
         return CachedValuesManager.getCachedValue(methodReference, () ->
-            CachedValueProvider.Result.create(resolvePhpClassFromMethodRef(methodReference), PsiModificationTracker.MODIFICATION_COUNT)
+            CachedValueProvider.Result.create(resolvePhpClassFromMethodRef(methodReference), methodReference)
         );
     }
 
@@ -258,7 +257,7 @@ public class PhpClassUtils {
         }
 
         return CachedValuesManager.getCachedValue(classConstant, () ->
-            CachedValueProvider.Result.create(resolvePhpClass(classConstant), PsiModificationTracker.MODIFICATION_COUNT)
+            CachedValueProvider.Result.create(resolvePhpClass(classConstant), classConstant)
         );
     }
 
@@ -293,7 +292,7 @@ public class PhpClassUtils {
         return CachedValuesManager.getCachedValue(methodReference, () ->
             CachedValueProvider.Result.create(
                 doGetContainingPhpClassFromMethodRef(methodReference),
-                PsiModificationTracker.MODIFICATION_COUNT
+                methodReference
             )
         );
 
