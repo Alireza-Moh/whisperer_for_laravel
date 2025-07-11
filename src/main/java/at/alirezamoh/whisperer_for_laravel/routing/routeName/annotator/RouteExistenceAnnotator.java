@@ -1,7 +1,8 @@
 package at.alirezamoh.whisperer_for_laravel.routing.routeName.annotator;
 
-import at.alirezamoh.whisperer_for_laravel.packages.inertia.InertiaUtil;
 import at.alirezamoh.whisperer_for_laravel.routing.RouteUtils;
+import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
@@ -25,7 +26,12 @@ public class RouteExistenceAnnotator implements Annotator {
     @Override
     public void annotate(@NotNull PsiElement psiElement, @NotNull AnnotationHolder annotationHolder) {
         Project project = psiElement.getProject();
-        if (InertiaUtil.shouldNotCompleteOrNavigate(project)) {
+        if (PluginUtils.shouldNotCompleteOrNavigate(project)) {
+            return;
+        }
+
+        SettingsState settingsState = SettingsState.getInstance(project);
+        if (!settingsState.isRouteNotFoundAnnotatorWarning()) {
             return;
         }
 

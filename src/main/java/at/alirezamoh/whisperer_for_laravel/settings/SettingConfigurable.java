@@ -45,6 +45,7 @@ public class SettingConfigurable implements Configurable {
         String currentModuleSrcDirectory = settingsComponent.getModuleSrcDirectoryPath();
         String currentInertiaPageRootPath = settingsComponent.getInertiaPageRootPath();
         boolean currentSuppressRealTimeFacadeWarnings = settingsComponent.suppressRealTimeFacadeWarnings();
+        boolean currentRouteNotFoundInspectionWarning = settingsComponent.getRouteNotFoundAnnotatorWarningCheckbox();
 
         String storedProjectType = settingsState.getProjectType();
         String storedProjectRootDirectory = settingsState.getProjectDirectoryPath();
@@ -52,13 +53,15 @@ public class SettingConfigurable implements Configurable {
         String storedModuleSrcDirectory = settingsState.getModuleSrcDirectoryPath();
         String storedInertiaPageRootPath = settingsState.getInertiaPageRootPath();
         boolean storedSuppressRealTimeFacadeWarnings = settingsState.isSuppressRealTimeFacadeWarnings();
+        boolean storedRouteNotFoundInspectionWarning = settingsState.isRouteNotFoundAnnotatorWarning();
 
         return !Objects.equals(currentProjectType, storedProjectType)
             || !Objects.equals(currentProjectRootDirectory, storedProjectRootDirectory)
             || !Objects.equals(currentModuleRootDirectory, storedModuleRootDirectory)
             || !Objects.equals(currentModuleSrcDirectory, storedModuleSrcDirectory)
             || !Objects.equals(currentInertiaPageRootPath, storedInertiaPageRootPath)
-            || !Objects.equals(currentSuppressRealTimeFacadeWarnings, storedSuppressRealTimeFacadeWarnings);
+            || !Objects.equals(currentSuppressRealTimeFacadeWarnings, storedSuppressRealTimeFacadeWarnings)
+            || !Objects.equals(currentRouteNotFoundInspectionWarning, storedRouteNotFoundInspectionWarning);
     }
 
     @Override
@@ -71,6 +74,7 @@ public class SettingConfigurable implements Configurable {
         settingsState.setModuleSrcDirectoryPath(settingsComponent.getModuleSrcDirectoryPath());
         settingsState.setInertiaPageRootPath(settingsComponent.getInertiaPageRootPath());
         settingsState.setSuppressRealTimeFacadeWarnings(settingsComponent.suppressRealTimeFacadeWarnings());
+        settingsState.setRouteNotFoundAnnotatorWarning(settingsComponent.getRouteNotFoundAnnotatorWarningCheckbox());
     }
 
     @Override
@@ -81,6 +85,7 @@ public class SettingConfigurable implements Configurable {
         settingsComponent.setModuleSrcDirectoryPathTextField(settingsState.getModuleSrcDirectoryPath());
         settingsComponent.setInertiaPageRootPath(settingsState.getInertiaPageRootPath());
         settingsComponent.setSuppressRealTimeFacadeWarnings(settingsState.isSuppressRealTimeFacadeWarnings());
+        settingsComponent.setRouteNotFoundAnnotatorWarningCheckbox(settingsState.isRouteNotFoundAnnotatorWarning());
     }
 
     @Override

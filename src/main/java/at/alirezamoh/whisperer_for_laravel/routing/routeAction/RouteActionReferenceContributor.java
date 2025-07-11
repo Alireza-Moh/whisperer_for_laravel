@@ -78,7 +78,7 @@ public class RouteActionReferenceContributor extends PsiReferenceContributor {
      * @return True or false
      */
     private boolean isRouteActionParam(MethodReference methodReference, PsiElement position) {
-        Integer expectedParamIndex = RouteUtils.ROUTE_METHODS.get(methodReference.getName());
+        Integer expectedParamIndex = RouteUtils.ROUTE_METHODS_FOR_DEFINING_ROUTES.get(methodReference.getName());
         if (expectedParamIndex == null) {
             return false;
         }

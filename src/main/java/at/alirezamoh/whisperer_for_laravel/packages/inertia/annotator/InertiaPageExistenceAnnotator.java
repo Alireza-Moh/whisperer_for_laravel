@@ -29,10 +29,6 @@ public class InertiaPageExistenceAnnotator implements Annotator {
      */
     @Override
     public void annotate(@NotNull PsiElement psiElement, @NotNull AnnotationHolder annotationHolder) {
-        if (psiElement == null) {
-            return;
-        }
-
         Project project = psiElement.getProject();
         if (InertiaUtil.shouldNotCompleteOrNavigate(project)) {
             return;

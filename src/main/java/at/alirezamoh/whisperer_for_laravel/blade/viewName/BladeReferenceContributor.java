@@ -11,6 +11,7 @@ import com.intellij.psi.*;
 import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.elements.impl.ArrayCreationExpressionImpl;
+import com.jetbrains.php.lang.psi.elements.impl.FunctionReferenceImpl;
 import com.jetbrains.php.lang.psi.elements.impl.PhpClassImpl;
 import com.jetbrains.php.lang.psi.elements.impl.PhpPsiElementImpl;
 import org.jetbrains.annotations.NotNull;
@@ -106,7 +107,7 @@ public class BladeReferenceContributor extends PsiReferenceContributor {
             return isViewMethodParam(method, psiElement) && isViewOrRouteFacadeMethod(method, project);
         }
 
-        FunctionReference function = MethodUtils.resolveFunctionReference(psiElement, 10);
+        FunctionReferenceImpl function = MethodUtils.resolveFunctionReference(psiElement, 3);
         return function != null && isViewFunctionParam(function, psiElement);
     }
 
@@ -161,7 +162,7 @@ public class BladeReferenceContributor extends PsiReferenceContributor {
      * @param position The PSI element position.
      * @return true or false
      */
-    private boolean isViewFunctionParam(FunctionReference functionReference, PsiElement position) {
+    private boolean isViewFunctionParam(FunctionReferenceImpl functionReference, PsiElement position) {
         return isExpectedParam(position, functionReference.getName(), ROUTE_METHODS);
     }
 

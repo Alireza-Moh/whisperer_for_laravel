@@ -12,7 +12,7 @@ public class LaravelStartupActivity implements ProjectActivity {
 
     @Override
     public @Nullable Object execute(@NotNull Project project, @NotNull Continuation<? super Unit> continuation) {
-        if (!PluginUtils.isDumbMode(project)) {
+        if (PluginUtils.isNotInDumbMode(project)) {
             SettingsState settingsState = SettingsState.getInstance(project);
 
             if (settingsState.isProjectDirectoryEmpty()) {
@@ -37,6 +37,10 @@ public class LaravelStartupActivity implements ProjectActivity {
 
             if (!settingsState.isSuppressRealTimeFacadeWarnings()) {
                 settingsState.setSuppressRealTimeFacadeWarnings(true);
+            }
+
+            if (!settingsState.isRouteNotFoundAnnotatorWarning()) {
+                settingsState.setRouteNotFoundAnnotatorWarning(true);
             }
         }
 
