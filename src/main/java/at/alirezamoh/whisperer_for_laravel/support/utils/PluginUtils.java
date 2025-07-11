@@ -64,8 +64,8 @@ public class PluginUtils {
      * @param project The current project
      * @return true or false
      */
-    public static boolean isDumbMode(Project project) {
-        return com.intellij.openapi.project.DumbService.isDumb(project);
+    public static boolean isNotInDumbMode(Project project) {
+        return !com.intellij.openapi.project.DumbService.isDumb(project);
     }
 
     /**
