@@ -32,6 +32,7 @@
                 <li>Adds support for checking if route names exist.</li>
                 <li>Adds support for checking if controller methods used in routes exist with quick fixes</li>
                 <li>Adds support for generating helper code when creating new Eloquent models through the plugin.</li>
+                <li>Bug fixes.</li>
             </ul>
         ]]>
     </change-notes>
@@ -42,7 +43,7 @@
     <depends>com.intellij.modules.json</depends>
     <depends>JavaScript</depends>
 
-    <version>1.4.0</version>
+    <version>1.4.1</version>
 
     <extensions defaultExtensionNs="com.intellij">
         <notificationGroup id="NotificationGroup" displayType="BALLOON"/>
