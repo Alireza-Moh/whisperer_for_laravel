@@ -183,7 +183,7 @@ public class SettingsComponent {
 
         JPanel routePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         routePanel.add(routeNotFoundAnnotatorWarningCheckbox);
-        routePanel.add(new JBLabel("Annotate undefined route names: 'Route name not found'"));
+        routePanel.add(new JBLabel("Enable annotation for undefined route names: 'Route name not found'"));
         checkboxPanel.add(routePanel);
 
         FormBuilder builder = FormBuilder.createFormBuilder()
