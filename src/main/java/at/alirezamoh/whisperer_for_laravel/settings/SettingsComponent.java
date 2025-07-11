@@ -33,6 +33,7 @@ public class SettingsComponent {
 
     /*==============Components for laravel inspections & suppressions==============*/
     private final JBCheckBox suppressRealTimeFacadeWarningsCheckbox = new JBCheckBox();
+    private final JBCheckBox routeNotFoundAnnotatorWarningCheckbox = new JBCheckBox();
 
     public SettingsComponent() {
         initializeTabs();
@@ -100,6 +101,14 @@ public class SettingsComponent {
         this.suppressRealTimeFacadeWarningsCheckbox.setSelected(suppress);
     }
 
+    public boolean getRouteNotFoundAnnotatorWarningCheckbox() {
+        return routeNotFoundAnnotatorWarningCheckbox.isSelected();
+    }
+
+    public void setRouteNotFoundAnnotatorWarningCheckbox(boolean suppress) {
+        this.routeNotFoundAnnotatorWarningCheckbox.setSelected(suppress);
+    }
+
     /**
      * Initializes the tabs in the `JBTabbedPane`
      */
@@ -165,9 +174,17 @@ public class SettingsComponent {
     }
 
     private JPanel createInspectionsAndSuppressionsPanel() {
-        JPanel checkboxPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        checkboxPanel.add(suppressRealTimeFacadeWarningsCheckbox);
-        checkboxPanel.add(new JBLabel("Suppress real-time facade warnings: 'Undefined class' & 'Undefined namespace'"));
+        JPanel checkboxPanel = new JPanel(new GridLayout(0, 1));
+
+        JPanel suppressPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        suppressPanel.add(suppressRealTimeFacadeWarningsCheckbox);
+        suppressPanel.add(new JBLabel("Suppress real-time facade warnings: 'Undefined class' & 'Undefined namespace'"));
+        checkboxPanel.add(suppressPanel);
+
+        JPanel routePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        routePanel.add(routeNotFoundAnnotatorWarningCheckbox);
+        routePanel.add(new JBLabel("Annotate undefined route names: 'Route name not found'"));
+        checkboxPanel.add(routePanel);
 
         FormBuilder builder = FormBuilder.createFormBuilder()
             .addComponent(checkboxPanel);

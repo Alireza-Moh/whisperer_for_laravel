@@ -38,6 +38,10 @@ public class LaravelStartupActivity implements ProjectActivity {
             if (!settingsState.isSuppressRealTimeFacadeWarnings()) {
                 settingsState.setSuppressRealTimeFacadeWarnings(true);
             }
+
+            if (!settingsState.isRouteNotFoundAnnotatorWarning()) {
+                settingsState.setRouteNotFoundAnnotatorWarning(true);
+            }
         }
 
         return Unit.INSTANCE;
