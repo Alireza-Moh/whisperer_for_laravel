@@ -4,9 +4,9 @@ import at.alirezamoh.whisperer_for_laravel.support.utils.MethodUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PhpClassUtils;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
-import com.jetbrains.php.lang.psi.elements.FunctionReference;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
+import com.jetbrains.php.lang.psi.elements.impl.FunctionReferenceImpl;
 import com.jetbrains.php.lang.psi.elements.impl.PhpClassImpl;
 import org.jetbrains.annotations.NotNull;
 
@@ -150,17 +150,17 @@ public class InertiaMethodValidator {
      * @return         true or false
      */
     private static boolean isInertiaFunction(PsiElement position) {
-        FunctionReference functionReference = MethodUtils.resolveFunctionReference(position, 10);
-        if (functionReference == null) {
+        FunctionReferenceImpl function = MethodUtils.resolveFunctionReference(position, 3);
+        if (function == null) {
             return false;
         }
 
-        String methodName = functionReference.getName();
-        if (methodName == null) {
+        String functionName = function.getName();
+        if (functionName == null) {
             return false;
         }
 
-        Integer expectedParamIndex = ROUTE_INERTIA_METHODS.get(methodName);
+        Integer expectedParamIndex = ROUTE_INERTIA_METHODS.get(functionName);
 
         if (expectedParamIndex == null) {
             return false;

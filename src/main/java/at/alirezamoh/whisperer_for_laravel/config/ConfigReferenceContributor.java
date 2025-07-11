@@ -10,9 +10,9 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.*;
 import com.intellij.util.ProcessingContext;
-import com.jetbrains.php.lang.psi.elements.FunctionReference;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
+import com.jetbrains.php.lang.psi.elements.impl.FunctionReferenceImpl;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -89,7 +89,7 @@ public class ConfigReferenceContributor extends PsiReferenceContributor {
      */
     private boolean isInsideConfigHelperMethod(@NotNull PsiElement psiElement) {
         MethodReference method = MethodUtils.resolveMethodReference(psiElement, 10);
-        FunctionReference function = MethodUtils.resolveFunctionReference(psiElement, 10);
+        FunctionReferenceImpl function = MethodUtils.resolveFunctionReference(psiElement, 5);
         Project project = psiElement.getProject();
 
         return (
@@ -113,7 +113,7 @@ public class ConfigReferenceContributor extends PsiReferenceContributor {
     private boolean isConfigParam(PsiElement reference, PsiElement position) {
         String referenceName = (reference instanceof MethodReference)
                 ? ((MethodReference) reference).getName()
-                : ((FunctionReference) reference).getName();
+                : ((FunctionReferenceImpl) reference).getName();
 
         if (referenceName == null) {
             return false;

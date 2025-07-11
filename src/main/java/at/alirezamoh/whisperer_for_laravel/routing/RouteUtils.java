@@ -8,18 +8,18 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.intellij.util.indexing.IdFilter;
-import com.jetbrains.php.lang.psi.elements.FunctionReference;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.impl.ClassReferenceImpl;
+import com.jetbrains.php.lang.psi.elements.impl.FunctionReferenceImpl;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
 public class RouteUtils {
     /**
-     * The names of the route helper functions
+     * The names of the route methods that are used to define routes in Laravel
      */
-    public static final Map<String, Integer> ROUTE_METHODS = new HashMap<>() {{
+    public static final Map<String, Integer> ROUTE_METHODS_FOR_DEFINING_ROUTES = new HashMap<>() {{
         put("get", 1);
         put("post", 1);
         put("put", 1);
@@ -32,30 +32,33 @@ public class RouteUtils {
     }};
 
     /**
-     * The namespaces of the `Route` facade and class
+     * The classes that are used to define routes in Laravel
      */
-    public static final List<String> ROUTE_NAMESPACES = new ArrayList<>() {{
+    public static final List<String> ROUTE_CLASSES_FOR_DEFINING_ROUTES = new ArrayList<>() {{
         add("\\Illuminate\\Routing\\Route");
         add("\\Illuminate\\Support\\Facades\\Route");
         add("\\Route");
     }};
 
     /**
-     * The names of the route helper functions
+     * The names of the route methods that are used to redirect to routes
      */
-    private final static Map<String, Integer> ROUTE_NAME_METHODS = new HashMap<>() {{
+    private final static Map<String, Integer> ROUTE_NAME_METHODS_FOR_REDIRECTING = new HashMap<>() {{
         put("route", 0);
         put("to_route", 0);
         put("signedRoute", 0);
     }};
 
     /**
-     * Classes to provide route names autocompletion
+     * The classes that are used to redirect to routes in Laravel and generate URLs
      */
-    private final static String[] ROUTE_CLASSES = {"\\Illuminate\\Support\\Facades\\Redirect", "\\Illuminate\\Support\\Facades\\URL"};
+    private final static String[] ROUTE_CLASSES_FOR_REDIRECTING = {
+        "\\Illuminate\\Support\\Facades\\Redirect",
+        "\\Illuminate\\Support\\Facades\\URL"
+    };
 
     /**
-     * Redirect and URL class methods
+     * Methods that are used to redirect to routes or generate URLs from routes
      */
     private final static Map<String, Integer> REDIRECT_AND_URL_METHODS = new HashMap<>() {{
         put("route", 0);
@@ -72,21 +75,21 @@ public class RouteUtils {
         ClassReferenceImpl routeClassReference = PhpClassUtils.getClassReferenceImplFromMethodRef(methodReference);
 
         return routeClassReference != null
-            && ROUTE_METHODS.containsKey(methodReference.getName())
+            && ROUTE_METHODS_FOR_DEFINING_ROUTES.containsKey(methodReference.getName())
             && routeClassReference.getFQN() != null
-            && ROUTE_NAMESPACES.contains(routeClassReference.getFQN());
+            && ROUTE_CLASSES_FOR_DEFINING_ROUTES.contains(routeClassReference.getFQN());
     }
 
     public static String[] getRouteNamespacesAsArray(String ...additionalNamespaces) {
         if (additionalNamespaces != null) {
             for (String namespace : additionalNamespaces) {
-                if (!ROUTE_NAMESPACES.contains(namespace)) {
-                    ROUTE_NAMESPACES.add(namespace);
+                if (!ROUTE_CLASSES_FOR_DEFINING_ROUTES.contains(namespace)) {
+                    ROUTE_CLASSES_FOR_DEFINING_ROUTES.add(namespace);
                 }
             }
         }
 
-        return ROUTE_NAMESPACES.toArray(new String[0]);
+        return ROUTE_CLASSES_FOR_DEFINING_ROUTES.toArray(new String[0]);
     }
 
     /**
@@ -95,15 +98,15 @@ public class RouteUtils {
      * @return           True or false
      */
     public static boolean isInsideCorrectRouteNameMethod(@NotNull PsiElement psiElement) {
-        MethodReference method = MethodUtils.resolveMethodReference(psiElement, 10);
-        FunctionReference function = MethodUtils.resolveFunctionReference(psiElement, 10);
+        MethodReference method = MethodUtils.resolveMethodReference(psiElement, 3);
+        FunctionReferenceImpl function = MethodUtils.resolveFunctionReference(psiElement, 3);
         Project project = psiElement.getProject();
 
         return (
             method != null
                 && isRouteParam(method, psiElement)
-                && PhpClassUtils.isCorrectRelatedClass(method, project, ROUTE_CLASSES)
-        )
+                && PhpClassUtils.isCorrectRelatedClass(method, project, ROUTE_CLASSES_FOR_REDIRECTING)
+            )
             || (function != null && isRouteParam(function, psiElement));
     }
 
@@ -145,7 +148,7 @@ public class RouteUtils {
     private static boolean isRouteParam(PsiElement reference, PsiElement position) {
         String referenceName = (reference instanceof MethodReference)
             ? ((MethodReference) reference).getName()
-            : ((FunctionReference) reference).getName();
+            : ((FunctionReferenceImpl) reference).getName();
 
         if (referenceName == null) {
             return false;
@@ -153,7 +156,7 @@ public class RouteUtils {
 
         Integer expectedParamIndex = REDIRECT_AND_URL_METHODS.get(referenceName);
         if (expectedParamIndex == null) {
-            expectedParamIndex = ROUTE_NAME_METHODS.get(referenceName);
+            expectedParamIndex = ROUTE_NAME_METHODS_FOR_REDIRECTING.get(referenceName);
         }
 
         if (expectedParamIndex == null) {
