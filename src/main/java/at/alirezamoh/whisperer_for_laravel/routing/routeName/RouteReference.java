@@ -1,6 +1,7 @@
 package at.alirezamoh.whisperer_for_laravel.routing.routeName;
 
 import at.alirezamoh.whisperer_for_laravel.indexes.RouteIndex;
+import at.alirezamoh.whisperer_for_laravel.routing.RouteUtils;
 import at.alirezamoh.whisperer_for_laravel.support.WhispererForLaravelIcon;
 import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
@@ -84,18 +85,7 @@ public class RouteReference extends PsiReferenceBase<PsiElement> implements PsiP
         List<ResolveResult> results = new ArrayList<>();
         FileBasedIndex fileBasedIndex = FileBasedIndex.getInstance();
 
-        Set<String> matchingKeys = new HashSet<>();
-        fileBasedIndex.processAllKeys(RouteIndex.INDEX_ID, key -> {
-            String[] split = key.split(" \\| ");
-            if (split.length >= 3 && split[1].equals(routeName)) {
-                matchingKeys.add(key);
-            }
-            return true;
-        },
-            GlobalSearchScope.projectScope(project),
-            IdFilter.getProjectIdFilter(project, false)
-        );
-
+        Set<String> matchingKeys = RouteUtils.getMatchingRouteNames(routeName, project);
         for (String key : matchingKeys) {
             String[] split = key.split(" \\| ");
 

@@ -1,10 +1,9 @@
 package at.alirezamoh.whisperer_for_laravel.packages.livewire.property.utils;
 
+import at.alirezamoh.whisperer_for_laravel.support.utils.PhpClassUtils;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiRecursiveElementVisitor;
-import com.intellij.psi.PsiReference;
 import com.jetbrains.php.lang.psi.elements.*;
-import com.jetbrains.php.lang.psi.elements.impl.MethodImpl;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -51,19 +50,7 @@ public class LivewirePhpComponentVisitor extends PsiRecursiveElementVisitor {
      * @return true or false
      */
     private boolean isCorrectWithMethod(MethodReference methodReference) {
-        PsiReference reference = methodReference.getReference();
-
-        if (reference == null) {
-            return false;
-        }
-
-        PsiElement psiElement = reference.resolve();
-
-        if (!(psiElement instanceof MethodImpl method)) {
-            return false;
-        }
-
-        PhpClass viewClass = method.getContainingClass();
+        PhpClass viewClass = PhpClassUtils.getCachedContainingPhpClassFromMethodRef(methodReference);
 
         return viewClass != null && Objects.equals(viewClass.getFQN(), VIEW_CLASS_NAME);
     }

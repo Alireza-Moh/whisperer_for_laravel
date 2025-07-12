@@ -19,7 +19,7 @@ public class StartPluginAction extends DefaultActionGroup {
 
         boolean isVisible =
             project != null
-            && !PluginUtils.isDumbMode(project)
+            && PluginUtils.isNotInDumbMode(project)
             && PluginUtils.isLaravelProject(project);
 
         e.getPresentation().setEnabledAndVisible(isVisible);

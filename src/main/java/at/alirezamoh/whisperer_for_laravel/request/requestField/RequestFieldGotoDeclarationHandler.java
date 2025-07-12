@@ -3,6 +3,7 @@ package at.alirezamoh.whisperer_for_laravel.request.requestField;
 import at.alirezamoh.whisperer_for_laravel.request.requestField.util.RequestFieldUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.MethodUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
 import com.intellij.codeInsight.navigation.actions.GotoDeclarationHandler;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
@@ -49,7 +50,7 @@ public class RequestFieldGotoDeclarationHandler implements GotoDeclarationHandle
     }
 
     private PsiElement resolveParentElement(PsiElement sourceElement) {
-        PsiElement greatGrandParent = getNthParent(sourceElement, 3);
+        PsiElement greatGrandParent = PsiElementUtils.getNthParent(sourceElement, 3);
         if (greatGrandParent == null) {
             return null;
         }
@@ -90,16 +91,5 @@ public class RequestFieldGotoDeclarationHandler implements GotoDeclarationHandle
                 .filter(rule -> RequestFieldUtils.isMatchingRule(contextElement, rule))
                 .map(ArrayHashElement::getKey)
                 .toArray(PsiElement[]::new);
-    }
-
-    private PsiElement getNthParent(PsiElement element, int n) {
-        PsiElement current = element;
-        for (int i = 0; i < n; i++) {
-            if (current == null) {
-                return null;
-            }
-            current = current.getParent();
-        }
-        return current;
     }
 }

@@ -11,6 +11,8 @@ public class EloquentModel extends BaseModel {
 
     private String tableName;
 
+    private DbFactoryModel dbFactoryModel;
+
     /**
      * @param name                      The name of the eloquent model
      * @param unformattedModuleFullPath The unformatted full path to the module
@@ -56,5 +58,13 @@ public class EloquentModel extends BaseModel {
     @Override
     public void setWithoutModuleSrc() {
         this.withoutModuleSrcPath = false;
+    }
+
+    public void setDbFactoryModel(DbFactoryModel dbFactoryModel) {
+        this.dbFactoryModel = dbFactoryModel;
+    }
+
+    public DbFactoryModel getDbFactoryModel() {
+        return dbFactoryModel;
     }
 }

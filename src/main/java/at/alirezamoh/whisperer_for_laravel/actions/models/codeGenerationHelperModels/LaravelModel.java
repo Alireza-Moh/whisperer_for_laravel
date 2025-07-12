@@ -2,6 +2,7 @@ package at.alirezamoh.whisperer_for_laravel.actions.models.codeGenerationHelperM
 
 import at.alirezamoh.whisperer_for_laravel.actions.models.dataTables.Field;
 import at.alirezamoh.whisperer_for_laravel.actions.models.dataTables.Method;
+import at.alirezamoh.whisperer_for_laravel.actions.models.dataTables.ReadProperty;
 import at.alirezamoh.whisperer_for_laravel.actions.models.dataTables.Relation;
 
 import java.util.ArrayList;
@@ -11,6 +12,8 @@ public class LaravelModel {
     private String namespaceName;
 
     private List<Field> fields;
+
+    private List<ReadProperty> readProperties;
 
     private List<Method> methods;
 
@@ -24,6 +27,7 @@ public class LaravelModel {
         this.fields = new ArrayList<>();
         this.methods = new ArrayList<>();
         this.relations = new ArrayList<>();
+        this.readProperties = new ArrayList<>();
     }
 
     public List<Field> getFields() {
@@ -32,6 +36,14 @@ public class LaravelModel {
 
     public void setFields(List<Field> fields) {
         this.fields = fields;
+    }
+
+    public List<ReadProperty> getReadProperties() {
+        return readProperties;
+    }
+
+    public void setReadProperties(List<ReadProperty> readProperties) {
+        this.readProperties = readProperties;
     }
 
     public List<Method> getMethods() {
@@ -84,5 +96,13 @@ public class LaravelModel {
 
     public void addField(Field field) {
         this.fields.add(field);
+    }
+
+    public void addFields(List<Field> fields) {
+        this.fields.addAll(fields);
+    }
+
+    public void addReadProperty(ReadProperty readProperty) {
+        this.readProperties.add(readProperty);
     }
 }

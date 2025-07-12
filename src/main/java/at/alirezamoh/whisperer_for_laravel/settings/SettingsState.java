@@ -51,6 +51,11 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
      */
     private boolean suppressRealTimeFacadeWarnings;
 
+    /**
+     * Whether to inspect for route names: 'Route name not found'
+     */
+    private boolean routeNotFoundAnnotatorWarning;
+
     public static SettingsState getInstance(@NotNull Project foundedProject) {
         project = foundedProject;
         return foundedProject.getService(SettingsState.class);
@@ -121,6 +126,14 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
 
     public void setSuppressRealTimeFacadeWarnings(boolean suppressRealTimeFacadeWarnings) {
         this.suppressRealTimeFacadeWarnings = suppressRealTimeFacadeWarnings;
+    }
+
+    public boolean isRouteNotFoundAnnotatorWarning() {
+        return routeNotFoundAnnotatorWarning;
+    }
+
+    public void setRouteNotFoundAnnotatorWarning(boolean routeNotFoundAnnotatorWarning) {
+        this.routeNotFoundAnnotatorWarning = routeNotFoundAnnotatorWarning;
     }
 
     public boolean isModuleApplication() {

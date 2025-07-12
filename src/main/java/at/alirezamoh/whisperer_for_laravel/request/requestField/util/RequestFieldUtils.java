@@ -10,6 +10,9 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.searches.ReferencesSearch;
+import com.intellij.psi.util.CachedValueProvider;
+import com.intellij.psi.util.CachedValuesManager;
+import com.intellij.psi.util.PsiModificationTracker;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.Query;
 import com.jetbrains.php.lang.psi.elements.*;
@@ -59,20 +62,17 @@ final public class RequestFieldUtils {
      * @param project the current project
      * @return the resolved PhpClassImpl instance or null if not found
      */
-    public static PhpClassImpl resolveRequestClass(Variable variable, Project project) {
-        PhpClassImpl phpClass = PhpClassUtils.getClassFromTypedElement(variable, project);
-
-        if (phpClass == null) {
-            PsiReference reference = variable.getReference();
-            if (reference != null) {
-                PsiElement resolved = reference.resolve();
-                if (resolved instanceof PhpClass requestClass) {
-                    phpClass = (PhpClassImpl) requestClass;
-                }
-            }
+    public static @Nullable PhpClassImpl resolveCachedRequestClass(Variable variable, Project project) {
+        if (variable == null) {
+            return null;
         }
 
-        return phpClass;
+        return CachedValuesManager.getCachedValue(variable, () ->
+            CachedValueProvider.Result.create(
+                doResolveRequestClass(variable, project),
+                PsiModificationTracker.MODIFICATION_COUNT
+            )
+        );
     }
 
     /**
@@ -134,7 +134,7 @@ final public class RequestFieldUtils {
                     return false;
                 }
 
-                PhpClassImpl phpClass = resolveRequestClass(variable, variable.getProject());
+                PhpClassImpl phpClass = resolveCachedRequestClass(variable, variable.getProject());
                 return phpClass != null && phpClass.getFQN().equals(REQUEST);
             })
             .flatMap(methodReference -> {
@@ -230,22 +230,26 @@ final public class RequestFieldUtils {
      */
     public static @Nullable PhpClassImpl resolvePhpClass(PsiElement element, Project project) {
         if (element instanceof VariableImpl variable) {
-            PhpClassImpl phpClass = resolveRequestClass(variable, project);
+            PhpClassImpl phpClass = resolveCachedRequestClass(variable, project);
 
-            if (phpClass == null) {
-                Query<PsiReference> references = ReferencesSearch.search(variable.getOriginalElement(), GlobalSearchScope.projectScope(project), false);
+            if (phpClass == null && variable.isValid()) {
+                try {
+                    Query<PsiReference> references = ReferencesSearch.search(variable.getOriginalElement(), GlobalSearchScope.projectScope(project), false);
 
-                for (PsiReference reference : references) {
-                    PsiElement parent = reference.getElement().getParent();
-                    if (parent instanceof AssignmentExpression assignmentExpression) {
-                        PsiElement expression = assignmentExpression.getValue();
+                    for (PsiReference reference : references) {
+                        PsiElement parent = reference.getElement().getParent();
+                        if (parent instanceof AssignmentExpression assignmentExpression) {
+                            PsiElement expression = assignmentExpression.getValue();
 
-                        if (expression instanceof NewExpression newExpression) {
-                            return PhpClassUtils.getClassFromTypedElement(newExpression.getClassReference(), project);
-                        } else if (expression instanceof MethodReference methodReference) {
-                            return PhpClassUtils.getClassFromTypedElement(methodReference.getClassReference(), project);
+                            if (expression instanceof NewExpression newExpression) {
+                                return PhpClassUtils.getClassFromTypedElement(newExpression.getClassReference(), project);
+                            } else if (expression instanceof MethodReference methodReference) {
+                                return PhpClassUtils.getClassFromTypedElement(methodReference.getClassReference(), project);
+                            }
                         }
                     }
+                } catch (AssertionError ignored) {
+                    return null;
                 }
             }
 
@@ -292,5 +296,28 @@ final public class RequestFieldUtils {
         }
 
         return MethodUtils.findParamIndex(position, false) == paramPositions;
+    }
+
+    /**
+     * Resolves the request class from a variable $this
+     *
+     * @param variable the variable to resolve
+     * @param project the current project
+     * @return the resolved PhpClassImpl instance or null if not found
+     */
+    private static @Nullable PhpClassImpl doResolveRequestClass(Variable variable, Project project) {
+        PhpClassImpl phpClass = PhpClassUtils.getClassFromTypedElement(variable, project);
+
+        if (phpClass == null) {
+            PsiReference reference = variable.getReference();
+            if (reference != null) {
+                PsiElement resolved = reference.resolve();
+                if (resolved instanceof PhpClass requestClass && requestClass instanceof PhpClassImpl phpClassImpl) {
+                    phpClass = phpClassImpl;
+                }
+            }
+        }
+
+        return phpClass;
     }
 }

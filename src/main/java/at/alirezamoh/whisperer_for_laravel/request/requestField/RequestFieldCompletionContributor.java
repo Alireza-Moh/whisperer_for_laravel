@@ -3,6 +3,7 @@ package at.alirezamoh.whisperer_for_laravel.request.requestField;
 import at.alirezamoh.whisperer_for_laravel.request.requestField.util.RequestFieldUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.MethodUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
 import com.intellij.codeInsight.completion.*;
 import com.intellij.openapi.project.Project;
 import com.intellij.patterns.PlatformPatterns;
@@ -14,6 +15,7 @@ import com.jetbrains.php.lang.psi.elements.impl.ArrayIndexImpl;
 import com.jetbrains.php.lang.psi.elements.impl.PhpClassImpl;
 import com.jetbrains.php.lang.psi.elements.impl.VariableImpl;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 
@@ -83,9 +85,12 @@ public class RequestFieldCompletionContributor extends CompletionContributor {
         );
     }
 
-    private PsiElement getTargetElement(PsiElement position) {
-        PsiElement parent = position.getParent().getParent().getParent();
-        if (parent instanceof ArrayAccessExpression arrayAccess) {
+    private @Nullable PsiElement getTargetElement(@Nullable PsiElement position) {
+        if (position == null) {
+            return null;
+        }
+
+        if (PsiElementUtils.getNthParent(position, 3) instanceof ArrayAccessExpression arrayAccess) {
             return arrayAccess.getValue();
         }
 

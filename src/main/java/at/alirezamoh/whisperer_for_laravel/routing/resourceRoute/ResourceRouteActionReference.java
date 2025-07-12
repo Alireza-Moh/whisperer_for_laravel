@@ -7,10 +7,8 @@ import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiReferenceBase;
 import com.jetbrains.php.lang.psi.elements.*;
-import com.jetbrains.php.lang.psi.elements.impl.ClassReferenceImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -91,26 +89,6 @@ public class ResourceRouteActionReference extends PsiReferenceBase<PsiElement> {
             return null;
         }
 
-        PsiElement parameter = resourceMethod.getParameter(1);
-        if (!(parameter instanceof ClassConstantReference classConstantReference)) {
-            return null;
-        }
-
-        PhpExpression classReference = classConstantReference.getClassReference();
-        if (!(classReference instanceof ClassReferenceImpl)) {
-            return null;
-        }
-
-        PsiReference reference = classReference.getReference();
-        if (reference == null) {
-            return null;
-        }
-
-        PsiElement resolved = reference.resolve();
-        if (resolved instanceof PhpClass controllerClass) {
-            return controllerClass;
-        }
-
-        return null;
+        return PhpClassUtils.getCachedPhpClassFromClassConstant(resourceMethod.getParameter(1));
     }
 }

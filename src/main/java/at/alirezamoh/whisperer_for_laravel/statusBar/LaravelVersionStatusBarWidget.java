@@ -1,6 +1,6 @@
 package at.alirezamoh.whisperer_for_laravel.statusBar;
 
-import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
+import at.alirezamoh.whisperer_for_laravel.statusBar.util.StatusBarUtil;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.project.Project;
@@ -13,7 +13,7 @@ public class LaravelVersionStatusBarWidget implements StatusBarWidget  {
     private String versionText = "";
 
     public LaravelVersionStatusBarWidget(Project project) {
-        ReadAction.nonBlocking(() -> PluginUtils.laravelVersion(project)).finishOnUiThread(ModalityState.nonModal(), version -> {
+        ReadAction.nonBlocking(() -> StatusBarUtil.laravelVersion(project)).finishOnUiThread(ModalityState.nonModal(), version -> {
             if (version != null) {
                 versionText = "Laravel: " + version;
             }

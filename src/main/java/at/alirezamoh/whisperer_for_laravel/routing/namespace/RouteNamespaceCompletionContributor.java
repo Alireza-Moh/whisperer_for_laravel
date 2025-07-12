@@ -1,5 +1,6 @@
 package at.alirezamoh.whisperer_for_laravel.routing.namespace;
 
+import at.alirezamoh.whisperer_for_laravel.routing.RouteUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.MethodUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PhpClassUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
@@ -19,11 +20,6 @@ import java.util.Map;
 import java.util.Set;
 
 public class RouteNamespaceCompletionContributor extends CompletionContributor {
-    /**
-     * The namespaces of the `Route` facade and class
-     */
-    private final String[] ROUTE_NAMESPACES = {"\\Illuminate\\Routing\\Route", "\\Illuminate\\Support\\Facades\\Route", "\\Route", "\\Illuminate\\Routing\\RouteRegistrar"};
-
     /**
      * The names of the methods for autocompletion
      */
@@ -49,7 +45,7 @@ public class RouteNamespaceCompletionContributor extends CompletionContributor {
                     if (
                         method != null
                         && isNamespaceParam(method, element)
-                        && PhpClassUtils.isCorrectRelatedClass(method, element.getProject(), ROUTE_NAMESPACES)
+                        && PhpClassUtils.isCorrectRelatedClass(method, element.getProject(), RouteUtils.getRouteNamespacesAsArray("\\Illuminate\\Routing\\RouteRegistrar"))
                     )
                     {
                         for (String namespace : getAllNamespaces(completionResultSet, element)) {

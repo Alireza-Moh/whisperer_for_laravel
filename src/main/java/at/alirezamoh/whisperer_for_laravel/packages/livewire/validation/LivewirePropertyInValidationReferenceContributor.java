@@ -14,7 +14,6 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
-import com.jetbrains.php.lang.psi.elements.impl.ArrayHashElementImpl;
 import com.jetbrains.php.lang.psi.elements.impl.MethodImpl;
 import org.jetbrains.annotations.NotNull;
 
@@ -68,36 +67,7 @@ public class LivewirePropertyInValidationReferenceContributor extends PsiReferen
             && PhpClassUtils.isCorrectRelatedClass(methodReference, project, "\\Livewire\\Component")
             && RequestFieldUtils.VALIDATION_METHODS.contains(methodReference.getName())
             && RuleValidationUtil.isRuleParam(methodReference, psiElement)
-            && isInsideArrayKey(psiElement);
-    }
-
-    private boolean isInsideArrayKey(PsiElement psiElement) {
-        return PsiElementUtils.isAssocArray(psiElement, 10) && isInArrayKey(psiElement, 10);
-    }
-
-    /**
-     * Checks if the given PSI element is a key in an array [key => value]
-     *
-     * @param element  The PSI element to check
-     * @param maxDepth Maximum number of parents to traverse up the PSI tree
-     * @return true or false
-     */
-    private boolean isInArrayKey(PsiElement element, int maxDepth) {
-        PsiElement currentElement = element;
-        int currentDepth = 0;
-
-        while (currentElement != null && currentDepth < maxDepth) {
-            if (currentElement instanceof ArrayHashElementImpl arrayHashElement) {
-                if (arrayHashElement.getKey() == element) {
-                    return true;
-                }
-            }
-
-            currentElement = currentElement.getParent();
-            currentDepth++;
-        }
-
-        return false;
+            && PsiElementUtils.isInsideArrayKey(psiElement);
     }
 
     /**
@@ -108,6 +78,6 @@ public class LivewirePropertyInValidationReferenceContributor extends PsiReferen
 
         return methodCall != null
             && methodCall.getName().equals("rules")
-            && isInsideArrayKey(psiElement);
+            && PsiElementUtils.isInsideArrayKey(psiElement);
     }
 }

@@ -1,6 +1,6 @@
 package at.alirezamoh.whisperer_for_laravel.indexes;
 
-import at.alirezamoh.whisperer_for_laravel.support.utils.PhpClassUtils;
+import at.alirezamoh.whisperer_for_laravel.routing.RouteUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.openapi.project.Project;
@@ -15,7 +15,6 @@ import com.intellij.util.io.VoidDataExternalizer;
 import com.jetbrains.php.lang.PhpFileType;
 import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.*;
-import com.jetbrains.php.lang.psi.elements.impl.ClassReferenceImpl;
 import com.jetbrains.php.lang.psi.elements.impl.MethodReferenceImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -29,30 +28,6 @@ public class RouteIndex extends FileBasedIndexExtension<String, Void> {
      * The name of the method used to define route names
      */
     private final String ROUTE_METHOD_NAME = "name";
-
-    /**
-     * The names of the route helper functions
-     */
-    public static Map<String, Integer> ROUTE_METHODS = new HashMap<>() {{
-        put("get", 1);
-        put("post", 1);
-        put("put", 1);
-        put("delete", 1);
-        put("patch", 1);
-        put("options", 1);
-        put("any", 1);
-        put("fallback", 0);
-        put("match", 0);
-    }};
-
-    /**
-     * The namespaces of the `Route` facade and class
-     */
-    private final List<String> ROUTE_NAMESPACES = new ArrayList<>() {{
-        add("\\Illuminate\\Routing\\Route");
-        add("\\Illuminate\\Support\\Facades\\Route");
-        add("\\Route");
-    }};
 
     @Override
     public @NotNull ID<String, Void> getName() {
@@ -77,7 +52,7 @@ public class RouteIndex extends FileBasedIndexExtension<String, Void> {
             Map<String, Void> routes = new HashMap<>();
 
             for (MethodReference methodReference : PsiTreeUtil.findChildrenOfType(file, MethodReference.class)) {
-                if (isLaravelRouteMethod(methodReference)) {
+                if (RouteUtils.isLaravelRouteMethod(methodReference)) {
                     String routeData = extractRouteData(methodReference);
                     if (routeData != null) {
                         routes.put(routeData, null);
@@ -101,7 +76,7 @@ public class RouteIndex extends FileBasedIndexExtension<String, Void> {
 
     @Override
     public int getVersion() {
-        return 2;
+        return 3;
     }
 
     @Override
@@ -117,15 +92,6 @@ public class RouteIndex extends FileBasedIndexExtension<String, Void> {
     @Override
     public boolean traceKeyHashToVirtualFileMapping() {
         return true;
-    }
-
-    private boolean isLaravelRouteMethod(MethodReference methodReference) {
-        ClassReferenceImpl routeClassReference = PhpClassUtils.getClassReferenceImplFromMethodRef(methodReference);
-
-        return routeClassReference != null
-            && ROUTE_METHODS.containsKey(methodReference.getName())
-            && routeClassReference.getFQN() != null
-            && ROUTE_NAMESPACES.contains(routeClassReference.getFQN());
     }
 
     private @Nullable String extractRouteData(MethodReference methodReference) {

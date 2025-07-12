@@ -50,19 +50,38 @@ public class MethodUtils extends PhpElementVisitor {
     }
 
     /**
-     * Recursively searches up the PSI tree to find the nearest {@link FunctionReference}.
+     * Recursively searches up the PSI tree to find the nearest {@link MethodImpl}
      *
      * @param element    The starting PSI element
      * @param depthLimit Stop searching after a certain depth
-     * @return The found {@link FunctionReference}, or {@code null} if not found
+     * @return The found {@link MethodImpl}, or {@code null} if not found
      */
-    public static @Nullable FunctionReference resolveFunctionReference(PsiElement element, int depthLimit) {
+    public static @Nullable MethodImpl resolveMethodImpl(PsiElement element, int depthLimit) {
         if (element == null || depthLimit <= 0) {
             return null;
         }
 
-        if (element.getParent() instanceof FunctionReference) {
-            return (FunctionReference) element.getParent();
+        if (element.getParent() instanceof MethodImpl) {
+            return (MethodImpl) element.getParent();
+        }
+
+        return resolveMethodImpl(element.getParent(), depthLimit - 1);
+    }
+
+    /**
+     * Recursively searches up the PSI tree to find the nearest {@link FunctionReferenceImpl}.
+     *
+     * @param element    The starting PSI element
+     * @param depthLimit Stop searching after a certain depth
+     * @return The found {@link FunctionReferenceImpl}, or {@code null} if not found
+     */
+    public static @Nullable FunctionReferenceImpl resolveFunctionReference(PsiElement element, int depthLimit) {
+        if (element == null || depthLimit <= 0) {
+            return null;
+        }
+
+        if (element instanceof FunctionReferenceImpl function) {
+            return function;
         }
 
         return resolveFunctionReference(element.getParent(), depthLimit - 1);

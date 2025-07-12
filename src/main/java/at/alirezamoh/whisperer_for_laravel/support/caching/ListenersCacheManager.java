@@ -1,6 +1,5 @@
 package at.alirezamoh.whisperer_for_laravel.support.caching;
 
-import at.alirezamoh.whisperer_for_laravel.eloquent.ModelRelatedFilesCollector;
 import at.alirezamoh.whisperer_for_laravel.support.utils.EloquentUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.MethodUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PhpClassUtils;
@@ -96,7 +95,7 @@ public final class ListenersCacheManager {
                         for (PhpClassImpl clazz : resolvedClasses) {
                             if (PhpClassUtils.isChildOf(clazz, baseEloquentModel)) {
                                 PsiElement parameter = methodReference.getParameter(0);
-                                PsiFile containingFile = ModelRelatedFilesCollector.getContainingFileFromClassConstant(parameter);
+                                PsiFile containingFile = PhpClassUtils.getContainingFileFromClassConstant(parameter);
 
                                 if (containingFile != null) {
                                     mapping.computeIfAbsent(clazz.getName(), k -> new ArrayList<>()).add(containingFile);

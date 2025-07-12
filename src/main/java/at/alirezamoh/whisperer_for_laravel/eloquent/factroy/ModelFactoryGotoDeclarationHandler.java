@@ -1,4 +1,4 @@
-package at.alirezamoh.whisperer_for_laravel.eloquent;
+package at.alirezamoh.whisperer_for_laravel.eloquent.factroy;
 
 import at.alirezamoh.whisperer_for_laravel.support.utils.EloquentUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PhpClassUtils;
@@ -8,11 +8,8 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiReference;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
-import com.jetbrains.php.lang.psi.elements.PhpExpression;
-import com.jetbrains.php.lang.psi.elements.impl.ClassReferenceImpl;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -39,7 +36,7 @@ public class ModelFactoryGotoDeclarationHandler implements GotoDeclarationHandle
             return null;
         }
 
-        PhpClass model = PhpClassUtils.getPhpClassFromMethodRef(methodReference);
+        PhpClass model = PhpClassUtils.getCachedPhpClassFromMethodRef(methodReference);
         if (model == null) {
             return null;
         }

@@ -1,10 +1,9 @@
 package at.alirezamoh.whisperer_for_laravel.support.codeGeneration;
 
 import at.alirezamoh.whisperer_for_laravel.actions.models.codeGenerationHelperModels.LaravelModel;
+import at.alirezamoh.whisperer_for_laravel.actions.models.dataTables.*;
 import at.alirezamoh.whisperer_for_laravel.actions.models.dataTables.Field;
 import at.alirezamoh.whisperer_for_laravel.actions.models.dataTables.Method;
-import at.alirezamoh.whisperer_for_laravel.actions.models.dataTables.Relation;
-import at.alirezamoh.whisperer_for_laravel.actions.models.dataTables.Table;
 import at.alirezamoh.whisperer_for_laravel.indexes.TableIndex;
 import at.alirezamoh.whisperer_for_laravel.support.codeGeneration.vistors.MigrationVisitor;
 import at.alirezamoh.whisperer_for_laravel.support.utils.*;
@@ -14,9 +13,8 @@ import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.jetbrains.php.lang.psi.PhpFile;
+import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.elements.Parameter;
-import com.jetbrains.php.lang.psi.elements.PhpClass;
-import com.jetbrains.php.lang.psi.elements.impl.*;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -53,8 +51,11 @@ public class MigrationManager {
 
     private List<Table> tables = new ArrayList<>();
 
+    private final ModelMethodRelationGenerator modelMethodRelationGenerator;
+
     public MigrationManager(Project project) {
         this.project = project;
+        this.modelMethodRelationGenerator = new ModelMethodRelationGenerator(project);
 
         getAllModels(project);
     }
@@ -76,30 +77,17 @@ public class MigrationManager {
                 laravelModel.setNamespaceName(StrUtils.addBackSlashes(modelClass.getNamespaceName(), true, true));
                 laravelModel.setModelName(modelClass.getName());
                 laravelModel.setTableName(tableName);
-                laravelModel.setFields(table.fields());
 
-                List<Relation> relations = new ArrayList<>();
-                for (com.jetbrains.php.lang.psi.elements.Method method : collectModelRelations(modelClass, project)) {
-                    Map.Entry<String, PhpClass> methodNameAndRelatedModel = findRelationships(method);
-                    if (methodNameAndRelatedModel != null) {
-                        relations.add(
-                            new Relation(
-                                method.getName(),
-                                methodNameAndRelatedModel.getKey(),
-                                "\\Illuminate\\Database\\Eloquent\\Relations\\"
-                                    + StrUtils.ucFirst(methodNameAndRelatedModel.getKey())
-                                    + "|"
-                                    + methodNameAndRelatedModel.getValue().getName()
-                            )
-                        );
-                        laravelModel.addField(
-                            new Field(methodNameAndRelatedModel.getValue().getName(), method.getName(), false)
-                        );
-                    }
-                }
+                laravelModel.setFields(replaceFieldTypeByFromCasts(table, modelClass));
+                createModelMagicMethods(laravelModel);
+
+                modelMethodRelationGenerator.setEloquentModelAsPhpClass(modelClass);
+                List<Relation> relations = modelMethodRelationGenerator.createMethodsFromModelRelations();
+
                 laravelModel.setRelations(relations);
-                createLaravelModelHelperMethods(laravelModel);
+                laravelModel.addFields(modelMethodRelationGenerator.getRelationsAsFields());
                 addLocalScopeMethods(modelClass, laravelModel);
+                addAggregateFields(relations, laravelModel);
 
                 models.add(laravelModel);
             }
@@ -253,7 +241,7 @@ public class MigrationManager {
      *
      * @param laravelModel the model
      */
-    private void createLaravelModelHelperMethods(LaravelModel laravelModel) {
+    private void createModelMagicMethods(LaravelModel laravelModel) {
         for (Field field : laravelModel.getFields()) {
             if (!field.getName().isEmpty()) {
                 Method method = new Method(
@@ -290,103 +278,6 @@ public class MigrationManager {
         return null;
     }
 
-    /**
-     * Finds the related model relationships.
-     *
-     * @param foundedMethod the relationship method defined in the eloquent model
-     * @return an entry containing the method name and related PhpClass, or null if no relationship is found
-     */
-    private @Nullable Map.Entry<String, PhpClass> findRelationships(com.jetbrains.php.lang.psi.elements.Method foundedMethod) {
-        return Arrays.stream(foundedMethod.getChildren())
-            .filter(element -> element instanceof GroupStatementImpl)
-            .flatMap(groupStatement -> Arrays.stream(groupStatement.getChildren()))
-            .filter(child -> child instanceof PhpReturnImpl)
-            .flatMap(phpReturn -> Arrays.stream(phpReturn.getChildren()))
-            .filter(child2 -> child2 instanceof MethodReferenceImpl)
-            .map(child2 -> (MethodReferenceImpl) child2)
-            .map(methodReference -> {
-                PhpClass relatedModel = findRelatedModelFromMethod(foundedMethod);
-                if (relatedModel != null) {
-                    return new AbstractMap.SimpleEntry<>(methodReference.getName(), relatedModel);
-                }
-                return null;
-            })
-            .filter(Objects::nonNull)
-            .findFirst()
-            .orElse(null);
-    }
-
-    /**
-     * Resolves all relationships defined in the given model class
-     *
-     * @param model   the model to analyze for relationships
-     * @param project the project
-     * @return a list of relationships in the given model class
-     */
-    private List<com.jetbrains.php.lang.psi.elements.Method> collectModelRelations(PhpClass model, Project project) {
-        List<com.jetbrains.php.lang.psi.elements.Method> relations = new ArrayList<>();
-
-        for (com.jetbrains.php.lang.psi.elements.Method method : model.getOwnMethods()) {
-            if (isRelationshipMethod(method, project)) {
-                relations.add(method);
-            }
-        }
-
-        return relations;
-    }
-
-    /**
-     * Determines whether the given method is a Laravel relationship method
-     *
-     * @param method  the method to check
-     * @param project the project
-     * @return true or false
-     */
-    private boolean isRelationshipMethod(com.jetbrains.php.lang.psi.elements.Method method, Project project) {
-        return Arrays.stream(method.getChildren())
-            .filter(element -> element instanceof GroupStatementImpl)
-            .flatMap(element -> Arrays.stream(element.getChildren()))
-            .filter(child -> child instanceof PhpReturnImpl)
-            .flatMap(child -> Arrays.stream(child.getChildren()))
-            .filter(child2 -> child2 instanceof MethodReferenceImpl)
-            .map(child2 -> (MethodReferenceImpl) child2)
-            .anyMatch(methodReference -> {
-                List<PhpClassImpl> classes = MethodUtils.resolveMethodClasses(methodReference, project);
-                PhpClass relationClass = PhpClassUtils.getClassByFQN(project, LaravelPaths.LaravelClasses.Model);
-                String methodName = methodReference.getName();
-
-                return methodName != null
-                    && RELATION_METHODS.containsKey(methodName)
-                    && relationClass != null
-                    && classes.stream().anyMatch(clazz -> PhpClassUtils.isChildOf(clazz, relationClass));
-            });
-    }
-
-    /**
-     * Resolves the related model referenced in a relationship method
-     *
-     * @param foundedMethod the relationship method to analyze
-     * @return the PhpClass of the related model, or null if no related model is found
-     */
-    private @Nullable PhpClass findRelatedModelFromMethod(com.jetbrains.php.lang.psi.elements.Method foundedMethod) {
-        return Arrays.stream(foundedMethod.getChildren())
-            .filter(element -> element instanceof GroupStatementImpl)
-            .flatMap(groupStatement -> Arrays.stream(groupStatement.getChildren()))
-            .filter(child -> child instanceof PhpReturnImpl)
-            .flatMap(phpReturn -> Arrays.stream(phpReturn.getChildren()))
-            .filter(child2 -> child2 instanceof MethodReferenceImpl)
-            .map(child2 -> (MethodReferenceImpl) child2)
-            .map(methodReference -> methodReference.getParameter(0))
-            .filter(parameter -> parameter instanceof ClassConstantReferenceImpl)
-            .map(parameter -> ((ClassConstantReferenceImpl) parameter).getClassReference())
-            .filter(phpExpression -> phpExpression instanceof ClassReferenceImpl)
-            .map(phpExpression -> ((ClassReferenceImpl) phpExpression).resolve())
-            .filter(resolvedClass -> resolvedClass instanceof PhpClass)
-            .map(resolvedClass -> (PhpClass) resolvedClass)
-            .findFirst()
-            .orElse(null);
-    }
-
     private void addLocalScopeMethods(PhpClass model, LaravelModel laravelModel) {
         for (com.jetbrains.php.lang.psi.elements.Method method : model.getOwnMethods()) {
             String methodName = method.getName();
@@ -402,6 +293,42 @@ public class MigrationManager {
                 }
 
                 laravelModel.addMethod(localScopeMethod);
+            }
+        }
+    }
+
+    /**
+     * Replaces the field types in the table with the types defined in the model's casts
+     *
+     * @param table      the table to process
+     * @param modelClass the model class to check for casts
+     * @return a list of fields with updated types
+     */
+    private List<Field> replaceFieldTypeByFromCasts(Table table, PhpClass modelClass) {
+        List<Field> fields = table.fields();
+        Map<String, String> casts = ModelCastsResolver.resolveCasts(modelClass);
+        if (!casts.isEmpty()) {
+            for (Field field : fields) {
+                String castType = casts.get(field.getName());
+                if (castType != null) {
+                    field.setType(castType);
+                }
+            }
+        }
+        return fields;
+    }
+
+    /**
+     * Adds aggregate fields to the model based on the relations
+     *
+     * @param relations    the list of relations in the model
+     * @param laravelModel the Laravel model to add fields to
+     */
+    private void addAggregateFields(List<Relation> relations, LaravelModel laravelModel) {
+        for (Relation relation : relations) {
+            if (relation.isArrayOrCollection()) {
+                String aggregateName = StrUtils.snake(relation.getName(), "_") + "_count";
+                laravelModel.addReadProperty(new ReadProperty(aggregateName, "int"));
             }
         }
     }
