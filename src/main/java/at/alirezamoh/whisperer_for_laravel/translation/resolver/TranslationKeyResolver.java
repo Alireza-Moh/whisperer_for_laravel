@@ -29,6 +29,7 @@ import java.util.Optional;
  * Resolves references to translation keys within Laravel translation files.
  * Assumes translations are defined as PHP arrays inside files located in:
  *  resources/lang/{locale}/<file>.php
+ *  or lang/{locale}/<file>.php
  */
 public class TranslationKeyResolver {
     private static final String PHP_EXTENSION = ".php";
@@ -37,7 +38,9 @@ public class TranslationKeyResolver {
 
     private static final String DOT_SEPARATOR = ".";
 
-    private static final String RESOURCES_LANG_PATH = "/resources/lang/";
+    private static final String TRANSLATION_STORAGE_PATH_IN_RESOURCES_DIR = "/resources/lang/";
+
+    private static final String TRANSLATION_STORAGE_PATH_OUTSIDE_RESOURCES_DIR = "/lang/";
 
     private static final TranslationKeyResolver INSTANCE = new TranslationKeyResolver();
 
@@ -269,7 +272,7 @@ public class TranslationKeyResolver {
     /**
      * Returns the relative translation file path (a pseudo-namespace) without the language folder.
      * For example, given:
-     *   /project/resources/lang/en/dashboard/user.php
+     *   /project/resources/lang/en/dashboard/user.php OR /project/lang/en/dashboard/user.php
      * It returns "dashboard.user"
      *
      * @param translationFile The translation file.
@@ -277,13 +280,19 @@ public class TranslationKeyResolver {
      */
     private @Nullable String getRelativeTranslationFilePath(@NotNull VirtualFile translationFile) {
         String filePath = translationFile.getPath().replace('\\', '/');
-        int langIndex = filePath.indexOf(RESOURCES_LANG_PATH);
+        int langIndex = filePath.indexOf(TRANSLATION_STORAGE_PATH_IN_RESOURCES_DIR);
+        String pathToUse = TRANSLATION_STORAGE_PATH_IN_RESOURCES_DIR;
         if (langIndex == -1) {
-            return null;
+            langIndex = filePath.indexOf(TRANSLATION_STORAGE_PATH_OUTSIDE_RESOURCES_DIR);
+            pathToUse = TRANSLATION_STORAGE_PATH_OUTSIDE_RESOURCES_DIR;
+
+            if (langIndex == -1) {
+                return null;
+            }
         }
 
-        // Start after "/resources/lang/"
-        int start = langIndex + RESOURCES_LANG_PATH.length();
+        // Start after "/resources/lang/" or "/lang/"
+        int start = langIndex + pathToUse.length();
 
         // Skip the locale folder (e.g., "en/"), then capture the remaining path
         int slashAfterLocale = filePath.indexOf(PATH_SEPARATOR, start);

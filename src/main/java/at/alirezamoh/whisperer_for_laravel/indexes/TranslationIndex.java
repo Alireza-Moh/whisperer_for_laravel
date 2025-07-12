@@ -129,18 +129,26 @@ public class TranslationIndex extends FileBasedIndexExtension<String, String> {
         }
 
         SettingsState settings = SettingsState.getInstance(project);
-        String pathPart = "/resources/lang/";
+        //For older laravel versions inside the resources/lang directory
+        String translationPathInsideResourcesDir = "/resources/lang/";
+
+        //For newer laravel versions inside the project directory
+        String translationPathOutsideResourcesDir = "/lang/";
 
         if (!settings.isProjectDirectoryEmpty()) {
-            pathPart = StrUtils.addSlashes(
+            String projectDirPath = StrUtils.addSlashes(
                 settings.getProjectDirectoryPath(),
                 false,
                 true
-            )
-                + pathPart;
+            );
+            translationPathInsideResourcesDir = projectDirPath + translationPathInsideResourcesDir;
+            translationPathOutsideResourcesDir = projectDirPath + translationPathOutsideResourcesDir;
         }
 
-        return file.getPath().replace(basePath, "").startsWith(pathPart);
+        String normalizedTranslationFilePath = file.getPath().replace(basePath, "");
+
+        return normalizedTranslationFilePath.startsWith(translationPathInsideResourcesDir)
+            || normalizedTranslationFilePath.startsWith(translationPathOutsideResourcesDir);
     }
 
     public static String buildParentPathForTranslationKey(VirtualFile file, Project project, boolean forModule, String configKeyIdentifier) {
@@ -162,9 +170,12 @@ public class TranslationIndex extends FileBasedIndexExtension<String, String> {
             fullPath = fullPath.substring(1);
         }
 
-        // Expect path like: resources/lang/en/messages.php or resources/lang/en.json
+        // Expect path like: resources/lang/en/messages.php
+        // or resources/lang/en.json or lang/en/messages.php or lang/en.json
         if (fullPath.startsWith("resources/lang/")) {
             fullPath = fullPath.substring("resources/lang/".length());
+        } else if (fullPath.startsWith("lang/")) {
+            fullPath = fullPath.substring("lang/".length());
         }
 
         String[] parts = fullPath.split("/");

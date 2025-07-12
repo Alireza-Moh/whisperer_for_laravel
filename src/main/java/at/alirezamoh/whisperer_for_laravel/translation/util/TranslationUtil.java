@@ -2,7 +2,7 @@ package at.alirezamoh.whisperer_for_laravel.translation.util;
 
 import at.alirezamoh.whisperer_for_laravel.support.utils.MethodUtils;
 import com.intellij.psi.PsiElement;
-import com.jetbrains.php.lang.psi.elements.FunctionReference;
+import com.jetbrains.php.lang.psi.elements.impl.FunctionReferenceImpl;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -23,7 +23,7 @@ public class TranslationUtil {
      * @return           True or false
      */
     public static boolean isInsideCorrectMethod(@NotNull PsiElement psiElement) {
-        FunctionReference function = MethodUtils.resolveFunctionReference(psiElement, 10);
+        FunctionReferenceImpl function = MethodUtils.resolveFunctionReference(psiElement, 10);
 
         return function != null && isTranslationParam(function, psiElement);
     }
@@ -34,7 +34,7 @@ public class TranslationUtil {
      * @param position The PSI element position
      * @return True or false
      */
-    private static boolean isTranslationParam(FunctionReference reference, PsiElement position) {
+    private static boolean isTranslationParam(FunctionReferenceImpl reference, PsiElement position) {
         String referenceName = reference.getName();
 
         if (referenceName == null) {
