@@ -111,6 +111,7 @@
         <annotator language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.packages.inertia.annotator.InertiaPageExistenceAnnotator"/>
         <annotator language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.routing.controller.annotator.ControllerMethodExistenceAnnotator"/>
         <annotator language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.routing.routeName.annotator.RouteExistenceAnnotator"/>
+        <annotator language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.translation.annotator.TranslationKeyExistenceAnnotator"/>
 
         <codeInsight.lineMarkerProvider language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.eloquent.EloquentModelLineMarker"/>
         <lang.inspectionSuppressor language="XML" implementationClass="at.alirezamoh.whisperer_for_laravel.packages.livewire.htmlDirectives.supressor.LivewireHtmlDirectiveSuppressor" />

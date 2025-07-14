@@ -57,7 +57,7 @@ public class TranslationIndex extends FileBasedIndexExtension<String, String> {
                 return Collections.emptyMap();
             }
 
-            String dottedPath = buildParentPathForTranslationKey(inputData.getFile(), project, false, "");
+            String dottedPath = buildParentPathForTranslationKey(inputData.getFile(), project);
             if (dottedPath.isEmpty()) {
                 return Collections.emptyMap();
             }
@@ -123,35 +123,12 @@ public class TranslationIndex extends FileBasedIndexExtension<String, String> {
     }
 
     private boolean isTranslationFile(VirtualFile file, Project project) {
-        String basePath = project.getBasePath();
-        if (basePath == null) {
-            return false;
-        }
+        String filePath = file.getPath();
 
-        SettingsState settings = SettingsState.getInstance(project);
-        //For older laravel versions inside the resources/lang directory
-        String translationPathInsideResourcesDir = "/resources/lang/";
-
-        //For newer laravel versions inside the project directory
-        String translationPathOutsideResourcesDir = "/lang/";
-
-        if (!settings.isProjectDirectoryEmpty()) {
-            String projectDirPath = StrUtils.addSlashes(
-                settings.getProjectDirectoryPath(),
-                false,
-                true
-            );
-            translationPathInsideResourcesDir = projectDirPath + translationPathInsideResourcesDir;
-            translationPathOutsideResourcesDir = projectDirPath + translationPathOutsideResourcesDir;
-        }
-
-        String normalizedTranslationFilePath = file.getPath().replace(basePath, "");
-
-        return normalizedTranslationFilePath.startsWith(translationPathInsideResourcesDir)
-            || normalizedTranslationFilePath.startsWith(translationPathOutsideResourcesDir);
+        return filePath.contains("/resources/lang/") || filePath.contains("/lang/");
     }
 
-    public static String buildParentPathForTranslationKey(VirtualFile file, Project project, boolean forModule, String configKeyIdentifier) {
+    public static String buildParentPathForTranslationKey(VirtualFile file, Project project) {
         String basePath = project.getBasePath();
         if (basePath == null) {
             return "";
@@ -172,10 +149,16 @@ public class TranslationIndex extends FileBasedIndexExtension<String, String> {
 
         // Expect path like: resources/lang/en/messages.php
         // or resources/lang/en.json or lang/en/messages.php or lang/en.json
-        if (fullPath.startsWith("resources/lang/")) {
-            fullPath = fullPath.substring("resources/lang/".length());
-        } else if (fullPath.startsWith("lang/")) {
-            fullPath = fullPath.substring("lang/".length());
+        // Strip up to and including "/lang/"
+        int langIndex = fullPath.indexOf("/lang/");
+        if (langIndex != -1) {
+            fullPath = fullPath.substring(langIndex + "/lang/".length());
+        } else {
+            // Also check for "resources/lang/" directly
+            int resourcesLangIndex = fullPath.indexOf("resources/lang/");
+            if (resourcesLangIndex != -1) {
+                fullPath = fullPath.substring(resourcesLangIndex + "resources/lang/".length());
+            }
         }
 
         String[] parts = fullPath.split("/");
@@ -188,19 +171,17 @@ public class TranslationIndex extends FileBasedIndexExtension<String, String> {
             return "";
         }
 
-        fullPath = fullPath.substring(fullPath.split("/")[0].length() + 1);
+        // Remove the language directory (like "en/") part
+        fullPath = fullPath.substring(fullPath.indexOf("/") + 1); // remove lang prefix
 
+        // Remove .php extension
         if (fullPath.endsWith(".php")) {
             fullPath = fullPath.substring(0, fullPath.length() - 4);
         }
 
-        fullPath = fullPath.replace('/', '.');
+        // Convert slashes to dots for nested files
+        return parts[0] + "|" + fullPath.replace('/', '.');
 
-        if (forModule) {
-            fullPath = configKeyIdentifier;
-        }
-
-        return fullPath;
     }
 
     private void iterateOverFileChildren(String dirName, PsiFile configFile, Map<String, String> variants) {

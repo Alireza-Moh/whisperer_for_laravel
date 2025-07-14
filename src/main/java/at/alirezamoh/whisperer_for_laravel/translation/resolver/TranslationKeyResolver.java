@@ -1,6 +1,7 @@
 package at.alirezamoh.whisperer_for_laravel.translation.resolver;
 
 import at.alirezamoh.whisperer_for_laravel.indexes.TranslationIndex;
+import at.alirezamoh.whisperer_for_laravel.support.utils.EnvUtils;
 import com.intellij.json.JsonUtil;
 import com.intellij.json.psi.JsonFile;
 import com.intellij.json.psi.JsonObject;
@@ -22,6 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Optional;
 
@@ -92,10 +94,16 @@ public class TranslationKeyResolver {
      * @return A collection of virtual files that might contain the translation key
      */
     private Collection<VirtualFile> findTranslationFiles(String text, Project project) {
+        String appLocale = EnvUtils.getAppLocale(project);
+
+        if (appLocale == null) {
+            return Collections.emptyList();
+        }
+
         return FileBasedIndex.getInstance().getContainingFiles(
             TranslationIndex.INDEX_ID,
-            text,
-            GlobalSearchScope.projectScope(project)
+            appLocale + "|" + text,
+            GlobalSearchScope.allScope(project)
         );
     }
 
