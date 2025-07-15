@@ -64,19 +64,25 @@ public class TranslationKeyExistenceAnnotator implements Annotator {
         String cleanedTranslationKey = StrUtils.removeQuotes(stringLiteralExpression.getText());
         String appLocale = ProjectLocaleLangResolver.loadProjectLocale(project);
 
-        if (appLocale == null) {
-            return FileBasedIndex.getInstance().processValues(
-                TranslationIndex.INDEX_ID,
-                cleanedTranslationKey,
-                null,
-                (file, value) -> false,
-                GlobalSearchScope.allScope(project)
-            );
+        String translationKey = cleanedTranslationKey;
+        if (appLocale != null) {
+            translationKey = appLocale + "|" + cleanedTranslationKey;
         }
 
+        return checkIfTranslationKeyExists(translationKey, project);
+    }
+
+    /**
+     * Checks if the translation key exists in the index
+     *
+     * @param translationKey The translation key to check
+     * @param project        The current project
+     * @return true if the translation key does not exist, false otherwise
+     */
+    private static boolean checkIfTranslationKeyExists(String translationKey, Project project) {
         return !FileBasedIndex.getInstance().processValues(
             TranslationIndex.INDEX_ID,
-            appLocale + "|" + cleanedTranslationKey,
+            translationKey,
             null,
             (file, value) -> false,
             GlobalSearchScope.allScope(project)

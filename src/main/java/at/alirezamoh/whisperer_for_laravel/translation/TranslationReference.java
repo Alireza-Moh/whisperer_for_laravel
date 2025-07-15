@@ -3,7 +3,6 @@ package at.alirezamoh.whisperer_for_laravel.translation;
 import at.alirezamoh.whisperer_for_laravel.indexes.TranslationIndex;
 import at.alirezamoh.whisperer_for_laravel.support.ProjectLocaleLangResolver;
 import at.alirezamoh.whisperer_for_laravel.support.WhispererForLaravelIcon;
-import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import at.alirezamoh.whisperer_for_laravel.translation.resolver.TranslationKeyResolver;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
