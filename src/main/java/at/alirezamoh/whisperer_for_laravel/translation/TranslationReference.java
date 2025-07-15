@@ -1,8 +1,9 @@
 package at.alirezamoh.whisperer_for_laravel.translation;
 
 import at.alirezamoh.whisperer_for_laravel.indexes.TranslationIndex;
+import at.alirezamoh.whisperer_for_laravel.support.ProjectLocaleLangResolver;
 import at.alirezamoh.whisperer_for_laravel.support.WhispererForLaravelIcon;
-import at.alirezamoh.whisperer_for_laravel.support.utils.EnvUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import at.alirezamoh.whisperer_for_laravel.translation.resolver.TranslationKeyResolver;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
@@ -66,8 +67,7 @@ public class TranslationReference extends PsiReferenceBase<PsiElement> implement
         List<LookupElementBuilder> variants = new ArrayList<>();
         FileBasedIndex fileBasedIndex = FileBasedIndex.getInstance();
 
-        String appLocale = EnvUtils.getAppLocale(project);
-
+        String appLocale = ProjectLocaleLangResolver.loadProjectLocale(project);
         if (appLocale == null) {
             fileBasedIndex.processAllKeys(TranslationIndex.INDEX_ID, key -> {
                 fileBasedIndex.processValues(TranslationIndex.INDEX_ID, key, null, (file, value) -> {
