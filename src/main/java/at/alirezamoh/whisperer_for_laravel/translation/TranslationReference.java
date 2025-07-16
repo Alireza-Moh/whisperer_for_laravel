@@ -1,7 +1,6 @@
 package at.alirezamoh.whisperer_for_laravel.translation;
 
 import at.alirezamoh.whisperer_for_laravel.indexes.TranslationIndex;
-import at.alirezamoh.whisperer_for_laravel.support.ProjectLocaleLangResolver;
 import at.alirezamoh.whisperer_for_laravel.support.WhispererForLaravelIcon;
 import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import at.alirezamoh.whisperer_for_laravel.translation.resolver.TranslationKeyResolver;
@@ -66,27 +65,13 @@ public class TranslationReference extends PsiReferenceBase<PsiElement> implement
         List<LookupElementBuilder> variants = new ArrayList<>();
         FileBasedIndex fileBasedIndex = FileBasedIndex.getInstance();
 
-        String appLocale = ProjectLocaleLangResolver.loadProjectLocale(project);
-        if (appLocale == null) {
-            fileBasedIndex.processAllKeys(TranslationIndex.INDEX_ID, key -> {
-                fileBasedIndex.processValues(TranslationIndex.INDEX_ID, key, null, (file, value) -> {
-                    variants.add(buildLookupElement(key, buildKeyValue(value)));
-                    return true;
-                }, GlobalSearchScope.allScope(project));
+        fileBasedIndex.processAllKeys(TranslationIndex.INDEX_ID, key -> {
+            fileBasedIndex.processValues(TranslationIndex.INDEX_ID, key, null, (file, value) -> {
+                variants.add(buildLookupElement(key, buildKeyValue(value)));
                 return true;
-            }, project);
-        }
-        else {
-            fileBasedIndex.processAllKeys(TranslationIndex.INDEX_ID, key -> {
-                fileBasedIndex.processValues(TranslationIndex.INDEX_ID, key, null, (file, value) -> {
-                    if (key.startsWith(appLocale)) {
-                        variants.add(buildLookupElement(key.substring(3), buildKeyValue(value)));
-                    }
-                    return true;
-                }, GlobalSearchScope.allScope(project));
-                return true;
-            }, project);
-        }
+            }, GlobalSearchScope.allScope(project));
+            return true;
+        }, project);
 
         return variants;
     }

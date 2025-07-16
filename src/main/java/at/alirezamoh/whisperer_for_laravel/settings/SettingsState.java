@@ -56,11 +56,6 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
      */
     private boolean routeNotFoundAnnotatorWarning;
 
-    /**
-     * The default language for the laravel project
-     */
-    private String defaultProjectLang;
-
     public static SettingsState getInstance(@NotNull Project foundedProject) {
         project = foundedProject;
         return foundedProject.getService(SettingsState.class);
@@ -139,14 +134,6 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
 
     public void setRouteNotFoundAnnotatorWarning(boolean routeNotFoundAnnotatorWarning) {
         this.routeNotFoundAnnotatorWarning = routeNotFoundAnnotatorWarning;
-    }
-
-    public String getDefaultProjectLang() {
-        return defaultProjectLang;
-    }
-
-    public void setDefaultProjectLang(String defaultProjectLang) {
-        this.defaultProjectLang = defaultProjectLang;
     }
 
     public boolean isModuleApplication() {

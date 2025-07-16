@@ -56,7 +56,7 @@ public class PresentableTranslationElement extends FakePsiElement {
         return new ItemPresentation() {
             @Override
             public @NlsSafe @Nullable String getPresentableText() {
-                return translationKey;
+                return translationKey + ": " + originalElement.getText();
             }
 
             @Override
@@ -69,5 +69,10 @@ public class PresentableTranslationElement extends FakePsiElement {
                 return WhispererForLaravelIcon.LARAVEL_ICON;
             }
         };
+    }
+
+    @Override
+    public @Nullable Icon getIcon(boolean open) {
+        return WhispererForLaravelIcon.LARAVEL_ICON;
     }
 }

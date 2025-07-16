@@ -1,6 +1,5 @@
 package at.alirezamoh.whisperer_for_laravel.settings;
 
-import at.alirezamoh.whisperer_for_laravel.support.ProjectLocaleLangResolver;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.ProjectActivity;
@@ -8,8 +7,6 @@ import kotlin.Unit;
 import kotlin.coroutines.Continuation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Objects;
 
 public class LaravelStartupActivity implements ProjectActivity {
 
@@ -44,13 +41,6 @@ public class LaravelStartupActivity implements ProjectActivity {
 
             if (!settingsState.isRouteNotFoundAnnotatorWarning()) {
                 settingsState.setRouteNotFoundAnnotatorWarning(true);
-            }
-
-            if (settingsState.getDefaultProjectLang() == null) {
-                String appLocaleLang = ProjectLocaleLangResolver.getAppLocale(project);
-                settingsState.setDefaultProjectLang(
-                    Objects.requireNonNullElse(appLocaleLang, "en")
-                );
             }
         }
 

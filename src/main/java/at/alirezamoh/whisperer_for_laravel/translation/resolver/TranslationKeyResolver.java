@@ -1,8 +1,6 @@
 package at.alirezamoh.whisperer_for_laravel.translation.resolver;
 
 import at.alirezamoh.whisperer_for_laravel.indexes.TranslationIndex;
-import at.alirezamoh.whisperer_for_laravel.support.ProjectLocaleLangResolver;
-import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
 import com.intellij.json.JsonUtil;
 import com.intellij.json.psi.JsonFile;
 import com.intellij.json.psi.JsonObject;
@@ -95,15 +93,9 @@ public class TranslationKeyResolver {
      * @return A collection of virtual files that might contain the translation key
      */
     private Collection<VirtualFile> findTranslationFiles(String text, Project project) {
-        String appLocale = ProjectLocaleLangResolver.loadProjectLocale(project);
-
-        if (appLocale == null) {
-            return Collections.emptyList();
-        }
-
         return FileBasedIndex.getInstance().getContainingFiles(
             TranslationIndex.INDEX_ID,
-            appLocale + "|" + text,
+            text,
             GlobalSearchScope.allScope(project)
         );
     }

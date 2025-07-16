@@ -2,7 +2,6 @@ package at.alirezamoh.whisperer_for_laravel.translation.annotator;
 
 import at.alirezamoh.whisperer_for_laravel.indexes.TranslationIndex;
 import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
-import at.alirezamoh.whisperer_for_laravel.support.ProjectLocaleLangResolver;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import at.alirezamoh.whisperer_for_laravel.translation.util.TranslationUtil;
@@ -62,14 +61,8 @@ public class TranslationKeyExistenceAnnotator implements Annotator {
      */
     public static boolean doesTranslationKeyExists(StringLiteralExpression stringLiteralExpression, Project project) {
         String cleanedTranslationKey = StrUtils.removeQuotes(stringLiteralExpression.getText());
-        String appLocale = ProjectLocaleLangResolver.loadProjectLocale(project);
 
-        String translationKey = cleanedTranslationKey;
-        if (appLocale != null) {
-            translationKey = appLocale + "|" + cleanedTranslationKey;
-        }
-
-        return checkIfTranslationKeyExists(translationKey, project);
+        return checkIfTranslationKeyExists(cleanedTranslationKey, project);
     }
 
     /**

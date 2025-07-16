@@ -150,9 +150,9 @@ public class TranslationIndex extends FileBasedIndexExtension<String, String> {
         // Expect path like: resources/lang/en/messages.php
         // or resources/lang/en.json or lang/en/messages.php or lang/en.json
         // Strip up to and including "/lang/"
-        int langIndex = fullPath.indexOf("/lang/");
+        int langIndex = fullPath.indexOf("lang/");
         if (langIndex != -1) {
-            fullPath = fullPath.substring(langIndex + "/lang/".length());
+            fullPath = fullPath.substring(langIndex + "lang/".length());
         } else {
             // Also check for "resources/lang/" directly
             int resourcesLangIndex = fullPath.indexOf("resources/lang/");
@@ -180,8 +180,7 @@ public class TranslationIndex extends FileBasedIndexExtension<String, String> {
         }
 
         // Convert slashes to dots for nested files
-        return parts[0] + "|" + fullPath.replace('/', '.');
-
+        return fullPath.replace('/', '.');
     }
 
     private void iterateOverFileChildren(String dirName, PsiFile configFile, Map<String, String> variants) {
