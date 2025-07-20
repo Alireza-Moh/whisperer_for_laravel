@@ -37,7 +37,7 @@ public class PsiElementUtils {
      * @param lookupElementBuilder The key
      * @return The LookupElementBuilder
      */
-    public static @NotNull LookupElement buildPrioritizedLookupElement(LookupElementBuilder lookupElementBuilder, int priority) {
+    public static @NotNull LookupElement buildPrioritizedLookupElement(LookupElementBuilder lookupElementBuilder, double priority) {
         return PrioritizedLookupElement.withPriority(
             lookupElementBuilder,
             priority
