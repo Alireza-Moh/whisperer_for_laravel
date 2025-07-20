@@ -33,7 +33,8 @@ public class LivewirePropertyInValidationReference extends PsiReferenceBase<PsiE
 
     @Override
     public @Nullable PsiElement resolve() {
-        return null;
+        ResolveResult[] resolveResults = multiResolve(false);
+        return resolveResults.length == 1 ? resolveResults[0].getElement() : null;
     }
 
     /**
