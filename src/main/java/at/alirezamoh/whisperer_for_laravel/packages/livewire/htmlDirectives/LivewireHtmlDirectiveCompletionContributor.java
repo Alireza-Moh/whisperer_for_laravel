@@ -307,7 +307,7 @@ public class LivewireHtmlDirectiveCompletionContributor extends CompletionContri
             LookupElementBuilder lookupElementBuilder = PsiElementUtils.buildSimpleLookupElement(key);
 
             completionResultSet.addElement(
-                PsiElementUtils.buildPrioritizedLookupElement(lookupElementBuilder, 1000)
+                PsiElementUtils.buildPrioritizedLookupElement(lookupElementBuilder, 1000.0)
             );
         }
 
@@ -316,7 +316,7 @@ public class LivewireHtmlDirectiveCompletionContributor extends CompletionContri
                 LookupElementBuilder lookupElementBuilder = PsiElementUtils.buildSimpleLookupElement(key);
 
                 completionResultSet.addElement(
-                    PsiElementUtils.buildPrioritizedLookupElement(lookupElementBuilder, 1000)
+                    PsiElementUtils.buildPrioritizedLookupElement(lookupElementBuilder, 1000.0)
                 );
             }
         }
@@ -328,7 +328,7 @@ public class LivewireHtmlDirectiveCompletionContributor extends CompletionContri
                 .withInsertHandler(new XmlAttributeInsertHandler());
 
             completionResultSet.addElement(
-                PsiElementUtils.buildPrioritizedLookupElement(lookupElementBuilder, 100)
+                PsiElementUtils.buildPrioritizedLookupElement(lookupElementBuilder, 1000.0)
             );
         }
 
@@ -337,7 +337,7 @@ public class LivewireHtmlDirectiveCompletionContributor extends CompletionContri
                 .withInsertHandler(new XmlAttributeInsertHandler());
 
             completionResultSet.addElement(
-                PsiElementUtils.buildPrioritizedLookupElement(lookupElementBuilder, 100)
+                PsiElementUtils.buildPrioritizedLookupElement(lookupElementBuilder, 1000.0)
             );
         }
 
@@ -347,7 +347,7 @@ public class LivewireHtmlDirectiveCompletionContributor extends CompletionContri
                     .withInsertHandler(new XmlAttributeInsertHandler());
 
                 completionResultSet.addElement(
-                    PsiElementUtils.buildPrioritizedLookupElement(lookupElementBuilder, 100)
+                    PsiElementUtils.buildPrioritizedLookupElement(lookupElementBuilder, 1000.0)
                 );
             }
         }

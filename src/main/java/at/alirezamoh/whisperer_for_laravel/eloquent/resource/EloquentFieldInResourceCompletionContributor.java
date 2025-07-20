@@ -62,7 +62,7 @@ public class EloquentFieldInResourceCompletionContributor extends CompletionCont
                             LookupElementBuilder lookupElementBuilder = PsiElementUtils.buildSimpleLookupElement(field.getName());
 
                             completionResultSet.addElement(
-                                PsiElementUtils.buildPrioritizedLookupElement(lookupElementBuilder, 1000)
+                                PsiElementUtils.buildPrioritizedLookupElement(lookupElementBuilder, 1000.0)
                             );
                         }
                     }

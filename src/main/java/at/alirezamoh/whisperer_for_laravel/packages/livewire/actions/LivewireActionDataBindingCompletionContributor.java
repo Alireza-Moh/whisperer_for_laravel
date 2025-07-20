@@ -2,6 +2,7 @@ package at.alirezamoh.whisperer_for_laravel.packages.livewire.actions;
 
 import at.alirezamoh.whisperer_for_laravel.packages.livewire.LivewireUtil;
 import at.alirezamoh.whisperer_for_laravel.packages.livewire.property.utils.LivewirePropertyProvider;
+import at.alirezamoh.whisperer_for_laravel.support.MethodLookupElement;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PhpClassUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
 import com.intellij.codeInsight.completion.*;
@@ -175,24 +176,14 @@ public class LivewireActionDataBindingCompletionContributor extends CompletionCo
      */
     private static void addMethodsFromPhpClasses(Collection<PhpClass> phpClasses, CompletionResultSet completionResultSet) {
         for (PhpClass phpClass : phpClasses) {
-            PhpClassUtils.getClassPublicMethods(phpClass, true).forEach(method ->
-                addLookupElement(method.getName(), completionResultSet)
-            );
+            PhpClassUtils.getClassPublicMethods(phpClass, true).forEach(method -> {
+                LookupElement lookupElement = PrioritizedLookupElement.withPriority(
+                    new MethodLookupElement(method),
+                    1000.0
+                );
+                completionResultSet.addElement(lookupElement);
+            });
         }
-    }
-
-    /**
-     * Creates a lookup element for the given name and adds it to the completion result set
-     *
-     * @param name The name to be used in the lookup element
-     * @param completionResultSet The completion result set where the lookup element is added
-     */
-    private static void addLookupElement(String name, CompletionResultSet completionResultSet) {
-        LookupElement lookupElement = PsiElementUtils.buildPrioritizedLookupElement(
-            PsiElementUtils.buildSimpleLookupElement(name),
-            1000
-        );
-        completionResultSet.addElement(lookupElement);
     }
 
     /**
@@ -202,7 +193,11 @@ public class LivewireActionDataBindingCompletionContributor extends CompletionCo
      */
     private static void addPredefinedActions(CompletionResultSet completionResultSet) {
         for (String predefinedAction : PREDEFINED_ACTIONS) {
-            addLookupElement(predefinedAction, completionResultSet);
+            LookupElement lookupElement = PsiElementUtils.buildPrioritizedLookupElement(
+                PsiElementUtils.buildSimpleLookupElement(predefinedAction),
+                1000.0
+            );
+            completionResultSet.addElement(lookupElement);
         }
     }
 }
