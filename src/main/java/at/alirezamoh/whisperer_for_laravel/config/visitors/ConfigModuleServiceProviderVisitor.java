@@ -73,8 +73,8 @@ public class ConfigModuleServiceProviderVisitor extends BaseServiceProviderVisit
             return;
         }
 
-        PsiElement namespaceParameter = parameters.getParameter(0);
-        if (!(namespaceParameter instanceof ConcatenationExpressionImpl concatenationExpression)) {
+        PsiElement configFilePathParameter = parameters.getParameter(0);
+        if (!(configFilePathParameter instanceof ConcatenationExpressionImpl concatenationExpression)) {
             return;
         }
 
