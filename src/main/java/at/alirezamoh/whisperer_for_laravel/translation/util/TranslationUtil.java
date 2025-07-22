@@ -1,8 +1,11 @@
 package at.alirezamoh.whisperer_for_laravel.translation.util;
 
+import at.alirezamoh.whisperer_for_laravel.config.visitors.ArrayReturnPsiRecursiveVisitor;
 import at.alirezamoh.whisperer_for_laravel.indexes.TranslationIndex;
+import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.whisperer_for_laravel.support.WhispererForLaravelIcon;
 import at.alirezamoh.whisperer_for_laravel.support.utils.MethodUtils;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PhpClassUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import at.alirezamoh.whisperer_for_laravel.translation.PresentableTranslationElement;
@@ -10,23 +13,39 @@ import at.alirezamoh.whisperer_for_laravel.translation.resolver.TranslationKeyRe
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.lang.injection.InjectedLanguageManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.jetbrains.php.blade.psi.BladePsiLanguageInjectionHost;
+import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.impl.FunctionReferenceImpl;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.regex.Pattern;
 
-public class TranslationUtil {
+final public class TranslationUtil {
+    private TranslationUtil() {}
+
+    /**
+     * The namespace of the `Lang` facade
+     */
+    private final static String LANG_FACADE_FQN_CLASS = "\\Illuminate\\Support\\Facades\\Lang";
+
+    /**
+     * The names of the methods in the `Lang` facade
+     */
+    public static Map<String, Integer> LANG_FACADE_METHODS = new HashMap<>() {{
+        put("get", 0);
+        put("has", 0);
+        put("choice", 0);
+    }};
+
     /**
      * The names of the translation helper functions
      */
-    private static final Map<String, Integer> TRANSLATION_METHODS = new HashMap<>() {{
+    private static final Map<String, Integer> TRANSLATION_HELPER_FUNCTIONS = new HashMap<>() {{
         put("__", 0);
         put("trans_choice", 0);
     }};
@@ -36,28 +55,39 @@ public class TranslationUtil {
      * @param psiElement The PSI element to check
      * @return           True or false
      */
-    public static boolean isInsideCorrectMethod(@NotNull PsiElement psiElement) {
-        FunctionReferenceImpl function = MethodUtils.resolveFunctionReference(psiElement, 10);
+    public static boolean isInsideCorrectMethod(@NotNull PsiElement psiElement, Project project) {
+        MethodReference method = MethodUtils.resolveMethodReference(psiElement, 4);
+        FunctionReferenceImpl function = MethodUtils.resolveFunctionReference(psiElement, 4);
 
-        return function != null && isTranslationParam(function, psiElement);
+        return (
+            method != null
+                && isTranslationParam(method, psiElement)
+                && PhpClassUtils.isCorrectRelatedClass(method, project, LANG_FACADE_FQN_CLASS)
+        )
+            || (
+                function != null
+                    && isTranslationParam(function, psiElement)
+                    && TRANSLATION_HELPER_FUNCTIONS.containsKey(function.getName())
+        );
     }
 
     /**
-     * Processes all translation keys in the project index.
+     * Collects translation keys from the given PsiFile
+     *
+     * @param project the current project
+     * @param fileBasedIndex php file index
+     * @param variants the list to store collected keys
      */
-    public static List<LookupElementBuilder> getTranslationKeysFromIndex(Project project) {
-        List<LookupElementBuilder> variants = new ArrayList<>();
-        FileBasedIndex fileBasedIndex = FileBasedIndex.getInstance();
-
+    public static void getKeysFromTranslationIndex(@NotNull Project project, FileBasedIndex fileBasedIndex, List<LookupElementBuilder> variants) {
         fileBasedIndex.processAllKeys(TranslationIndex.INDEX_ID, key -> {
             fileBasedIndex.processValues(TranslationIndex.INDEX_ID, key, null, (file, value) -> {
-                variants.add(buildLookupElement(key, buildKeyValue(value)));
-                return true;
-            }, GlobalSearchScope.allScope(project));
+                    variants.add(buildLookupElement(key, buildKeyValue(value)));
+                    return true;
+                },
+                GlobalSearchScope.allScope(project)
+            );
             return true;
         }, project);
-
-        return variants;
     }
 
     public static boolean isInsideBladeLangDirective(@NotNull PsiElement psiElement, Project project) {
@@ -98,11 +128,78 @@ public class TranslationUtil {
         return results.toArray(new ResolveResult[0]);
     }
 
-    public static HashMap<PsiElement, PsiFile> getTranslationKeysFromIndex(Project project, String translationKey) {
+    public static HashMap<PsiElement, PsiFile> resolveTranslationKey(Project project, String translationKey) {
         PsiManager psiManager = PsiManager.getInstance(project);
         TranslationKeyResolver translationKeyResolver = TranslationKeyResolver.getInstance();
 
         return translationKeyResolver.resolveAllInTranslationFiles(translationKey, project, psiManager);
+    }
+
+    public static String buildParentPathForTranslationKey(VirtualFile file, Project project, boolean forModule, String configKeyIdentifier) {
+        String basePath = project.getBasePath();
+        if (basePath == null) {
+            return "";
+        }
+
+        SettingsState settingsState = SettingsState.getInstance(project);
+        if (!settingsState.isProjectDirectoryEmpty()) {
+            basePath = basePath + "/" + StrUtils.addSlashes(settingsState.getProjectDirectoryPath(), true, true);
+        }
+
+        String fullPath = file.getPath();
+
+        fullPath = fullPath.replaceFirst("(?i)^" + Pattern.quote(basePath), "");
+
+        while (fullPath.startsWith("/")) {
+            fullPath = fullPath.substring(1);
+        }
+
+        // Expect path like: resources/lang/en/messages.php
+        // or resources/lang/en.json or lang/en/messages.php or lang/en.json
+        // Strip up to and including "/lang/"
+        int langIndex = fullPath.indexOf("lang/");
+        if (langIndex != -1) {
+            fullPath = fullPath.substring(langIndex + "lang/".length());
+        } else {
+            // Also check for "resources/lang/" directly
+            int resourcesLangIndex = fullPath.indexOf("resources/lang/");
+            if (resourcesLangIndex != -1) {
+                fullPath = fullPath.substring(resourcesLangIndex + "resources/lang/".length());
+            }
+        }
+
+        String[] parts = fullPath.split("/");
+
+        if (parts.length < 2) {
+            return "";
+        }
+
+        if (fullPath.endsWith(".json")) {
+            return "";
+        }
+
+        // Remove the language directory (like "en/") part
+        fullPath = fullPath.substring(fullPath.indexOf("/") + 1); // remove lang prefix
+
+        // Remove .php extension
+        if (fullPath.endsWith(".php")) {
+            fullPath = fullPath.substring(0, fullPath.length() - 4);
+        }
+
+        fullPath = fullPath.replace('/', '.');
+
+        if (forModule) {
+            fullPath = configKeyIdentifier;
+        }
+
+        return fullPath;
+    }
+
+    public static void iterateOverFileChildren(String dirName, PsiFile configFile, Map<String, String> variants) {
+        ArrayReturnPsiRecursiveVisitor visitor = new ArrayReturnPsiRecursiveVisitor(dirName);
+        configFile.acceptChildren(visitor);
+
+        variants.putAll(visitor.getVariants());
     }
 
     private static boolean isLangDirective(PsiElement psiElement) {
@@ -119,16 +216,21 @@ public class TranslationUtil {
      * @param position The PSI element position
      * @return True or false
      */
-    private static boolean isTranslationParam(FunctionReferenceImpl reference, PsiElement position) {
-        String referenceName = reference.getName();
+    private static boolean isTranslationParam(PsiElement reference, PsiElement position) {
+        String referenceName = (reference instanceof MethodReference)
+            ? ((MethodReference) reference).getName()
+            : ((FunctionReferenceImpl) reference).getName();
 
         if (referenceName == null) {
             return false;
         }
 
-        Integer expectedParamIndex = TRANSLATION_METHODS.get(referenceName);
+        Integer expectedParamIndex = TRANSLATION_HELPER_FUNCTIONS.get(referenceName);
         if (expectedParamIndex == null) {
-            return false;
+            expectedParamIndex = LANG_FACADE_METHODS.get(referenceName);
+            if (expectedParamIndex == null) {
+                return false;
+            }
         }
 
         return MethodUtils.findParamIndex(position, false) == expectedParamIndex;

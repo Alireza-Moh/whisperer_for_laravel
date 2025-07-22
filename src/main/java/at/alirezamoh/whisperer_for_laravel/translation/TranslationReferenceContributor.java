@@ -30,7 +30,7 @@ public class TranslationReferenceContributor extends PsiReferenceContributor {
                         return PsiReference.EMPTY_ARRAY;
                     }
 
-                    if(TranslationUtil.isInsideCorrectMethod(psiElement)) {
+                    if(TranslationUtil.isInsideCorrectMethod(psiElement, project)) {
                         return new PsiReference[]{
                             new TranslationReference(
                                 stringLiteralExpression,

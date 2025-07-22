@@ -1,6 +1,8 @@
 package at.alirezamoh.whisperer_for_laravel.translation.resolver;
 
+import at.alirezamoh.whisperer_for_laravel.indexes.ServiceProviderIndex;
 import at.alirezamoh.whisperer_for_laravel.indexes.TranslationIndex;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
 import com.intellij.json.JsonUtil;
 import com.intellij.json.psi.JsonFile;
 import com.intellij.json.psi.JsonObject;
@@ -21,10 +23,7 @@ import com.jetbrains.php.lang.psi.elements.impl.PhpReturnImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Resolves references to translation keys within Laravel translation files.
@@ -61,28 +60,79 @@ public class TranslationKeyResolver {
      * @return A map of PsiElement instances to their containing PsiFiles
      */
     public @NotNull HashMap<PsiElement, PsiFile> resolveAllInTranslationFiles(@NotNull String text, @NotNull Project project, @NotNull PsiManager psiManager) {
-
         HashMap<PsiElement, PsiFile> results = new HashMap<>();
-        Collection<VirtualFile> translationFiles = findTranslationFiles(text, project);
+        Collection<VirtualFile> translationFiles = text.contains("::")
+            ? searchInServiceProviderForTranslationKey(text, project)
+            : findTranslationFiles(text, project);
 
+        collectMatchingTranslations(translationFiles, text, psiManager, results);
+
+        return results;
+    }
+
+    private void collectMatchingTranslations(
+        @NotNull Collection<VirtualFile> translationFiles,
+        @NotNull String text,
+        @NotNull PsiManager psiManager,
+        @NotNull HashMap<PsiElement, PsiFile> results
+    ) {
         for (VirtualFile file : translationFiles) {
             PsiFile psiFile = psiManager.findFile(file);
-            if (psiFile == null) {
-                continue;
+            if (psiFile == null) continue;
+
+            if (text.contains("::")) {
+                text = text.substring(text.indexOf("::") + 2).trim();
             }
 
             if (psiFile instanceof JsonFile jsonFile) {
                 processJsonFile(jsonFile, text, results);
-                continue;
-            }
-
-            String relativePath = getRelativeTranslationFilePath(file);
-            if (relativePath != null) {
-                processPhpFile(psiFile, text, relativePath, results);
+            } else {
+                String relativePath = getRelativeTranslationFilePath(file);
+                if (relativePath != null) {
+                    processPhpFile(psiFile, text, relativePath, results);
+                }
             }
         }
+    }
 
-        return results;
+    private List<VirtualFile> searchInServiceProviderForTranslationKey(String translationKey, Project project) {
+        List<VirtualFile> translationFiles = new ArrayList<>();
+        FileBasedIndex fileBasedIndex = FileBasedIndex.getInstance();
+
+        fileBasedIndex.processAllKeys(ServiceProviderIndex.INDEX_ID, key -> {
+            fileBasedIndex.processValues(
+                ServiceProviderIndex.INDEX_ID,
+                key,
+                null,
+                (file, serviceProvider) -> {
+                    for (Map.Entry<String, String> entry : serviceProvider.getTranslationKeys().entrySet()) {
+
+                        if (entry.getKey().equals(translationKey)) {
+                            String filePath;
+
+                            String[] parts = entry.getValue().split("\\|", 2);
+                            if (parts.length < 2) {
+                                filePath = parts[0];
+                            }
+                            else {
+                                filePath = parts[1];
+                            }
+                            VirtualFile virtualFile = PsiElementUtils.resolveFilePath(filePath);
+                            if (virtualFile != null) {
+                                translationFiles.add(virtualFile);
+                                return false;
+                            }
+                        }
+                    }
+                    return true;
+                },
+                GlobalSearchScope.allScope(project)
+            );
+
+            return true;
+        }, project);
+
+        return translationFiles;
     }
 
     /**

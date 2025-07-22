@@ -18,16 +18,18 @@ public class TranslationJsonFlattener {
      * Parses a JSON translation file and converts it to a flattened map
      *
      * @param jsonFile The JSON file to parse
+     * @param forModule is a package translation file
+     * @param namespace the namespace for the translation keys
      * @return A map of dot-notation keys to their corresponding values, or null if parsing fails
      */
-    public static @Nullable Map<String, String> parseJsonTranslation(JsonFile jsonFile) {
+    public static @Nullable Map<String, String> parseJsonTranslation(JsonFile jsonFile, boolean forModule, String namespace) {
         JsonObject topLevel = JsonUtil.getTopLevelObject(jsonFile);
         if (topLevel == null) {
             return null;
         }
 
         Map<String, String> result = new HashMap<>();
-        flattenJsonObject("", topLevel, result);
+        flattenJsonObject(jsonFile, "", topLevel, result, forModule, namespace);
         return result;
     }
 
@@ -37,9 +39,11 @@ public class TranslationJsonFlattener {
      * @param jsonObject The JSON object to flatten
      * @param prefix The current key prefix (for nested objects)
      * @param result The map to store the flattened key-value pairs
+     * @param forModule is a package translation file
+     * @param namespace the namespace for the translation keys
      */
 
-    private static void flattenJsonObject(String prefix, JsonObject jsonObject, Map<String, String> result) {
+    private static void flattenJsonObject(JsonFile jsonFile, String prefix, JsonObject jsonObject, Map<String, String> result, boolean forModule, String namespace) {
         for (JsonProperty property : jsonObject.getPropertyList()) {
             String key = property.getName();
 
@@ -47,9 +51,17 @@ public class TranslationJsonFlattener {
             PsiElement valueElement = property.getValue();
 
             if (valueElement instanceof JsonObject nestedObject) {
-                flattenJsonObject(fullKey, nestedObject, result);
+                flattenJsonObject(jsonFile, fullKey, nestedObject, result, forModule, namespace);
             } else if (valueElement != null) {
-                result.put(fullKey, StrUtils.removeQuotes(valueElement.getText()));
+                if (forModule) {
+                    result.put(
+                        namespace + "::" + fullKey,
+                        StrUtils.removeQuotes(valueElement.getText()) + "|" + jsonFile.getVirtualFile().getPath()
+                    );
+                }
+                else {
+                    result.put(fullKey, StrUtils.removeQuotes(valueElement.getText()));
+                }
             }
         }
     }

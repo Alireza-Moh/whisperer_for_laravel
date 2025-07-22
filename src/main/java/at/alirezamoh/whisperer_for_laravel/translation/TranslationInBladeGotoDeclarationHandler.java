@@ -32,7 +32,7 @@ public class TranslationInBladeGotoDeclarationHandler implements GotoDeclaration
 
         if (TranslationUtil.isInsideBladeLangDirective(sourceElement, project)) {
             String translationKey = StrUtils.removeQuotes(sourceElement.getText());
-            HashMap<PsiElement, PsiFile> resolvedTranslationKeys = TranslationUtil.getTranslationKeysFromIndex(project, translationKey);
+            HashMap<PsiElement, PsiFile> resolvedTranslationKeys = TranslationUtil.resolveTranslationKey(project, translationKey);
 
             if (resolvedTranslationKeys.isEmpty()) {
                 return null;
