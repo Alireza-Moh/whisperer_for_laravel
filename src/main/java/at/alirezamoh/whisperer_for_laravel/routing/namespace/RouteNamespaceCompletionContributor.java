@@ -42,11 +42,7 @@ public class RouteNamespaceCompletionContributor extends CompletionContributor {
                     PsiElement element = completionParameters.getPosition().getOriginalElement();
 
                     MethodReference method = MethodUtils.resolveMethodReference(element, 10);
-                    if (
-                        method != null
-                        && isNamespaceParam(method, element)
-                        && PhpClassUtils.isCorrectRelatedClass(method, element.getProject(), RouteUtils.getRouteNamespacesAsArray("\\Illuminate\\Routing\\RouteRegistrar"))
-                    )
+                    if (isInsideCorrectMethod(method, element))
                     {
                         for (String namespace : getAllNamespaces(completionResultSet, element)) {
                             completionResultSet.addElement(
@@ -59,6 +55,30 @@ public class RouteNamespaceCompletionContributor extends CompletionContributor {
         );
     }
 
+    /**
+     * Check if the method is a valid route method for namespace completion and if the element is inside the correct method
+     * @param method The method reference
+     * @param element The PSI element position
+     * @return True or false
+     */
+    private boolean isInsideCorrectMethod(MethodReference method, PsiElement element) {
+        boolean isCorrectClass = PhpClassUtils.isCorrectRelatedClass(
+            method,
+            element.getProject(),
+            RouteUtils.getRouteNamespacesAsArray("\\Illuminate\\Routing\\RouteRegistrar")
+        );
+
+        return method != null
+            && isNamespaceParam(method, element)
+            && isCorrectClass;
+    }
+
+    /**
+     * Get all namespaces from the project that match the prefix matcher
+     * @param completionResultSet The completion result set
+     * @param element The PSI element position
+     * @return A list of namespaces
+     */
     private static @NotNull Set<String> getAllNamespaces(@NotNull CompletionResultSet completionResultSet, PsiElement element) {
         Set<String> namespaces = new HashSet<>();
         PhpIndex.getInstance(element.getProject()).getAllClassFqns(completionResultSet.getPrefixMatcher()).forEach(fqn -> {
