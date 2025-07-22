@@ -56,6 +56,7 @@
         <fileBasedIndex implementation="at.alirezamoh.whisperer_for_laravel.indexes.ServiceProviderIndex"/>
         <fileBasedIndex implementation="at.alirezamoh.whisperer_for_laravel.indexes.ModelFactoryIndex"/>
         <fileBasedIndex implementation="at.alirezamoh.whisperer_for_laravel.indexes.PolicyIndex"/>
+        <fileBasedIndex implementation="at.alirezamoh.whisperer_for_laravel.indexes.TranslationIndex"/>
 
         <projectConfigurable parentId="language" instance="at.alirezamoh.whisperer_for_laravel.settings.SettingConfigurable" id="whisperer_for_laravel_settings" displayName="Whisperer For Laravel" nonDefaultProject="true"/>
         <projectService serviceImplementation="at.alirezamoh.whisperer_for_laravel.settings.SettingsState"/>
@@ -72,6 +73,7 @@
         <psi.referenceContributor language="PHP" implementation="at.alirezamoh.whisperer_for_laravel.routing.routeAction.RouteActionReferenceContributor"/>
         <psi.referenceContributor language="PHP" implementation="at.alirezamoh.whisperer_for_laravel.routing.resourceRoute.ResourceRouteReferenceContributor"/>
         <psi.referenceContributor language="PHP" implementation="at.alirezamoh.whisperer_for_laravel.packages.livewire.validation.LivewirePropertyInValidationReferenceContributor"/>
+        <psi.referenceContributor language="PHP" implementation="at.alirezamoh.whisperer_for_laravel.translation.TranslationReferenceContributor"/>
 
         <completion.contributor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.request.validation.RuleValidationCompletionContributor"/>
         <completion.contributor language="XML" implementationClass="at.alirezamoh.whisperer_for_laravel.blade.component.BladeXComponentCompletionContributor"/>
@@ -88,6 +90,7 @@
         <completion.contributor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.packages.livewire.validation.RequestMessageForLivewirePropertyCompletionContributor"/>
         <completion.contributor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.eloquent.factroy.EloquentFieldInFactoryCompletionContributor"/>
         <completion.contributor language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.eloquent.resource.EloquentFieldInResourceCompletionContributor"/>
+        <completion.contributor language="any" implementationClass="at.alirezamoh.whisperer_for_laravel.translation.TranslationInBladeCompletionContributor"/>
 
         <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.blade.component.BladeXComponentGotoDeclarationHandler"/>
         <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.request.validation.RuleValidationGotoDeclarationHandler"/>
@@ -98,6 +101,7 @@
         <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.packages.livewire.property.LivewirePropertyGotoDeclarationHandler"/>
         <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.packages.livewire.property.dataBinding.LivewirePropertyDataBindingGoToDeclarationHandler"/>
         <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.packages.livewire.actions.LivewireActionDataBindingGoToDeclarationHandler"/>
+        <gotoDeclarationHandler implementation="at.alirezamoh.whisperer_for_laravel.translation.TranslationInBladeGotoDeclarationHandler"/>
 
         <codeInsight.template.postfixTemplateProvider language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.postfixes.dd.DDPostfixProvider" />
 
@@ -109,6 +113,8 @@
         <annotator language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.packages.inertia.annotator.InertiaPageExistenceAnnotator"/>
         <annotator language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.routing.controller.annotator.ControllerMethodExistenceAnnotator"/>
         <annotator language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.routing.routeName.annotator.RouteExistenceAnnotator"/>
+        <annotator language="PHP" order="first" implementationClass="at.alirezamoh.whisperer_for_laravel.translation.annotator.TranslationKeyExistenceAnnotator"/>
+        <annotator language="" order="first" implementationClass="at.alirezamoh.whisperer_for_laravel.translation.annotator.TranslationKeyInBladeExistenceAnnotator"/>
 
         <codeInsight.lineMarkerProvider language="PHP" implementationClass="at.alirezamoh.whisperer_for_laravel.eloquent.EloquentModelLineMarker"/>
         <lang.inspectionSuppressor language="XML" implementationClass="at.alirezamoh.whisperer_for_laravel.packages.livewire.htmlDirectives.supressor.LivewireHtmlDirectiveSuppressor" />

@@ -34,6 +34,7 @@ public class SettingsComponent {
     /*==============Components for laravel inspections & suppressions==============*/
     private final JBCheckBox suppressRealTimeFacadeWarningsCheckbox = new JBCheckBox();
     private final JBCheckBox routeNotFoundAnnotatorWarningCheckbox = new JBCheckBox();
+    private final JBCheckBox translationKeyNotFoundAnnotatorWarningCheckbox = new JBCheckBox();
 
     public SettingsComponent() {
         initializeTabs();
@@ -107,6 +108,14 @@ public class SettingsComponent {
 
     public void setRouteNotFoundAnnotatorWarningCheckbox(boolean suppress) {
         this.routeNotFoundAnnotatorWarningCheckbox.setSelected(suppress);
+    }
+
+    public boolean getTranslationKeyNotFoundAnnotatorWarningCheckbox() {
+        return translationKeyNotFoundAnnotatorWarningCheckbox.isSelected();
+    }
+
+    public void setTranslationKeyNotFoundAnnotatorWarningCheckbox(boolean suppress) {
+        this.translationKeyNotFoundAnnotatorWarningCheckbox.setSelected(suppress);
     }
 
     /**
@@ -185,6 +194,11 @@ public class SettingsComponent {
         routePanel.add(routeNotFoundAnnotatorWarningCheckbox);
         routePanel.add(new JBLabel("Enable annotation for undefined route names: 'Route name not found'"));
         checkboxPanel.add(routePanel);
+
+        JPanel translationPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        routePanel.add(translationKeyNotFoundAnnotatorWarningCheckbox);
+        routePanel.add(new JBLabel("Enable annotation for undefined translation key: 'Translation key not found'"));
+        checkboxPanel.add(translationPanel);
 
         FormBuilder builder = FormBuilder.createFormBuilder()
             .addComponent(checkboxPanel);
