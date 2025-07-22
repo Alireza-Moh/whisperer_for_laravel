@@ -28,6 +28,13 @@ public class ServiceProviderDataExternalizer implements DataExternalizer<Service
             dataOutput.writeUTF(entry.getKey());
             dataOutput.writeUTF(entry.getValue());
         }
+
+        Map<String, String> translationFiles = serviceProvider.getTranslationKeys();
+        dataOutput.writeInt(translationFiles.size());
+        for (Map.Entry<String, String> entry : translationFiles.entrySet()) {
+            dataOutput.writeUTF(entry.getKey());
+            dataOutput.writeUTF(entry.getValue());
+        }
     }
 
     @Override
@@ -48,6 +55,14 @@ public class ServiceProviderDataExternalizer implements DataExternalizer<Service
             bladeFiles.put(key, value);
         }
 
-        return new ServiceProvider(configKeys, bladeFiles);
+        int translationFilesSize = dataInput.readInt();
+        Map<String, String> translationFiles = new HashMap<>(translationFilesSize);
+        for (int i = 0; i < translationFilesSize; i++) {
+            String key = dataInput.readUTF();
+            String value = dataInput.readUTF();
+            translationFiles.put(key, value);
+        }
+
+        return new ServiceProvider(configKeys, bladeFiles, translationFiles);
     }
 }

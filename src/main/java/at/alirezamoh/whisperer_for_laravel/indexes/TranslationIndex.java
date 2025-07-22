@@ -1,11 +1,9 @@
 package at.alirezamoh.whisperer_for_laravel.indexes;
 
 
-import at.alirezamoh.whisperer_for_laravel.config.visitors.ArrayReturnPsiRecursiveVisitor;
-import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
-import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import at.alirezamoh.whisperer_for_laravel.translation.util.TranslationJsonFlattener;
+import at.alirezamoh.whisperer_for_laravel.translation.util.TranslationUtil;
 import com.intellij.json.psi.JsonFile;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectUtil;
@@ -26,7 +24,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.regex.Pattern;
 
 public class TranslationIndex extends FileBasedIndexExtension<String, String> {
     public static final ID<String, String> INDEX_ID = ID.create("whisperer_for_laravel.translations");
@@ -47,23 +44,27 @@ public class TranslationIndex extends FileBasedIndexExtension<String, String> {
 
             PsiFile file = inputData.getPsiFile();
             if (file instanceof JsonFile jsonFile) {
-                Map<String, String> variants = TranslationJsonFlattener.parseJsonTranslation(jsonFile);
+                Map<String, String> variants = TranslationJsonFlattener.parseJsonTranslation(jsonFile, false, "");
 
                 return Objects.requireNonNullElse(variants, Collections.emptyMap());
-
             }
 
             if (!(file instanceof PhpFile)) {
                 return Collections.emptyMap();
             }
 
-            String dottedPath = buildParentPathForTranslationKey(inputData.getFile(), project);
+            String dottedPath = TranslationUtil.buildParentPathForTranslationKey(
+                inputData.getFile(),
+                project,
+                false,
+                ""
+            );
             if (dottedPath.isEmpty()) {
                 return Collections.emptyMap();
             }
 
             Map<String, String> variants = new HashMap<>();
-            iterateOverFileChildren(dottedPath, file, variants);
+            TranslationUtil.iterateOverFileChildren(dottedPath, file, variants);
 
             return variants;
         };
@@ -108,7 +109,7 @@ public class TranslationIndex extends FileBasedIndexExtension<String, String> {
                 return false;
             }
 
-            return isTranslationFile(file, project);
+            return isTranslationFile(file);
         };
     }
 
@@ -122,71 +123,9 @@ public class TranslationIndex extends FileBasedIndexExtension<String, String> {
         return true;
     }
 
-    private boolean isTranslationFile(VirtualFile file, Project project) {
+    private boolean isTranslationFile(VirtualFile file) {
         String filePath = file.getPath();
 
         return filePath.contains("/resources/lang/") || filePath.contains("/lang/");
-    }
-
-    public static String buildParentPathForTranslationKey(VirtualFile file, Project project) {
-        String basePath = project.getBasePath();
-        if (basePath == null) {
-            return "";
-        }
-
-        SettingsState settingsState = SettingsState.getInstance(project);
-        if (!settingsState.isProjectDirectoryEmpty()) {
-            basePath = basePath + "/" + StrUtils.addSlashes(settingsState.getProjectDirectoryPath(), true, true);
-        }
-
-        String fullPath = file.getPath();
-
-        fullPath = fullPath.replaceFirst("(?i)^" + Pattern.quote(basePath), "");
-
-        while (fullPath.startsWith("/")) {
-            fullPath = fullPath.substring(1);
-        }
-
-        // Expect path like: resources/lang/en/messages.php
-        // or resources/lang/en.json or lang/en/messages.php or lang/en.json
-        // Strip up to and including "/lang/"
-        int langIndex = fullPath.indexOf("lang/");
-        if (langIndex != -1) {
-            fullPath = fullPath.substring(langIndex + "lang/".length());
-        } else {
-            // Also check for "resources/lang/" directly
-            int resourcesLangIndex = fullPath.indexOf("resources/lang/");
-            if (resourcesLangIndex != -1) {
-                fullPath = fullPath.substring(resourcesLangIndex + "resources/lang/".length());
-            }
-        }
-
-        String[] parts = fullPath.split("/");
-
-        if (parts.length < 2) {
-            return "";
-        }
-
-        if (fullPath.endsWith(".json")) {
-            return "";
-        }
-
-        // Remove the language directory (like "en/") part
-        fullPath = fullPath.substring(fullPath.indexOf("/") + 1); // remove lang prefix
-
-        // Remove .php extension
-        if (fullPath.endsWith(".php")) {
-            fullPath = fullPath.substring(0, fullPath.length() - 4);
-        }
-
-        // Convert slashes to dots for nested files
-        return fullPath.replace('/', '.');
-    }
-
-    private void iterateOverFileChildren(String dirName, PsiFile configFile, Map<String, String> variants) {
-        ArrayReturnPsiRecursiveVisitor visitor = new ArrayReturnPsiRecursiveVisitor(dirName);
-        configFile.acceptChildren(visitor);
-
-        variants.putAll(visitor.getVariants());
     }
 }

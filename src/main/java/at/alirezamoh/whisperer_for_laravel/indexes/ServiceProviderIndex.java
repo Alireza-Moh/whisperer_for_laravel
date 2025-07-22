@@ -10,6 +10,12 @@ import at.alirezamoh.whisperer_for_laravel.indexes.dataExternalizeres.ServicePro
 import at.alirezamoh.whisperer_for_laravel.indexes.dtos.ServiceProvider;
 import at.alirezamoh.whisperer_for_laravel.support.utils.LaravelPaths;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
+import at.alirezamoh.whisperer_for_laravel.translation.util.TranslationJsonFlattener;
+import at.alirezamoh.whisperer_for_laravel.translation.util.TranslationKeyCollector;
+import at.alirezamoh.whisperer_for_laravel.translation.util.TranslationModule;
+import at.alirezamoh.whisperer_for_laravel.translation.util.TranslationUtil;
+import at.alirezamoh.whisperer_for_laravel.translation.visitor.TranslationModuleServiceProviderVisitor;
+import com.intellij.json.psi.JsonFile;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
@@ -26,7 +32,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 
 public class ServiceProviderIndex extends FileBasedIndexExtension<String, ServiceProvider> {
-    public static final ID<String, ServiceProvider> INDEX_ID = ID.create("whisperer_for_laravel.service_providers");
+    public static final ID<String, ServiceProvider> INDEX_ID = ID.create("whisperer_for_laravel.service_providrters");
 
     @Override
     public @NotNull ID<String, ServiceProvider> getName() {
@@ -54,7 +60,8 @@ public class ServiceProviderIndex extends FileBasedIndexExtension<String, Servic
                 if (shouldScanFile(phpClass)) {
                     ServiceProvider serviceProvider = new ServiceProvider(
                         collectConfigKeys(phpClass, project),
-                        collectBladeFiles(phpClass, project)
+                        collectBladeFiles(phpClass, project),
+                        collectTranslationKeys(phpClass, project)
                     );
 
                     result.put(phpClass.getFQN(), serviceProvider);
@@ -77,7 +84,7 @@ public class ServiceProviderIndex extends FileBasedIndexExtension<String, Servic
 
     @Override
     public int getVersion() {
-        return 2;
+        return 3;
     }
 
     @Override
@@ -164,5 +171,54 @@ public class ServiceProviderIndex extends FileBasedIndexExtension<String, Servic
         }
 
         return bladeFiles;
+    }
+
+    private Map<String, String> collectTranslationKeys(PhpClass serviceProvider, Project project) {
+        TranslationModuleServiceProviderVisitor translationModuleServiceProviderVisitor = new TranslationModuleServiceProviderVisitor(project);
+        Map<String, String> translationKeys = new HashMap<>();
+
+        serviceProvider.acceptChildren(translationModuleServiceProviderVisitor);
+        List<TranslationModule> translationModules = translationModuleServiceProviderVisitor.getTranslationFilesInModule();
+
+        if (!translationModules.isEmpty()) {
+            for (TranslationModule translationModule : translationModules) {
+                List<PsiFile> foundedFiles = TranslationKeyCollector.collectTranslationFilesFromDir(translationModule.translationDir());
+
+                for (PsiFile file : foundedFiles) {
+                    Map<String, String> variants = new HashMap<>();
+                    if (file instanceof JsonFile jsonFile) {
+                        Map<String, String> foundedKeys = TranslationJsonFlattener.parseJsonTranslation(
+                            jsonFile,
+                            true,
+                            translationModule.translationNamespace()
+                        );
+                        if (foundedKeys != null) {
+                            translationKeys.putAll(foundedKeys);
+                        }
+                    }
+
+                    if (file instanceof PhpFile) {
+                        Map<String, String> phpVariants = new HashMap<>();
+                        VirtualFile translationFile = file.getVirtualFile();
+                        String dottedPath = TranslationUtil.buildParentPathForTranslationKey(
+                            translationFile,
+                            project,
+                            true,
+                            translationModule.translationNamespace()
+                        );
+                        if (!dottedPath.isEmpty()) {
+                            TranslationUtil.iterateOverFileChildren(dottedPath, file, phpVariants);
+
+                            for (Map.Entry<String, String> transEntry : phpVariants.entrySet()) {
+                                translationKeys.put(transEntry.getKey(), transEntry.getValue() + "|" + translationFile.getPath());
+                            }
+                        }
+                    }
+
+                }
+            }
+        }
+
+        return translationKeys;
     }
 }
