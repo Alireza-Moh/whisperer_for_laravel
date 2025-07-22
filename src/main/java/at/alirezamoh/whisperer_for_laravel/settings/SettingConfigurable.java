@@ -46,6 +46,7 @@ public class SettingConfigurable implements Configurable {
         String currentInertiaPageRootPath = settingsComponent.getInertiaPageRootPath();
         boolean currentSuppressRealTimeFacadeWarnings = settingsComponent.suppressRealTimeFacadeWarnings();
         boolean currentRouteNotFoundInspectionWarning = settingsComponent.getRouteNotFoundAnnotatorWarningCheckbox();
+        boolean currentTranslationKeyNotFoundInspectionWarning = settingsComponent.getTranslationKeyNotFoundAnnotatorWarningCheckbox();
 
         String storedProjectType = settingsState.getProjectType();
         String storedProjectRootDirectory = settingsState.getProjectDirectoryPath();
@@ -54,6 +55,7 @@ public class SettingConfigurable implements Configurable {
         String storedInertiaPageRootPath = settingsState.getInertiaPageRootPath();
         boolean storedSuppressRealTimeFacadeWarnings = settingsState.isSuppressRealTimeFacadeWarnings();
         boolean storedRouteNotFoundInspectionWarning = settingsState.isRouteNotFoundAnnotatorWarning();
+        boolean storedTranslationKeyNotFoundInspectionWarning = settingsState.isTranslationKeyNotFoundAnnotatorWarning();
 
         return !Objects.equals(currentProjectType, storedProjectType)
             || !Objects.equals(currentProjectRootDirectory, storedProjectRootDirectory)
@@ -61,7 +63,8 @@ public class SettingConfigurable implements Configurable {
             || !Objects.equals(currentModuleSrcDirectory, storedModuleSrcDirectory)
             || !Objects.equals(currentInertiaPageRootPath, storedInertiaPageRootPath)
             || !Objects.equals(currentSuppressRealTimeFacadeWarnings, storedSuppressRealTimeFacadeWarnings)
-            || !Objects.equals(currentRouteNotFoundInspectionWarning, storedRouteNotFoundInspectionWarning);
+            || !Objects.equals(currentRouteNotFoundInspectionWarning, storedRouteNotFoundInspectionWarning)
+            || !Objects.equals(currentTranslationKeyNotFoundInspectionWarning, storedTranslationKeyNotFoundInspectionWarning);
     }
 
     @Override
@@ -75,6 +78,7 @@ public class SettingConfigurable implements Configurable {
         settingsState.setInertiaPageRootPath(settingsComponent.getInertiaPageRootPath());
         settingsState.setSuppressRealTimeFacadeWarnings(settingsComponent.suppressRealTimeFacadeWarnings());
         settingsState.setRouteNotFoundAnnotatorWarning(settingsComponent.getRouteNotFoundAnnotatorWarningCheckbox());
+        settingsState.setTranslationKeyNotFoundAnnotatorWarning(settingsComponent.getTranslationKeyNotFoundAnnotatorWarningCheckbox());
     }
 
     @Override
@@ -86,6 +90,7 @@ public class SettingConfigurable implements Configurable {
         settingsComponent.setInertiaPageRootPath(settingsState.getInertiaPageRootPath());
         settingsComponent.setSuppressRealTimeFacadeWarnings(settingsState.isSuppressRealTimeFacadeWarnings());
         settingsComponent.setRouteNotFoundAnnotatorWarningCheckbox(settingsState.isRouteNotFoundAnnotatorWarning());
+        settingsComponent.setTranslationKeyNotFoundAnnotatorWarningCheckbox(settingsState.isTranslationKeyNotFoundAnnotatorWarning());
     }
 
     @Override

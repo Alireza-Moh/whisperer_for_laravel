@@ -2,19 +2,20 @@ package at.alirezamoh.whisperer_for_laravel.translation.annotator;
 
 import at.alirezamoh.whisperer_for_laravel.settings.SettingsState;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
-import at.alirezamoh.whisperer_for_laravel.translation.util.TranslationUtil;
+import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
 import com.intellij.lang.annotation.HighlightSeverity;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
-import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
+import com.jetbrains.php.blade.psi.BladePsiDirective;
+import com.jetbrains.php.blade.psi.BladeTokenTypes;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * Annotator that checks if a translation key exists.
  */
-public class TranslationKeyExistenceAnnotator implements Annotator {
+public class TranslationKeyInBladeExistenceAnnotator implements Annotator {
     /**
      * Inspects the given PSI element and adds a warning annotation if the translation key does not exist
      *
@@ -33,21 +34,23 @@ public class TranslationKeyExistenceAnnotator implements Annotator {
             return;
         }
 
-        if (TranslationUtil.isInsideBladeLangDirective(psiElement, project)) {
+        PsiElement parent = PsiElementUtils.getNthParent(psiElement, 2);
+        if (psiElement.getNode().getElementType() != BladeTokenTypes.DIRECTIVE_PARAMETER_CONTENT || parent == null) {
             return;
         }
 
-        if (!(psiElement instanceof StringLiteralExpression stringLiteralExpression)) {
+        if (!(parent instanceof BladePsiDirective bladePsiDirective)) {
             return;
         }
 
-        if (!TranslationUtil.isInsideCorrectMethod(psiElement, project)) {
+        String directiveName = bladePsiDirective.getName();
+        if (directiveName == null || !directiveName.equals("@lang")) {
             return;
         }
 
-        if (TranslationAnnotatorUtil.doesTranslationKeyNotExists(stringLiteralExpression, project)) {
+        if (TranslationAnnotatorUtil.doesTranslationKeyNotExists(psiElement, project)) {
             annotationHolder.newAnnotation(HighlightSeverity.WARNING, "Translation key not found")
-                .range(stringLiteralExpression.getTextRange())
+                .range(psiElement.getTextRange())
                 .create();
         }
     }
