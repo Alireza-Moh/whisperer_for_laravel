@@ -41,8 +41,7 @@ public class RouteNamespaceCompletionContributor extends CompletionContributor {
                 protected void addCompletions(@NotNull CompletionParameters completionParameters, @NotNull ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
                     PsiElement element = completionParameters.getPosition().getOriginalElement();
 
-                    MethodReference method = MethodUtils.resolveMethodReference(element, 10);
-                    if (isInsideCorrectMethod(method, element))
+                    if (isInsideCorrectMethod(element))
                     {
                         for (String namespace : getAllNamespaces(completionResultSet, element)) {
                             completionResultSet.addElement(
@@ -57,20 +56,22 @@ public class RouteNamespaceCompletionContributor extends CompletionContributor {
 
     /**
      * Check if the method is a valid route method for namespace completion and if the element is inside the correct method
-     * @param method The method reference
      * @param element The PSI element position
      * @return True or false
      */
-    private boolean isInsideCorrectMethod(MethodReference method, PsiElement element) {
+    private boolean isInsideCorrectMethod(PsiElement element) {
+        MethodReference method = MethodUtils.resolveMethodReference(element, 5);
+        if (method == null) {
+            return false;
+        }
+
         boolean isCorrectClass = PhpClassUtils.isCorrectRelatedClass(
             method,
             element.getProject(),
             RouteUtils.getRouteNamespacesAsArray("\\Illuminate\\Routing\\RouteRegistrar")
         );
 
-        return method != null
-            && isNamespaceParam(method, element)
-            && isCorrectClass;
+        return isNamespaceParam(method, element) && isCorrectClass;
     }
 
     /**
