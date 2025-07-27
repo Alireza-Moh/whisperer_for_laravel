@@ -6,7 +6,6 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
-import com.intellij.psi.util.PsiTreeUtil;
 import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
@@ -162,7 +161,7 @@ public class RouteActionReference extends PsiReferenceBase<PsiElement> implement
     private void collectPhpClasses(PsiDirectory directory, Map<String, PsiElement> elements) {
         for (PsiElement element : directory.getChildren()) {
             if (element instanceof PhpFile controllerFile) {
-                for (PhpClass phpClass : PsiTreeUtil.findChildrenOfType(controllerFile, PhpClass.class)) {
+                for (PhpClass phpClass : PhpClassUtils.getPhpClassesFromFile(controllerFile)) {
                     String fqn = phpClass.getPresentableFQN().replace("/", "\\");
                     for (Method method : PhpClassUtils.getClassPublicMethods(phpClass, false)) {
                         String methodName = method.getName();
