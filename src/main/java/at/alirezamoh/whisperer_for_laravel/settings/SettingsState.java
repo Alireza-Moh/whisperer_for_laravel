@@ -56,6 +56,11 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
      */
     private boolean routeNotFoundAnnotatorWarning;
 
+    /**
+     * Whether to inspect for translation key: 'Translation key not found'
+     */
+    private boolean translationKeyNotFoundAnnotatorWarning;
+
     public static SettingsState getInstance(@NotNull Project foundedProject) {
         project = foundedProject;
         return foundedProject.getService(SettingsState.class);
@@ -134,6 +139,14 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
 
     public void setRouteNotFoundAnnotatorWarning(boolean routeNotFoundAnnotatorWarning) {
         this.routeNotFoundAnnotatorWarning = routeNotFoundAnnotatorWarning;
+    }
+
+    public boolean isTranslationKeyNotFoundAnnotatorWarning() {
+        return translationKeyNotFoundAnnotatorWarning;
+    }
+
+    public void setTranslationKeyNotFoundAnnotatorWarning(boolean translationKeyNotFoundAnnotatorWarning) {
+        this.translationKeyNotFoundAnnotatorWarning = translationKeyNotFoundAnnotatorWarning;
     }
 
     public boolean isModuleApplication() {

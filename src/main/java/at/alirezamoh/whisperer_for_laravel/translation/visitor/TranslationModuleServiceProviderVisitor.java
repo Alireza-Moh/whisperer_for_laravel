@@ -1,11 +1,12 @@
-package at.alirezamoh.whisperer_for_laravel.config.visitors;
+package at.alirezamoh.whisperer_for_laravel.translation.visitor;
 
-import at.alirezamoh.whisperer_for_laravel.config.util.ConfigModule;
 import at.alirezamoh.whisperer_for_laravel.support.applicationModules.visitors.BaseServiceProviderVisitor;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
+import at.alirezamoh.whisperer_for_laravel.translation.util.TranslationModule;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
@@ -21,18 +22,18 @@ import java.util.List;
 /**
  * Visits module service provider to collect config keys in a Laravel project
  */
-public class ConfigModuleServiceProviderVisitor extends BaseServiceProviderVisitor {
+public class TranslationModuleServiceProviderVisitor extends BaseServiceProviderVisitor {
     /**
      * The name of the method to look for in the service provider
      */
-    private final String MERGE_CONFIG_METHOD = "mergeConfigFrom";
+    private final String TARGET_TRANSLATION_METHOD = "loadTranslationsFrom";
 
-    private List<ConfigModule> configFilesInModule = new ArrayList<>();
+    private List<TranslationModule> translationFilesInModule = new ArrayList<>();
 
     /**
      * @param project The current project
      */
-    public ConfigModuleServiceProviderVisitor(Project project) {
+    public TranslationModuleServiceProviderVisitor(Project project) {
         super(project);
     }
 
@@ -47,15 +48,15 @@ public class ConfigModuleServiceProviderVisitor extends BaseServiceProviderVisit
     public void visitElement(@NotNull PsiElement element) {
         if (element instanceof MethodReference methodReference) {
             String methodName = methodReference.getName();
-            if (methodName != null && methodName.equals(MERGE_CONFIG_METHOD)) {
+            if (methodName != null && methodName.equals(TARGET_TRANSLATION_METHOD)) {
                 initParameters(methodReference);
             }
         }
         super.visitElement(element);
     }
 
-    public List<ConfigModule> getConfigFilesInModule() {
-        return configFilesInModule;
+    public List<TranslationModule> getTranslationFilesInModule() {
+        return translationFilesInModule;
     }
 
     /**
@@ -63,8 +64,8 @@ public class ConfigModuleServiceProviderVisitor extends BaseServiceProviderVisit
      * @param method method reference being visited
      */
     private void initParameters(MethodReference method) {
-        String configKeyIdentifier = PsiElementUtils.getMethodParameterAt(method, 1);
-        if (configKeyIdentifier == null) {
+        String translationNamespace = PsiElementUtils.getMethodParameterAt(method, 1);
+        if (translationNamespace == null) {
             return;
         }
 
@@ -73,8 +74,8 @@ public class ConfigModuleServiceProviderVisitor extends BaseServiceProviderVisit
             return;
         }
 
-        PsiElement configFilePathParameter = parameters.getParameter(0);
-        if (!(configFilePathParameter instanceof ConcatenationExpressionImpl concatenationExpression)) {
+        PsiElement namespaceParameter = parameters.getParameter(0);
+        if (!(namespaceParameter instanceof ConcatenationExpressionImpl concatenationExpression)) {
             return;
         }
 
@@ -86,17 +87,16 @@ public class ConfigModuleServiceProviderVisitor extends BaseServiceProviderVisit
 
         VirtualFile parentDir = virtualFile.getParent();
         PsiElement rightOperand = concatenationExpression.getRightOperand();
-        if (rightOperand instanceof StringLiteralExpression relativePathConfigFilePath && parentDir != null) {
+        if (rightOperand instanceof StringLiteralExpression relativePathViewDirPath && parentDir != null) {
+
             VirtualFile resolvedVirtualFile = parentDir.findFileByRelativePath(
-                StrUtils.removeQuotes(relativePathConfigFilePath.getText())
+                StrUtils.removeQuotes(relativePathViewDirPath.getText())
             );
 
-            if (resolvedVirtualFile != null) {
-                PsiFile configFile = PsiManager.getInstance(project).findFile(resolvedVirtualFile);
-                if (configFile != null) {
-                    configFilesInModule.add(
-                        new ConfigModule(configFile, configKeyIdentifier)
-                    );
+            if (resolvedVirtualFile != null && resolvedVirtualFile.isDirectory()) {
+                PsiDirectory psiDirectory = PsiManager.getInstance(project).findDirectory(resolvedVirtualFile);
+                if (psiDirectory != null) {
+                    translationFilesInModule.add(new TranslationModule(psiDirectory, translationNamespace));
                 }
             }
         }

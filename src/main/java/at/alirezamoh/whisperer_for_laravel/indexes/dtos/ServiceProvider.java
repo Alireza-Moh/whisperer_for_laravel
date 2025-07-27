@@ -7,9 +7,12 @@ public class ServiceProvider {
 
     private Map<String, String> bladeFiles;
 
-    public ServiceProvider(Map<String, String> configKeys, Map<String, String> bladeFiles) {
+    private Map<String, String> translationFiles;
+
+    public ServiceProvider(Map<String, String> configKeys, Map<String, String> bladeFiles, Map<String, String> translationFiles) {
         this.configKeys = configKeys;
         this.bladeFiles = bladeFiles;
+        this.translationFiles = translationFiles;
     }
 
     public Map<String, String> getConfigKeys() {
@@ -20,6 +23,10 @@ public class ServiceProvider {
         return bladeFiles;
     }
 
+    public Map<String, String> getTranslationKeys() {
+        return translationFiles;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -28,13 +35,16 @@ public class ServiceProvider {
         ServiceProvider that = (ServiceProvider) o;
 
         if (!configKeys.equals(that.configKeys)) return false;
-        return bladeFiles.equals(that.bladeFiles);
+        if (!bladeFiles.equals(that.bladeFiles)) return false;
+        return translationFiles.equals(that.translationFiles);
     }
 
     @Override
     public int hashCode() {
         int result = configKeys != null ? configKeys.hashCode() : 0;
         result = 31 * result + (bladeFiles != null ? bladeFiles.hashCode() : 0);
+        result = 31 * result + (translationFiles != null ? translationFiles.hashCode() : 0);
+
         return result;
     }
 
@@ -43,6 +53,7 @@ public class ServiceProvider {
         return "ServiceProvider{" +
             "configKeys=" + configKeys +
             ", bladeFiles=" + bladeFiles +
+            ", translationFiles=" + translationFiles +
             '}';
     }
 }

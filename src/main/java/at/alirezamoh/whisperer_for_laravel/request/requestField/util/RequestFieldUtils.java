@@ -230,30 +230,36 @@ final public class RequestFieldUtils {
      */
     public static @Nullable PhpClassImpl resolvePhpClass(PsiElement element, Project project) {
         if (element instanceof VariableImpl variable) {
-            PhpClassImpl phpClass = resolveCachedRequestClass(variable, project);
+            PhpClassImpl cachedPhpClass = resolveCachedRequestClass(variable, project);
 
-            if (phpClass == null && variable.isValid()) {
+            if (cachedPhpClass == null && variable.isValid()) {
                 try {
                     Query<PsiReference> references = ReferencesSearch.search(variable.getOriginalElement(), GlobalSearchScope.projectScope(project), false);
 
-                    for (PsiReference reference : references) {
+                    PhpClassImpl[] resultHolder = new PhpClassImpl[1];
+                    references.forEach(reference -> {
                         PsiElement parent = reference.getElement().getParent();
                         if (parent instanceof AssignmentExpression assignmentExpression) {
                             PsiElement expression = assignmentExpression.getValue();
 
                             if (expression instanceof NewExpression newExpression) {
-                                return PhpClassUtils.getClassFromTypedElement(newExpression.getClassReference(), project);
+                                resultHolder[0] = PhpClassUtils.getClassFromTypedElement(newExpression.getClassReference(), project);
+                                return false;
                             } else if (expression instanceof MethodReference methodReference) {
-                                return PhpClassUtils.getClassFromTypedElement(methodReference.getClassReference(), project);
+                                resultHolder[0] = PhpClassUtils.getClassFromTypedElement(methodReference.getClassReference(), project);
+                                return false;
                             }
                         }
-                    }
+                        return true;
+                    });
+
+                    return resultHolder[0];
                 } catch (AssertionError ignored) {
                     return null;
                 }
             }
 
-            return phpClass;
+            return cachedPhpClass;
         } else if (element instanceof MethodReference methodRef) {
             return PhpClassUtils.getClassFromTypedElement(methodRef.getClassReference(), project);
         }

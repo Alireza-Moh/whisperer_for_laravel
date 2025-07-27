@@ -42,6 +42,10 @@ public class LaravelStartupActivity implements ProjectActivity {
             if (!settingsState.isRouteNotFoundAnnotatorWarning()) {
                 settingsState.setRouteNotFoundAnnotatorWarning(true);
             }
+
+            if (!settingsState.isTranslationKeyNotFoundAnnotatorWarning()) {
+                settingsState.setTranslationKeyNotFoundAnnotatorWarning(true);
+            }
         }
 
         return Unit.INSTANCE;

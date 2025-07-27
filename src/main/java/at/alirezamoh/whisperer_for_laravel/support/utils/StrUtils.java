@@ -113,12 +113,8 @@ public class StrUtils {
             return "";
         }
 
-        // Replace double forward slashes (//) with a single slash (/),
-        // but skip cases where // is part of a URL protocol like http:// or file://.
-        text = text.replaceAll("(?<!:)//+", "/");
-
-        // Replace double backslashes (\\) with a single backslash (\).
-        text = text.replaceAll("\\\\{2,}", "\\");
+        text = text.replaceAll("/+", "/");
+        text = text.replaceAll("\\\\+", "\\");
 
         return text;
     }

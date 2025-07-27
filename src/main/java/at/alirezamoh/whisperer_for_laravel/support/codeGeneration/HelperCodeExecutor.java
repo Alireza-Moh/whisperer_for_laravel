@@ -108,12 +108,11 @@ public class HelperCodeExecutor {
         if (indicator.isCanceled()) return;
         deletePluginVendorDir();
 
-        //TODO. This method should be replaced with a more robust solution
-        DumbService.getInstance(project).runReadActionInSmartMode(() -> {
+        DumbService.getInstance(project).waitForSmartMode();
+        ApplicationManager.getApplication().runReadAction(() -> {
             if (indicator.isCanceled()) return;
-            createModelsHelperCode();
 
-            if (indicator.isCanceled()) return;
+            createModelsHelperCode();
             createBaseQueryBuilderCode();
         });
 
