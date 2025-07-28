@@ -13,6 +13,8 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
 public class LaravelVersion implements StatusBarWidgetFactory {
+    private String versionText;
+
     @Override
     public @NotNull @NonNls String getId() {
         return "LaravelVersion";
@@ -27,12 +29,19 @@ public class LaravelVersion implements StatusBarWidgetFactory {
     public boolean isAvailable(@NotNull Project project) {
         return ApplicationManager
             .getApplication()
-            .runReadAction((Computable<Boolean>) () -> PluginUtils.isLaravelProject(project) && StatusBarUtil.laravelVersion(project) != null);
+            .runReadAction((Computable<Boolean>) () -> {
+                boolean isLaravelProject = PluginUtils.isLaravelProject(project);
+                if (isLaravelProject) {
+                    versionText = StatusBarUtil.laravelVersion(project);
+                    return versionText != null;
+                }
+                return false;
+            });
     }
 
     @Override
     public @NotNull StatusBarWidget createWidget(@NotNull Project project) {
-        return new LaravelVersionStatusBarWidget(project);
+        return new LaravelVersionStatusBarWidget(versionText);
     }
 
     @Override
