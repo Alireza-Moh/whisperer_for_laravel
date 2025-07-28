@@ -125,7 +125,11 @@ final public class RequestFieldUtils {
         return PsiTreeUtil.findChildrenOfType(method, MethodReference.class).stream()
             .filter(methodReference -> {
                 String methodName = methodReference.getName();
-                if (methodName == null || !VALIDATION_METHODS.contains(methodName)) {
+                if (methodName == null) {
+                    return false;
+                }
+
+                if (!VALIDATION_METHODS.contains(methodName)) {
                     return false;
                 }
 
