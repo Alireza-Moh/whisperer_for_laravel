@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class LaravelVersionStatusBarWidget implements StatusBarWidget  {
-    private String versionText = "";
+    private String versionText;
 
     public LaravelVersionStatusBarWidget(String versionText) {
         this.versionText = versionText != null ? "Laravel: " + versionText : "";
