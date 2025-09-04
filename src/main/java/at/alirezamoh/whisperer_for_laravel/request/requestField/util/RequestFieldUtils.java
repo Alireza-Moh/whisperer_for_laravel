@@ -5,6 +5,7 @@ import at.alirezamoh.whisperer_for_laravel.support.utils.PhpClassUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PsiElementUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.StrUtils;
 import com.intellij.codeInsight.completion.CompletionResultSet;
+import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
@@ -125,7 +126,11 @@ final public class RequestFieldUtils {
         return PsiTreeUtil.findChildrenOfType(method, MethodReference.class).stream()
             .filter(methodReference -> {
                 String methodName = methodReference.getName();
-                if (methodName == null || !VALIDATION_METHODS.contains(methodName)) {
+                if (methodName == null) {
+                    return false;
+                }
+
+                if (!VALIDATION_METHODS.contains(methodName)) {
                     return false;
                 }
 
@@ -214,8 +219,14 @@ final public class RequestFieldUtils {
         rules.forEach(rule -> {
             PsiElement key = rule.getKey();
             if (key instanceof StringLiteralExpression stringLiteral) {
+                LookupElementBuilder lookupElementBuilder = PsiElementUtils.buildSimpleLookupElement(
+                    StrUtils.removeQuotes(stringLiteral.getText())
+                );
                 resultSet.addElement(
-                    PsiElementUtils.buildSimpleLookupElement(StrUtils.removeQuotes(stringLiteral.getText()))
+                    PsiElementUtils.buildPrioritizedLookupElement(
+                        lookupElementBuilder,
+                        1000.0
+                    )
                 );
             }
         });

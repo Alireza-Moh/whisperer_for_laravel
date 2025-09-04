@@ -6,6 +6,7 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
+import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
@@ -57,28 +58,19 @@ public class RouteActionReference extends PsiReferenceBase<PsiElement> implement
         if (!targetAction.contains("@")) {
             return new ResolveResult[0];
         }
-
-        for (Map.Entry<String, PsiElement> entry : getAllControllersWithActions().entrySet()) {
-            if (entry.getKey().equals(targetAction)) {
-                return new ResolveResult[] { new PsiElementResolveResult(entry.getValue()) };
-            }
-        }
-
         String[] parts = targetAction.split("@");
 
         if (parts.length != 2) {
             return new ResolveResult[0];
         }
 
-        String fullController = parts[0].trim();
+        String controllerFqn = parts[0].trim();
         String methodName = parts[1].trim();
-        int lastIndex = fullController.lastIndexOf('\\');
-        String controllerName = (lastIndex != -1) ? fullController.substring(lastIndex + 1) : fullController;
-
-        Collection<PhpClass> controllers = PhpIndexUtils.getPhpClassesByName(controllerName, project);
+        Collection<PhpClass> foundedControllers = PhpIndex.getInstance(project).getClassesByFQN(controllerFqn);
         List<PsiElementResolveResult> foundedVariants = new ArrayList<>();
-        for (PhpClass controller : controllers) {
-            Method method = controller.findMethodByName(methodName);
+
+        for (PhpClass foundedController : foundedControllers) {
+            Method method = foundedController.findMethodByName(methodName);
 
             if (method != null) {
                 foundedVariants.add(new PsiElementResolveResult(method));

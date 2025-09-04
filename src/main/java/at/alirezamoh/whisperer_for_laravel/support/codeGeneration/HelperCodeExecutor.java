@@ -13,6 +13,8 @@ import at.alirezamoh.whisperer_for_laravel.support.notification.Notify;
 import at.alirezamoh.whisperer_for_laravel.support.utils.DirectoryUtils;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ReadAction;
+import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
@@ -109,7 +111,7 @@ public class HelperCodeExecutor {
         deletePluginVendorDir();
 
         DumbService.getInstance(project).waitForSmartMode();
-        ApplicationManager.getApplication().runReadAction(() -> {
+        ReadAction.run(() -> {
             if (indicator.isCanceled()) return;
 
             createModelsHelperCode();
@@ -127,7 +129,7 @@ public class HelperCodeExecutor {
      */
     private void deletePluginVendorDir() {
         ApplicationManager.getApplication().invokeAndWait(() -> {
-            ApplicationManager.getApplication().runWriteAction(() -> {
+            WriteAction.run(() -> {
                 PsiDirectory pluginVendor = PluginUtils.getPluginVendor(project);
                 if (pluginVendor != null) {
                     try {

@@ -3,6 +3,7 @@ package at.alirezamoh.whisperer_for_laravel.support.caching;
 import at.alirezamoh.whisperer_for_laravel.support.utils.PluginUtils;
 import com.google.gson.*;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Computable;
@@ -99,6 +100,7 @@ public final class ComposerPackageCacheManager {
     }
 
     private @NotNull Map<String, String> loadPackagesFromLock(VirtualFile lockFile) {
+        //TODO. use  ReadAction.compute() or  ReadAction.run() instead of ApplicationManager.getApplication().runReadAction()
         return ApplicationManager.getApplication().runReadAction((Computable<Map<String, String>>) () -> {
             Map<String, String> result = new HashMap<>();
             try {

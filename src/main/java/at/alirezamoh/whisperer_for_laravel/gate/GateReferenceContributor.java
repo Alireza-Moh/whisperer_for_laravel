@@ -128,6 +128,6 @@ public class GateReferenceContributor extends PsiReferenceContributor {
     private boolean isAuthMethod(MethodReference methodReference) {
         PhpClass phpClass = PhpClassUtils.getCachedContainingPhpClassFromMethodRef(methodReference);
 
-        return phpClass != null && phpClass.getFQN().equals(AUTH);
+        return phpClass != null && phpClass.isValid() && phpClass.getFQN().equals(AUTH);
     }
 }

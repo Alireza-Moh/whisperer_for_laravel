@@ -1,23 +1,14 @@
 package at.alirezamoh.whisperer_for_laravel.statusBar;
 
-import at.alirezamoh.whisperer_for_laravel.statusBar.util.StatusBarUtil;
-import com.intellij.openapi.application.ModalityState;
-import com.intellij.openapi.application.ReadAction;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.StatusBarWidget;
-import com.intellij.util.concurrency.AppExecutorUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class LaravelVersionStatusBarWidget implements StatusBarWidget  {
-    private String versionText = "";
+    private String versionText;
 
-    public LaravelVersionStatusBarWidget(Project project) {
-        ReadAction.nonBlocking(() -> StatusBarUtil.laravelVersion(project)).finishOnUiThread(ModalityState.nonModal(), version -> {
-            if (version != null) {
-                versionText = "Laravel: " + version;
-            }
-        }).submit(AppExecutorUtil.getAppExecutorService());
+    public LaravelVersionStatusBarWidget(String versionText) {
+        this.versionText = versionText != null ? "Laravel: " + versionText : "";
     }
 
     @Override
@@ -38,9 +29,11 @@ public class LaravelVersionStatusBarWidget implements StatusBarWidget  {
                 return 0;
             }
 
+
+
             @Override
             public @Nullable String getTooltipText() {
-                return "Displays the Laravel framework version for the project";
+                return "Laravel version";
             }
         };
     }

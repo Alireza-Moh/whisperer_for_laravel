@@ -196,8 +196,8 @@ public class SettingsComponent {
         checkboxPanel.add(routePanel);
 
         JPanel translationPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        routePanel.add(translationKeyNotFoundAnnotatorWarningCheckbox);
-        routePanel.add(new JBLabel("Enable annotation for undefined translation key: 'Translation key not found'"));
+        translationPanel.add(translationKeyNotFoundAnnotatorWarningCheckbox);
+        translationPanel.add(new JBLabel("Enable annotation for undefined translation key: 'Translation key not found'"));
         checkboxPanel.add(translationPanel);
 
         FormBuilder builder = FormBuilder.createFormBuilder()
