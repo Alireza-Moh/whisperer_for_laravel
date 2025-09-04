@@ -7,6 +7,9 @@
 
 Whisperer for Laravel is a PhpStorm plugin to help with Laravel development
 
+>This plugin is currently archived, since Laravel Idea is now available for free.  
+>It can be restored at any time upon request.
+
 [Documentation](https://alireza-moh.github.io/whisperer_for_laravel_docs/)
 
 [Plugin](https://plugins.jetbrains.com/plugin/26042-whisperer-for-laravel)
