@@ -39,7 +39,7 @@
     <depends>com.intellij.modules.json</depends>
     <depends>JavaScript</depends>
 
-    <version>1.5.0</version>
+    <version>1.5.1</version>
 
     <extensions defaultExtensionNs="com.intellij">
         <notificationGroup id="NotificationGroup" displayType="BALLOON"/>
